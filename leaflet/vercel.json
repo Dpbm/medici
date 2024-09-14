@@ -1,0 +1,14 @@
+{
+  "trailingSlash":false,
+  "rewrites":[
+    {
+      "source":"/api(.*)",
+      "destination":"/api/api.go"
+    }
+  ],
+  "build": {
+    "env": {
+      "GO_BUILD_FLAGS": "-ldflags '-s -w'"
+    }
+  }
+}
