@@ -7,3 +7,11 @@ Based on [iuryLandin/bulario](https://github.com/iuryLandin/bulario) and [iuryLa
 | route | url |
 |-------|-----|
 | `/api/medicine/${drug}` | `https://leaflet-dpbm-dpbms-projects.vercel.app/api/medicine/${drug}` |
+| `/api/medicine/${drug}` | `https://localhost:3030/api/medicine/${drug}`(local) |
+
+
+## run
+
+```bash
+make && ./server
+```
