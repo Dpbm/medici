@@ -7,6 +7,29 @@ class Home extends StatelessWidget{
   @override
   Widget build(BuildContext context){
     return Scaffold(
+      body: SizedBox(
+        width: 600,
+        height: 1000,
+        child: Column(children: [
+          Container(
+            height: 250,
+            child: Container(
+              padding: const EdgeInsets.fromLTRB(30, 41, 30, 41),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text("Não Tomados",
+                        style: TextStyle(fontSize: 40,fontFamily: "Montserrat"),),),
+            )
+          ),
+          Container(
+            child: Column(
+              children: [
+                Image.asset("images/fundo_home.png")
+              ],
+            ),
+          )
+        ],),
+      ),
       bottomNavigationBar: BottomNavigationBar(
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
