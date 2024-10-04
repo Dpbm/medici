@@ -1,5 +1,4 @@
 import 'package:path/path.dart';
-//import 'package:seshat/models/note.dart';
 import 'package:sqflite/sqflite.dart';
 
 Future<Database> getDB() async {
