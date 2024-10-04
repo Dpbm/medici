@@ -47,5 +47,9 @@
 		<true/>
 		<key>UIStatusBarHidden</key>
 		<false/>
+		<key>NSCameraUsageDescription</key>
+		<string>Get Drug photo.</string>
+		<key>NSMicrophoneUsageDescription</key>
+		<string>Get Drug photo.</string>
 	</dict>
 </plist>

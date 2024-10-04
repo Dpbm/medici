@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:medici/add.dart';
 import 'package:medici/utils/icons.dart';
 
 class Home extends StatelessWidget{
@@ -6,6 +7,16 @@ class Home extends StatelessWidget{
 
   @override
   Widget build(BuildContext context){
+
+    Future<void> goToPage(int index) async {
+      await Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => const Add()));
+      //setState(() {});
+    }
+
+
     return Scaffold(
       body: SizedBox(
         width: 600,
@@ -39,12 +50,13 @@ class Home extends StatelessWidget{
             label: ""),
           const BottomNavigationBarItem(
             icon:  LocalIcon(name:"botao_add",label: "Add"), 
-            label: ""),
+            label: "",),
             const BottomNavigationBarItem(
             icon:  LocalIcon(name:"botao_list",label: "List"), 
             label: "")
         ],
         backgroundColor: const Color.fromARGB(255,255,255,255),
+        onTap: goToPage,
       ),
     );
   }
