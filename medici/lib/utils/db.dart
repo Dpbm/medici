@@ -4,8 +4,7 @@ import 'package:sqflite/sqflite.dart';
 Future<Database> getDB() async {
   final database = openDatabase(join(await getDatabasesPath(), 'data.db'),
       onCreate: (db, version) {
-    db.execute(
-      '''
+    db.execute('''
         CREATE TABLE drug (
           id INTEGER PRIMARY KEY AUTOINCREMENT, 
           name TEXT NOT NULL, 
@@ -17,8 +16,7 @@ Future<Database> getDB() async {
           leaflet TEXT)
       ''');
 
-    db.execute(
-      '''
+    db.execute('''
         CREATE TABLE alert(
           id INTEGER PRIMARY KEY AUTOINCREMENT, 
           time INTEGER,
@@ -27,8 +25,7 @@ Future<Database> getDB() async {
         )
       ''');
 
-    db.execute(
-      '''
+    db.execute('''
         CREATE TABLE notification(
           id INTEGER PRIMARY KEY AUTOINCREMENT, 
           expiration_offset INTEGER,

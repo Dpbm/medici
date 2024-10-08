@@ -51,8 +51,14 @@ android {
             signingConfig = signingConfigs.debug
         }
     }
+
+    buildscript {
+        ext.kotlin_version = '1.6.0' 
+    }
 }
 
 flutter {
     source = "../.."
 }
+
+
