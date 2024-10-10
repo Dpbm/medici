@@ -1,6 +1,6 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:medici/utils/icons.dart';
+import 'package:medici/widgets/icons.dart';
 
 class Add extends StatelessWidget{
   const Add ({super.key});
