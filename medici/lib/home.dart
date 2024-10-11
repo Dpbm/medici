@@ -5,19 +5,21 @@ import 'package:medici/widgets/icons.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key, required this.height, required this.width});
-  final double height ;
-  final double width;
+  final double height, width;
 
   @override
   State<Home> createState() => _HomePage();
 }
 
 class _HomePage extends State<Home> {
+
   @override
   Widget build(BuildContext context) {
     Future<void> goToPage(int index) async {
       await Navigator.push(
-          context, MaterialPageRoute(builder: (context) => const Add()));
+          context, MaterialPageRoute(builder: 
+						(context) =>  Add(height:widget.height, width:widget.width)
+					));
       setState(() {});
     }
 
