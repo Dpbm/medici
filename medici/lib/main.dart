@@ -27,6 +27,6 @@ class App extends StatelessWidget {
           primary: const Color(0x063E42),
           secondary: const Color(0x90DCC7),
         )),
-        home: Home(width:width, height:height));
+        home: Home(width: width, height: height));
   }
 }

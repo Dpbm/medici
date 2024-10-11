@@ -4,6 +4,7 @@
 - [ ] remove appbar
 - [ ] fix layout width/height
 - [ ] navbar center padding icons
+- [ ] bottom bar - remove unnecessary things
 
 ## Add
 - [ ] top bar
