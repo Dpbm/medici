@@ -16,7 +16,7 @@ class InputType extends StatefulWidget {
 }
 
 class _InputType extends State<InputType> {
-  int selected = 1;
+  int selected = 0;
 
   void setSelectedRadio(int val) {
     setState(() {
@@ -26,30 +26,32 @@ class _InputType extends State<InputType> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Text(widget.label),
-        Column(children: [
-          RadioListTile<int>(
-              title: Text("ML"),
-              value: 1,
-              groupValue: selected,
-              activeColor: Colors.green,
-              onChanged: (val) {
-                if (val == null) return;
-                setSelectedRadio(val);
-              }),
-          RadioListTile<int>(
-              title: Text("ML2"),
-              value: 2,
-              groupValue: selected,
-              activeColor: Colors.blue,
-              onChanged: (val) {
-                if (val == null) return;
-                setSelectedRadio(val);
-              })
-        ])
-      ],
+    return SizedBox(
+      height: 250,
+      child: Column(
+        children: [
+          Text(widget.label),
+          Expanded(
+              child: ListView.builder(
+                  itemCount: widget.options.length,
+                  scrollDirection: Axis.horizontal,
+                  itemBuilder: (context, item) {
+                    return Row(
+                      children: [
+                        Text(widget.options[item]),
+                        Radio<int>(
+                            value: item,
+                            groupValue: selected,
+                            activeColor: Colors.green,
+                            onChanged: (selectedItem) {
+                              if (selectedItem == null) return;
+                              setSelectedRadio(selectedItem);
+                            })
+                      ],
+                    );
+                  })),
+        ],
+      ),
     );
   }
 }
