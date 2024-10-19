@@ -22,3 +22,5 @@
 
 - [ ] pass a controller to each input
 - [ ] change all elements to `Stateful`
+- [ ] set input date and input time as `textFormField`s
+- [ ] fix keyboard overlapping

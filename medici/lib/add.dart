@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:medici/widgets/app_bar.dart';
 import 'package:medici/widgets/forms/image_area.dart';
 import 'package:medici/widgets/forms/input_hour.dart';
+import 'package:medici/widgets/forms/input_number.dart';
 import 'package:medici/widgets/forms/input_select.dart';
 import 'package:medici/widgets/forms/input_text.dart';
 import 'package:medici/widgets/forms/separator.dart';
@@ -24,7 +25,6 @@ class _AddPage extends State<Add> {
     final double width = widget.width;
     final double height = widget.height;
     const double topBarSize = 80.0;
-    final double bodySize = height - topBarSize;
 
     return Scaffold(
         appBar: getAppBar(context, const Color(0xffffffff)),
@@ -64,14 +64,23 @@ class _AddPage extends State<Add> {
                           label: 'Tipo de Dose',
                           requiredField: true),
                       Separator(),
-                      InputSelect(
-                          options: ['4 em 4h', '8 em 8h', '12 em 12h'],
-                          label: 'Frequência',
-                          requiredField: true),
+                      InputSelect(options: [
+                        '4 em 4h',
+                        '6 em 6h',
+                        '8 em 8h',
+                        '12 em 12h'
+                      ], label: 'Frequência', requiredField: true),
                       Separator(),
                       InputHour(label: "Horário Inicial", requiredField: true),
                       Separator(),
-                      SwitchButton(label: "Recorrente", requiredField: true)
+                      SwitchButton(label: "Recorrente", requiredField: true),
+                      Separator(),
+                      InputDate(
+                        label: 'Último Dia',
+                        requiredField: true,
+                      ),
+                      Separator(),
+                      InputNumber(label: "Dose", requiredField: true)
                     ]),
                   ),
                 ],
