@@ -32,7 +32,7 @@ class _InputType extends State<InputType> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            widget.label,
+            widget.requiredField ? widget.label + "*" : widget.label,
             style: const TextStyle(fontSize: 16),
           ),
           Expanded(

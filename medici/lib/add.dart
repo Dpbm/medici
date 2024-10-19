@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:medici/widgets/app_bar.dart';
 import 'package:medici/widgets/forms/image_area.dart';
+import 'package:medici/widgets/forms/input_select.dart';
 import 'package:medici/widgets/forms/input_text.dart';
 import 'package:medici/widgets/forms/separator.dart';
 import 'package:medici/widgets/return_button.dart';
@@ -59,6 +60,11 @@ class _AddPage extends State<Add> {
                       options: ['comp.', 'ml'],
                       label: 'Tipo de Dose',
                       requiredField: true),
+                  Separator(),
+                  InputSelect(
+                      options: ['4 em 4h', '8 em 8h', '12 em 12h'],
+                      label: 'Frequência',
+                      requiredField: true)
                 ]),
               ),
             ],
