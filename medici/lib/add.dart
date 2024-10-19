@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:medici/widgets/app_bar.dart';
 import 'package:medici/widgets/forms/image_area.dart';
+import 'package:medici/widgets/forms/input_hour.dart';
 import 'package:medici/widgets/forms/input_select.dart';
 import 'package:medici/widgets/forms/input_text.dart';
 import 'package:medici/widgets/forms/separator.dart';
@@ -64,7 +65,9 @@ class _AddPage extends State<Add> {
                   InputSelect(
                       options: ['4 em 4h', '8 em 8h', '12 em 12h'],
                       label: 'Frequência',
-                      requiredField: true)
+                      requiredField: true),
+                  Separator(),
+                  InputHour(label: "Horário Inicial", requiredField: true)
                 ]),
               ),
             ],

@@ -30,8 +30,8 @@ class InputDate extends StatelessWidget {
         onTapInside: _openDateDialog,
         child: TextFormField(
           keyboardType: TextInputType.datetime,
-          enabled: true,
-          showCursor: true,
+          enabled: false,
+          showCursor: false,
           autocorrect: false,
           decoration: InputDecoration(
             fillColor: const Color(0xffffffff),

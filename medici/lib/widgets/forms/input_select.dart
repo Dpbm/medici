@@ -41,7 +41,7 @@ class _InputSelect extends State<InputSelect> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                widget.label,
+                widget.requiredField ? widget.label + "*" : widget.label,
                 style: const TextStyle(fontSize: 16),
               ),
               DropdownMenu<String>(
