@@ -27,10 +27,14 @@ class _InputType extends State<InputType> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 250,
+      height: 50,
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(widget.label),
+          Text(
+            widget.label,
+            style: const TextStyle(fontSize: 16),
+          ),
           Expanded(
               child: ListView.builder(
                   itemCount: widget.options.length,

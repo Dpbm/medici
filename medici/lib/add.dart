@@ -54,6 +54,7 @@ class _AddPage extends State<Add> {
                     label: 'Validade',
                     requiredField: true,
                   ),
+                  Separator(),
                   InputType(
                       options: ['comp.', 'ml'],
                       label: 'Tipo de Dose',
