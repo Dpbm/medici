@@ -6,6 +6,7 @@
 - [ ] fix layout width/height
 - [ ] navbar center padding icons
 - [ ] bottom bar - remove unnecessary things
+- [ ] dose type to enum
 
 ## Add
 

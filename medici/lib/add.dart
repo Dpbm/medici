@@ -7,6 +7,7 @@ import 'package:medici/widgets/forms/input_select.dart';
 import 'package:medici/widgets/forms/input_text.dart';
 import 'package:medici/widgets/forms/separator.dart';
 import 'package:medici/widgets/forms/specific/exp_notification.dart';
+import 'package:medici/widgets/forms/specific/quantity_notification.dart';
 import 'package:medici/widgets/forms/switch_button.dart';
 import 'package:medici/widgets/return_button.dart';
 import 'package:medici/widgets/forms/input_date.dart';
@@ -95,7 +96,9 @@ class _AddPage extends State<Add> {
                                 fontWeight: FontWeight.bold),
                           ),
                           Separator(),
-                          ExpirationNotification()
+                          ExpirationNotification(),
+                          Separator(),
+                          QuantityNotification(doseType: "comp.")
                         ],
                       )
                     ]),
