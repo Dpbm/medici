@@ -6,6 +6,7 @@ import 'package:medici/widgets/forms/input_number.dart';
 import 'package:medici/widgets/forms/input_select.dart';
 import 'package:medici/widgets/forms/input_text.dart';
 import 'package:medici/widgets/forms/separator.dart';
+import 'package:medici/widgets/forms/specific/exp_notification.dart';
 import 'package:medici/widgets/forms/switch_button.dart';
 import 'package:medici/widgets/return_button.dart';
 import 'package:medici/widgets/forms/input_date.dart';
@@ -80,7 +81,23 @@ class _AddPage extends State<Add> {
                         requiredField: true,
                       ),
                       Separator(),
-                      InputNumber(label: "Dose", requiredField: true)
+                      InputNumber(label: "Dose", requiredField: true),
+                      Separator(),
+                      Divider(),
+                      Separator(),
+                      Column(
+                        children: [
+                          Text(
+                            "Configuração de Notificações",
+                            style: TextStyle(
+                                fontSize: 16,
+                                fontFamily: 'Montserrat',
+                                fontWeight: FontWeight.bold),
+                          ),
+                          Separator(),
+                          ExpirationNotification()
+                        ],
+                      )
                     ]),
                   ),
                 ],

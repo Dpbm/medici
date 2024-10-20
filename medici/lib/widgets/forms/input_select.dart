@@ -5,11 +5,13 @@ class InputSelect extends StatefulWidget {
       {super.key,
       required this.options,
       required this.label,
-      required this.requiredField});
+      required this.requiredField,
+      this.width});
 
   final List<String> options;
   final String label;
   final bool requiredField;
+  final double? width;
 
   @override
   State<InputSelect> createState() => _InputSelect();
@@ -37,6 +39,7 @@ class _InputSelect extends State<InputSelect> {
         alignment: Alignment.centerLeft,
         child: SizedBox(
           height: 100,
+          width: 80,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -47,6 +50,7 @@ class _InputSelect extends State<InputSelect> {
               DropdownMenu<String>(
                 initialSelection: widget.options.first,
                 onSelected: select,
+                width: widget.width,
                 dropdownMenuEntries: widget.options
                     .map<DropdownMenuEntry<String>>((String value) {
                   return DropdownMenuEntry<String>(value: value, label: value);
