@@ -8,6 +8,7 @@ import 'package:medici/widgets/forms/input_text.dart';
 import 'package:medici/widgets/forms/separator.dart';
 import 'package:medici/widgets/forms/specific/exp_notification.dart';
 import 'package:medici/widgets/forms/specific/quantity_notification.dart';
+import 'package:medici/widgets/forms/submit_button.dart';
 import 'package:medici/widgets/forms/switch_button.dart';
 import 'package:medici/widgets/return_button.dart';
 import 'package:medici/widgets/forms/input_date.dart';
@@ -27,6 +28,8 @@ class _AddPage extends State<Add> {
     final double width = widget.width;
     final double height = widget.height;
     const double topBarSize = 80.0;
+
+    final formState = GlobalKey<FormState>();
 
     return Scaffold(
         appBar: getAppBar(context, const Color(0xffffffff)),
@@ -48,45 +51,47 @@ class _AddPage extends State<Add> {
                   Container(
                     //forms
                     margin: const EdgeInsets.fromLTRB(20, 30, 20, 30),
-                    child: const Column(children: [
-                      ImageArea(),
-                      Separator(),
-                      InputText(
+                    child: Column(children: [
+                      const ImageArea(),
+                      const Separator(),
+                      const InputText(
                         label: "Nome",
                         requiredField: true,
                       ),
-                      Separator(),
-                      InputDate(
+                      const Separator(),
+                      const InputDate(
                         label: 'Validade',
                         requiredField: true,
                       ),
-                      Separator(),
-                      InputType(
+                      const Separator(),
+                      const InputType(
                           options: ['comp.', 'ml'],
                           label: 'Tipo de Dose',
                           requiredField: true),
-                      Separator(),
-                      InputSelect(options: [
+                      const Separator(),
+                      const InputSelect(options: [
                         '4 em 4h',
                         '6 em 6h',
                         '8 em 8h',
                         '12 em 12h'
                       ], label: 'Frequência', requiredField: true),
-                      Separator(),
-                      InputHour(label: "Horário Inicial", requiredField: true),
-                      Separator(),
-                      SwitchButton(label: "Recorrente", requiredField: true),
-                      Separator(),
-                      InputDate(
+                      const Separator(),
+                      const InputHour(
+                          label: "Horário Inicial", requiredField: true),
+                      const Separator(),
+                      const SwitchButton(
+                          label: "Recorrente", requiredField: true),
+                      const Separator(),
+                      const InputDate(
                         label: 'Último Dia',
                         requiredField: true,
                       ),
-                      Separator(),
-                      InputNumber(label: "Dose", requiredField: true),
-                      Separator(),
-                      Divider(),
-                      Separator(),
-                      Column(
+                      const Separator(),
+                      const InputNumber(label: "Dose", requiredField: true),
+                      const Separator(),
+                      const Divider(),
+                      const Separator(),
+                      const Column(
                         children: [
                           Text(
                             "Configuração de Notificações",
@@ -100,7 +105,9 @@ class _AddPage extends State<Add> {
                           Separator(),
                           QuantityNotification(doseType: "comp.")
                         ],
-                      )
+                      ),
+                      const Separator(),
+                      SubmitButton(formState: formState)
                     ]),
                   ),
                 ],

@@ -25,3 +25,4 @@
 - [ ] change all elements to `Stateful`
 - [ ] set input date and input time as `textFormField`s
 - [ ] fix keyboard overlapping
+- [ ] check if submit is enabled or not (change styles as well)
