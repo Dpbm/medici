@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class InputDate extends StatelessWidget {
+class InputDate extends StatefulWidget {
   const InputDate(
       {super.key, required this.label, required this.requiredField});
 
@@ -8,38 +8,57 @@ class InputDate extends StatelessWidget {
   final bool requiredField;
 
   @override
+  State<InputDate> createState() => _InputDate();
+}
+
+class _InputDate extends State<InputDate> {
+  final TextEditingController _textInput = TextEditingController();
+
+  @override
+  void dispose() {
+    _textInput.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    Future<void> _openDateDialog(event) async {
+    Future<void> openDateDialog(event) async {
       DateTime? date = await showDatePicker(
         context: context,
-        firstDate: DateTime(1990),
+        firstDate: DateTime(DateTime.now().year),
         lastDate: DateTime(2999),
         builder: (BuildContext context, Widget? child) {
           return Theme(
               data: ThemeData.light().copyWith(
                   buttonTheme:
-                      const ButtonThemeData(buttonColor: Color(0xff000000))),
+                      const ButtonThemeData(buttonColor: Colors.black)),
               child: child!);
         },
       );
 
-      final selectedDate = date?.toString().split(' ')[0].split('-').join('/');
+      final selectedDate =
+          date?.toString().split(' ')[0].split('-').reversed.join('/');
+
+      if (selectedDate == null || selectedDate.isEmpty) return;
+
+      _textInput.text = selectedDate;
     }
 
     return TapRegion(
-        onTapInside: _openDateDialog,
+        onTapInside: openDateDialog,
         child: TextFormField(
           keyboardType: TextInputType.datetime,
-          enabled: false,
+          enabled: true,
           showCursor: false,
           autocorrect: false,
+          controller: _textInput,
           decoration: InputDecoration(
-            fillColor: const Color(0xffffffff),
+            fillColor: Colors.white,
             filled: true,
-            labelText: requiredField ? label + "*" : label,
+            labelText: widget.requiredField ? widget.label + "*" : widget.label,
             border: InputBorder.none,
             floatingLabelBehavior: FloatingLabelBehavior.auto,
-            floatingLabelStyle: const TextStyle(color: Color(0xff000000)),
+            floatingLabelStyle: const TextStyle(color: Colors.black),
           ),
         ));
   }
