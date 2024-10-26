@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 class ExpirationNotification extends StatefulWidget {
-  const ExpirationNotification({super.key});
+  const ExpirationNotification({super.key, this.width});
+
+  final double? width;
 
   @override
   State<ExpirationNotification> createState() => _ExpirationNotification();
@@ -27,17 +29,19 @@ class _ExpirationNotification extends State<ExpirationNotification> {
   @override
   Widget build(BuildContext context) {
     return Container(
+        width: widget.width,
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-            color: const Color(0xffffffff),
-            borderRadius: BorderRadius.circular(10)),
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(10)
+        ),
         child: Wrap(
           spacing: 10,
           crossAxisAlignment: WrapCrossAlignment.center,
           children: [
             const Text(
               "Notificar vencimento antes de",
-              style: TextStyle(fontSize: 16, fontFamily: 'Montserrat'),
+              style: TextStyle(fontSize: 18, fontFamily: 'Montserrat'),
             ),
             DropdownMenu<String>(
               initialSelection: selected,
@@ -50,7 +54,7 @@ class _ExpirationNotification extends State<ExpirationNotification> {
             ),
             const Text(
               "dias",
-              style: TextStyle(fontSize: 16, fontFamily: 'Montserrat'),
+              style: TextStyle(fontSize: 18, fontFamily: 'Montserrat'),
             ),
           ],
         ));

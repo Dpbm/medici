@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 
 class QuantityNotification extends StatefulWidget {
-  const QuantityNotification({super.key, required this.doseType});
+  const QuantityNotification({super.key, required this.doseType, this.width});
 
   final String doseType;
+  final double? width;
 
   @override
   State<QuantityNotification> createState() => _QuantityNotification();
@@ -29,6 +30,7 @@ class _QuantityNotification extends State<QuantityNotification> {
   @override
   Widget build(BuildContext context) {
     return Container(
+      width: widget.width,
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
             color: const Color(0xffffffff),
@@ -39,7 +41,7 @@ class _QuantityNotification extends State<QuantityNotification> {
           children: [
             const Text(
               "Notificar quando restar",
-              style: TextStyle(fontSize: 16, fontFamily: 'Montserrat'),
+              style: TextStyle(fontSize: 18, fontFamily: 'Montserrat'),
             ),
             DropdownMenu<String>(
               initialSelection: selected,
@@ -52,7 +54,7 @@ class _QuantityNotification extends State<QuantityNotification> {
             ),
             Text(
               widget.doseType,
-              style: const TextStyle(fontSize: 16, fontFamily: 'Montserrat'),
+              style: const TextStyle(fontSize: 18, fontFamily: 'Montserrat'),
             ),
           ],
         ));

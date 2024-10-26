@@ -24,12 +24,27 @@ class Add extends StatefulWidget {
 
 class _AddPage extends State<Add> {
   final _formState = GlobalKey<FormState>();
+  String type = "comp.";
+  bool recurrent = false;
 
   @override
   Widget build(BuildContext context) {
     final double width = widget.width;
     final double height = widget.height;
     const double topBarSize = 80.0;
+
+
+    void getType(String doseType){
+      setState(() {
+        type = doseType;
+      });
+    }
+
+    void getRecurrent(bool isRecurrent){
+      setState(() {
+        recurrent = isRecurrent;
+      });
+    }
 
     return Scaffold(
         appBar: getAppBar(context, const Color(0xffffffff)),
@@ -63,46 +78,56 @@ class _AddPage extends State<Add> {
                             requiredField: true,
                           ),
                           const Separator(),
-                          const InputType(
-                              options: ['comp.', 'ml'],
-                              label: 'Tipo de Dose',
+                          const InputNumber(
+                              label: "Qtde. Total", 
                               requiredField: true),
                           const Separator(),
-                          /* const InputSelect(options: [
+                          InputType(
+                              options: const ['comp.', 'ml'],
+                              label: 'Tipo de Dose',
+                              requiredField: true,
+                              callback: getType),
+                          const Separator(),
+                          const InputNumber(label: "Dose", requiredField: true),
+                           const Separator(),
+                          const InputSelect(options: [
                             '4 em 4h',
                             '6 em 6h',
                             '8 em 8h',
                             '12 em 12h'
-                          ], label: 'Frequência', requiredField: true), */
+                          ], label: 'Frequência', requiredField: true),
                           const Separator(),
                           const InputHour(
                               label: "Horário Inicial", requiredField: true),
                           const Separator(),
-                          const SwitchButton(
+                          SwitchButton(
+                            callback:getRecurrent,
                               label: "Recorrente", requiredField: true),
                           const Separator(),
-                          const InputDate(
-                            label: 'Último Dia',
-                            requiredField: true,
-                          ),
-                          const Separator(),
-                          const InputNumber(label: "Dose", requiredField: true),
+                          Builder(builder: (context){
+                            if(recurrent) return Container();
+                            return const InputDate(
+                                label: 'Último Dia',
+                                requiredField: true,
+                              );
+                          }),
+                          
                           const Separator(),
                           const Divider(),
                           const Separator(),
-                          const Column(
+                          Column(
                             children: [
-                              Text(
+                              const Text(
                                 "Configuração de Notificações",
                                 style: TextStyle(
                                     fontSize: 16,
                                     fontFamily: 'Montserrat',
                                     fontWeight: FontWeight.bold),
                               ),
-                              Separator(),
-                              ExpirationNotification(),
-                              Separator(),
-                              QuantityNotification(doseType: "comp.")
+                              const Separator(),
+                              ExpirationNotification(width: width),
+                              const Separator(),
+                              QuantityNotification(doseType: type, width:width)
                             ],
                           ),
                           const Separator(),

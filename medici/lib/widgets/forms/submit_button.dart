@@ -18,7 +18,9 @@ class _SubmitButton extends State<SubmitButton> {
             shape: WidgetStatePropertyAll<RoundedRectangleBorder>(
                 RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10)))),
-        onPressed: () {},
+        onPressed: () {
+          widget.formState.currentState!.validate();
+        },
         child: const Text(
           "Adicionar",
           style: TextStyle(

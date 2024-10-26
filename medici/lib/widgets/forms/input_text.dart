@@ -21,6 +21,7 @@ class _InputText extends State<InputText> {
     return null;
   }
 
+
   @override
   Widget build(BuildContext context) {
     return TextFormField(

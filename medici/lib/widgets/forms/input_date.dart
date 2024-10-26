@@ -20,6 +20,15 @@ class _InputDate extends State<InputDate> {
     super.dispose();
   }
 
+  String? _validate(String? value) {
+    if (!widget.requiredField) return null;
+
+    if (value == null || value.isEmpty) {
+      return widget.label + " Inválido";
+    }
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
     Future<void> openDateDialog(event) async {
@@ -52,6 +61,7 @@ class _InputDate extends State<InputDate> {
           showCursor: false,
           autocorrect: false,
           controller: _textInput,
+          validator: _validate,
           decoration: InputDecoration(
             fillColor: Colors.white,
             filled: true,

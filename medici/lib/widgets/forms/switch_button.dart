@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 
 class SwitchButton extends StatefulWidget {
   const SwitchButton(
-      {super.key, required this.label, required this.requiredField});
+      {super.key, required this.label, required this.requiredField, required this.callback});
 
   final String label;
   final bool requiredField;
+  final Function callback;
 
   @override
   State<SwitchButton> createState() => _SwitchButton();
@@ -14,8 +15,18 @@ class SwitchButton extends StatefulWidget {
 class _SwitchButton extends State<SwitchButton> {
   bool enable = false;
 
+
   @override
   Widget build(BuildContext context) {
+
+    void _onChange(bool value){
+      setState(() {
+        enable = value;
+      });
+
+      widget.callback(value);
+    }
+
     return Align(
         alignment: Alignment.centerLeft,
         child: Column(
@@ -26,11 +37,8 @@ class _SwitchButton extends State<SwitchButton> {
             Switch(
                 value: enable,
                 activeColor: Colors.green,
-                onChanged: (bool value) {
-                  setState(() {
-                    enable = value;
-                  });
-                })
+                onChanged: _onChange
+            )
           ],
         ));
   }

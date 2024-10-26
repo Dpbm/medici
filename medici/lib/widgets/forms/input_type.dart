@@ -5,11 +5,14 @@ class InputType extends StatefulWidget {
       {super.key,
       required this.options,
       required this.label,
-      required this.requiredField});
+      required this.requiredField,
+      required this.callback
+      });
 
   final List<String> options;
   final String label;
   final bool requiredField;
+  final Function callback;
 
   @override
   State<InputType> createState() => _InputType();
@@ -26,6 +29,14 @@ class _InputType extends State<InputType> {
 
   @override
   Widget build(BuildContext context) {
+
+
+    void _onChange(int? selectedItem) {
+      if (selectedItem == null) return;
+      setSelectedRadio(selectedItem);
+      widget.callback(widget.options[selectedItem]);
+    }
+
     return SizedBox(
       height: 50,
       child: Column(
@@ -47,10 +58,7 @@ class _InputType extends State<InputType> {
                             value: item,
                             groupValue: selected,
                             activeColor: Colors.green,
-                            onChanged: (selectedItem) {
-                              if (selectedItem == null) return;
-                              setSelectedRadio(selectedItem);
-                            })
+                            onChanged: _onChange)
                       ],
                     );
                   })),

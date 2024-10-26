@@ -12,7 +12,22 @@ class InputHour extends StatefulWidget {
 }
 
 class _InputHour extends State<InputHour> {
-  TimeOfDay selectedHour = TimeOfDay.now();
+  final TextEditingController _hourInputController = TextEditingController();
+
+  @override
+  void dispose() {
+    _hourInputController.dispose();
+    super.dispose();
+  }
+
+   String? _validate(String? value) {
+    if (!widget.requiredField) return null;
+
+    if (value == null || value.isEmpty) {
+      return widget.label + " Inválido";
+    }
+    return null;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,20 +44,22 @@ class _InputHour extends State<InputHour> {
           });
 
       if (hour == null) return;
-      setState(() {
-        selectedHour = hour;
-      });
+
+
+      _hourInputController.text = hour.hour.toString() + ":" + hour.minute.toString();
     }
 
     return TapRegion(
         onTapInside: _openTimeDialog,
         child: TextFormField(
           keyboardType: TextInputType.datetime,
-          enabled: false,
+          enabled: true,
           showCursor: false,
           autocorrect: false,
+          controller: _hourInputController,
+          validator: _validate,
           decoration: InputDecoration(
-            fillColor: const Color(0xffffffff),
+            fillColor: Colors.white,
             filled: true,
             labelText: widget.requiredField ? widget.label + "*" : widget.label,
             border: InputBorder.none,
