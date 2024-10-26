@@ -38,8 +38,6 @@ class _InputSelect extends State<InputSelect> {
     return Align(
         alignment: Alignment.centerLeft,
         child: SizedBox(
-          height: 100,
-          width: 80,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -47,7 +45,7 @@ class _InputSelect extends State<InputSelect> {
                 widget.requiredField ? widget.label + "*" : widget.label,
                 style: const TextStyle(fontSize: 16),
               ),
-              DropdownMenu<String>(
+               DropdownMenu<String>(
                 initialSelection: widget.options.first,
                 onSelected: select,
                 width: widget.width,

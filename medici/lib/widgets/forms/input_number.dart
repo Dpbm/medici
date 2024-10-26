@@ -12,15 +12,36 @@ class InputNumber extends StatefulWidget {
 }
 
 class _InputNumber extends State<InputNumber> {
+  double value = 0.0;
+
+  String? _validate(String? value) {
+    if (!widget.requiredField) return null;
+
+    if (value == null || value.isEmpty || double.parse(value) <= 0.0) {
+      return widget.label + " Inválido";
+    }
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
+    void _onChange(String? inputVal){
+      if(inputVal == null || inputVal.isEmpty) return;
+      setState(() {
+        value = double.parse(inputVal);
+      });
+    }
+
     return TextFormField(
       enabled: true,
       showCursor: true,
       autocorrect: false,
       keyboardType: TextInputType.number,
+      cursorColor: Colors.black,
+      validator: _validate,
+      onChanged: _onChange,
       decoration: InputDecoration(
-        fillColor: const Color(0xffffffff),
+        fillColor: Colors.white,
         filled: true,
         labelText: widget.requiredField ? widget.label + "*" : widget.label,
         border: InputBorder.none,
