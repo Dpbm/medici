@@ -25,7 +25,10 @@ class Add extends StatefulWidget {
 class _AddPage extends State<Add> {
   final _formState = GlobalKey<FormState>();
   String type = "comp.";
+  String? image;
   bool recurrent = false;
+
+  bool takingPicture = false;
 
   @override
   Widget build(BuildContext context) {
@@ -33,16 +36,21 @@ class _AddPage extends State<Add> {
     final double height = widget.height;
     const double topBarSize = 80.0;
 
-
-    void getType(String doseType){
+    void getType(String doseType) {
       setState(() {
         type = doseType;
       });
     }
 
-    void getRecurrent(bool isRecurrent){
+    void getRecurrent(bool isRecurrent) {
       setState(() {
         recurrent = isRecurrent;
+      });
+    }
+
+    void getImage(String image) {
+      setState(() {
+        image = image;
       });
     }
 
@@ -69,7 +77,9 @@ class _AddPage extends State<Add> {
                         //forms
                         margin: const EdgeInsets.fromLTRB(20, 30, 20, 30),
                         child: Column(children: [
-                          const ImageArea(),
+                          ImageArea(
+                            callback: getImage,
+                          ),
                           const Separator(),
                           const InputText(label: "Nome", requiredField: true),
                           const Separator(),
@@ -79,8 +89,7 @@ class _AddPage extends State<Add> {
                           ),
                           const Separator(),
                           const InputNumber(
-                              label: "Qtde. Total", 
-                              requiredField: true),
+                              label: "Qtde. Total", requiredField: true),
                           const Separator(),
                           InputType(
                               options: const ['comp.', 'ml'],
@@ -89,7 +98,7 @@ class _AddPage extends State<Add> {
                               callback: getType),
                           const Separator(),
                           const InputNumber(label: "Dose", requiredField: true),
-                           const Separator(),
+                          const Separator(),
                           const InputSelect(options: [
                             '4 em 4h',
                             '6 em 6h',
@@ -101,17 +110,17 @@ class _AddPage extends State<Add> {
                               label: "Horário Inicial", requiredField: true),
                           const Separator(),
                           SwitchButton(
-                            callback:getRecurrent,
-                              label: "Recorrente", requiredField: true),
+                              callback: getRecurrent,
+                              label: "Recorrente",
+                              requiredField: true),
                           const Separator(),
-                          Builder(builder: (context){
-                            if(recurrent) return Container();
+                          Builder(builder: (context) {
+                            if (recurrent) return Container();
                             return const InputDate(
-                                label: 'Último Dia',
-                                requiredField: true,
-                              );
+                              label: 'Último Dia',
+                              requiredField: true,
+                            );
                           }),
-                          
                           const Separator(),
                           const Divider(),
                           const Separator(),
@@ -127,7 +136,7 @@ class _AddPage extends State<Add> {
                               const Separator(),
                               ExpirationNotification(width: width),
                               const Separator(),
-                              QuantityNotification(doseType: type, width:width)
+                              QuantityNotification(doseType: type, width: width)
                             ],
                           ),
                           const Separator(),

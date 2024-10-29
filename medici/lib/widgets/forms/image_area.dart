@@ -1,46 +1,93 @@
+import 'dart:io';
+
+import 'package:path/path.dart' as path;
 import 'package:flutter/material.dart';
-import 'package:camera/camera.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
 
 class ImageArea extends StatefulWidget {
-  const ImageArea({super.key /* , required this.cameraController */});
+  const ImageArea({super.key, required this.callback});
 
-  /*  final CameraController cameraController; */
+  final Function callback;
 
   @override
   State<ImageArea> createState() => _ImageArea();
 }
 
 class _ImageArea extends State<ImageArea> {
-  Future<void> takePhoto() async {
+  String? _documentsDir;
+  File? _image;
+
+  Future<void> getImage() async {
     try {
-      //final picture = await widget.cameraController.takePicture();
+      final ImagePicker picker = ImagePicker();
+      final XFile? response =
+          await picker.pickImage(source: ImageSource.camera);
+
+      if (response == null) return;
+
+      if (_documentsDir == null) {
+        final String appDocumentsDir =
+            (await getApplicationDocumentsDirectory()).path;
+        setState(() {
+          _documentsDir = appDocumentsDir;
+        });
+      }
+
+      await _image?.delete();
+
+      final String imagePath = path.join(_documentsDir!, response.name);
+      print("Saving to: " + imagePath);
+      await response.saveTo(imagePath);
+
+      final File file = File(imagePath);
+
+      setState(() {
+        _image = file;
+      });
+
+      widget.callback(imagePath);
     } catch (error) {
-      print("Failed on taking picture...");
+      print("[!] Failed on get image: ");
       print(error);
     }
   }
 
+  Widget noImage() {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(100, 60, 100, 60),
+      decoration: BoxDecoration(
+          color: const Color(0xFFFFFFFF),
+          borderRadius: BorderRadius.circular(15)),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Image.asset("images/adicionar_imagens.jpg"),
+          const Text("Adicionar foto do medicamento",
+              textAlign: TextAlign.center,
+              style: TextStyle(fontFamily: "Montserrat", fontSize: 12))
+        ],
+      ),
+    );
+  }
+
+  Widget loadImage() {
+    return ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: Image.file(
+          _image!,
+          fit: BoxFit.cover,
+          height: 300,
+        ));
+  }
+
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-        width: 370,
-        child: Container(
-          padding: const EdgeInsets.fromLTRB(100, 60, 100, 60),
-          decoration: BoxDecoration(
-              color: const Color(0xFFFFFFFF),
-              borderRadius: BorderRadius.circular(15)),
-          child: GestureDetector(
-            onTap: takePhoto,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Image.asset("images/adicionar_imagens.jpg"),
-                const Text("Adicionar foto do medicamento",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontFamily: "Montserrat", fontSize: 12))
-              ],
-            ),
-          ),
-        ));
+    return GestureDetector(
+        onTap: getImage,
+        child: SizedBox(
+            width: 370, child: _image == null ? noImage() : loadImage()));
+
+    /*   */
   }
 }
