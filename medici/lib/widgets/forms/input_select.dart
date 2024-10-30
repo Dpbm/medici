@@ -6,12 +6,14 @@ class InputSelect extends StatefulWidget {
       required this.options,
       required this.label,
       required this.requiredField,
+      required this.callback,
       this.width});
 
   final List<String> options;
   final String label;
   final bool requiredField;
   final double? width;
+  final Function callback;
 
   @override
   State<InputSelect> createState() => _InputSelect();
@@ -31,6 +33,7 @@ class _InputSelect extends State<InputSelect> {
     setState(() {
       selected = selection;
     });
+    widget.callback(selection);
   }
 
   @override
@@ -45,7 +48,7 @@ class _InputSelect extends State<InputSelect> {
                 widget.requiredField ? widget.label + "*" : widget.label,
                 style: const TextStyle(fontSize: 16),
               ),
-               DropdownMenu<String>(
+              DropdownMenu<String>(
                 initialSelection: widget.options.first,
                 onSelected: select,
                 width: widget.width,

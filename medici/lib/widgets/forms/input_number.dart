@@ -2,10 +2,14 @@ import 'package:flutter/material.dart';
 
 class InputNumber extends StatefulWidget {
   const InputNumber(
-      {super.key, required this.label, required this.requiredField});
+      {super.key,
+      required this.label,
+      required this.requiredField,
+      required this.callback});
 
   final String label;
   final bool requiredField;
+  final Function callback;
 
   @override
   State<InputNumber> createState() => _InputNumber();
@@ -25,11 +29,14 @@ class _InputNumber extends State<InputNumber> {
 
   @override
   Widget build(BuildContext context) {
-    void _onChange(String? inputVal){
-      if(inputVal == null || inputVal.isEmpty) return;
+    void _onChange(String? inputVal) {
+      if (inputVal == null || inputVal.isEmpty) return;
+      double parsedValue = double.parse(inputVal);
       setState(() {
-        value = double.parse(inputVal);
+        value = parsedValue;
       });
+
+      widget.callback(parsedValue);
     }
 
     return TextFormField(

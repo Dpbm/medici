@@ -2,10 +2,14 @@ import 'package:flutter/material.dart';
 
 class InputDate extends StatefulWidget {
   const InputDate(
-      {super.key, required this.label, required this.requiredField});
+      {super.key,
+      required this.label,
+      required this.requiredField,
+      required this.callback});
 
   final String label;
   final bool requiredField;
+  final Function callback;
 
   @override
   State<InputDate> createState() => _InputDate();
@@ -51,6 +55,8 @@ class _InputDate extends State<InputDate> {
       if (selectedDate == null || selectedDate.isEmpty) return;
 
       _textInput.text = selectedDate;
+
+      widget.callback(date?.millisecondsSinceEpoch);
     }
 
     return TapRegion(

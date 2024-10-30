@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:medici/models/drug.dart';
 import 'package:medici/widgets/app_bar.dart';
 import 'package:medici/widgets/forms/image_area.dart';
 import 'package:medici/widgets/forms/input_hour.dart';
@@ -24,9 +25,16 @@ class Add extends StatefulWidget {
 
 class _AddPage extends State<Add> {
   final _formState = GlobalKey<FormState>();
-  String type = "comp.";
+  String type = doseTypes.first;
+  String? name;
   String? image;
+  int? expirationDate;
+  int? lastDay;
+  double? quantity;
+  double? dose;
+  String frequency = frequencies.first;
   bool recurrent = false;
+  TimeOfDay hour = TimeOfDay.now();
 
   bool takingPicture = false;
 
@@ -36,9 +44,33 @@ class _AddPage extends State<Add> {
     final double height = widget.height;
     const double topBarSize = 80.0;
 
+    void getName(String inputName) {
+      setState(() {
+        name = inputName;
+      });
+    }
+
+    void getExpirationDate(int date) {
+      setState(() {
+        expirationDate = date;
+      });
+    }
+
+    void getQuantity(double inputQuantity) {
+      setState(() {
+        quantity = inputQuantity;
+      });
+    }
+
     void getType(String doseType) {
       setState(() {
         type = doseType;
+      });
+    }
+
+    void getDose(double inputDose) {
+      setState(() {
+        dose = inputDose;
       });
     }
 
@@ -48,10 +80,32 @@ class _AddPage extends State<Add> {
       });
     }
 
+    void getFrequency(String inputFrequency) {
+      setState(() {
+        frequency = inputFrequency;
+      });
+    }
+
     void getImage(String image) {
       setState(() {
         image = image;
       });
+    }
+
+    void getHour(TimeOfDay inputHour) {
+      setState(() {
+        hour = inputHour;
+      });
+    }
+
+    void getLastDay(int inputLastDay) {
+      setState(() {
+        lastDay = inputLastDay;
+      });
+    }
+
+    void _submit() {
+      //const Drug data = Drug(name: name, expirationDate: expirationDate, quantity: quantity, doseType: type, dose: dose)
     }
 
     return Scaffold(
@@ -81,46 +135,55 @@ class _AddPage extends State<Add> {
                             callback: getImage,
                           ),
                           const Separator(),
-                          const InputText(label: "Nome", requiredField: true),
+                          InputText(
+                              label: "Nome",
+                              requiredField: true,
+                              callback: getName),
                           const Separator(),
-                          const InputDate(
-                            label: 'Validade',
-                            requiredField: true,
-                          ),
+                          InputDate(
+                              label: 'Validade',
+                              requiredField: true,
+                              callback: getExpirationDate),
                           const Separator(),
-                          const InputNumber(
-                              label: "Qtde. Total", requiredField: true),
+                          InputNumber(
+                              label: "Qtde. Total",
+                              requiredField: true,
+                              callback: getQuantity),
                           const Separator(),
                           InputType(
-                              options: const ['comp.', 'ml'],
+                              options: doseTypes,
                               label: 'Tipo de Dose',
                               requiredField: true,
                               callback: getType),
                           const Separator(),
-                          const InputNumber(label: "Dose", requiredField: true),
+                          InputNumber(
+                              label: "Dose",
+                              requiredField: true,
+                              callback: getDose),
                           const Separator(),
-                          const InputSelect(options: [
-                            '4 em 4h',
-                            '6 em 6h',
-                            '8 em 8h',
-                            '12 em 12h'
-                          ], label: 'Frequência', requiredField: true),
+                          InputSelect(
+                              options: frequencies,
+                              label: 'Frequência',
+                              requiredField: true,
+                              callback: getFrequency),
                           const Separator(),
-                          const InputHour(
-                              label: "Horário Inicial", requiredField: true),
+                          InputHour(
+                              label: "Horário Inicial",
+                              requiredField: true,
+                              callback: getHour),
                           const Separator(),
                           SwitchButton(
                               callback: getRecurrent,
                               label: "Recorrente",
                               requiredField: true),
                           const Separator(),
-                          Builder(builder: (context) {
-                            if (recurrent) return Container();
-                            return const InputDate(
-                              label: 'Último Dia',
-                              requiredField: true,
-                            );
-                          }),
+                          recurrent
+                              ? Container()
+                              : InputDate(
+                                  label: 'Último Dia',
+                                  requiredField: true,
+                                  callback: getLastDay,
+                                ),
                           const Separator(),
                           const Divider(),
                           const Separator(),
@@ -140,7 +203,10 @@ class _AddPage extends State<Add> {
                             ],
                           ),
                           const Separator(),
-                          SubmitButton(formState: _formState)
+                          SubmitButton(
+                            formState: _formState,
+                            callback: _submit,
+                          )
                         ]),
                       ),
                     ],

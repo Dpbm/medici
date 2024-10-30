@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 
 class SubmitButton extends StatefulWidget {
-  const SubmitButton({super.key, required this.formState});
+  const SubmitButton(
+      {super.key, required this.formState, required this.callback});
 
   final GlobalKey<FormState> formState;
+  final Function callback;
 
   @override
   State<SubmitButton> createState() => _SubmitButton();
@@ -19,7 +21,10 @@ class _SubmitButton extends State<SubmitButton> {
                 RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10)))),
         onPressed: () {
-          widget.formState.currentState!.validate();
+          bool valid = widget.formState.currentState!.validate();
+          if (!valid) return;
+
+          widget.callback();
         },
         child: const Text(
           "Adicionar",

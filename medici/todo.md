@@ -7,6 +7,8 @@
 - [ ] navbar center padding icons
 - [ ] bottom bar - remove unnecessary things
 - [ ] dose type to enum
+- [ ] create a DB as a class
+- [ ] pass an instance of a DB class throughout the application
 
 ## Add
 

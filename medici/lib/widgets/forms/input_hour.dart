@@ -2,10 +2,14 @@ import 'package:flutter/material.dart';
 
 class InputHour extends StatefulWidget {
   const InputHour(
-      {super.key, required this.label, required this.requiredField});
+      {super.key,
+      required this.label,
+      required this.requiredField,
+      required this.callback});
 
   final String label;
   final bool requiredField;
+  final Function callback;
 
   @override
   State<InputHour> createState() => _InputHour();
@@ -20,7 +24,7 @@ class _InputHour extends State<InputHour> {
     super.dispose();
   }
 
-   String? _validate(String? value) {
+  String? _validate(String? value) {
     if (!widget.requiredField) return null;
 
     if (value == null || value.isEmpty) {
@@ -45,8 +49,10 @@ class _InputHour extends State<InputHour> {
 
       if (hour == null) return;
 
+      _hourInputController.text =
+          hour.hour.toString() + ":" + hour.minute.toString();
 
-      _hourInputController.text = hour.hour.toString() + ":" + hour.minute.toString();
+      widget.callback(hour);
     }
 
     return TapRegion(
@@ -58,6 +64,7 @@ class _InputHour extends State<InputHour> {
           autocorrect: false,
           controller: _hourInputController,
           validator: _validate,
+          initialValue: TimeOfDay.now().toString(),
           decoration: InputDecoration(
             fillColor: Colors.white,
             filled: true,

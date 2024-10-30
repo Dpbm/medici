@@ -2,10 +2,14 @@ import 'package:flutter/material.dart';
 
 class InputText extends StatefulWidget {
   const InputText(
-      {super.key, required this.label, required this.requiredField});
+      {super.key,
+      required this.label,
+      required this.requiredField,
+      required this.callback});
 
   final String label;
   final bool requiredField;
+  final Function callback;
 
   @override
   State<InputText> createState() => _InputText();
@@ -21,7 +25,6 @@ class _InputText extends State<InputText> {
     return null;
   }
 
-
   @override
   Widget build(BuildContext context) {
     return TextFormField(
@@ -30,6 +33,10 @@ class _InputText extends State<InputText> {
       autocorrect: false,
       keyboardType: TextInputType.text,
       cursorColor: Colors.black,
+      onChanged: (String? input) {
+        if (input == null) return;
+        widget.callback(input);
+      },
       decoration: InputDecoration(
         fillColor: Colors.white,
         filled: true,
