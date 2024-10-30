@@ -1,4 +1,4 @@
-const frequencies = ['4 em 4h', '6 em 6h', '8 em 8h', '12 em 12h'];
+const frequencies = ['4 em 4h', '6 em 6h', '8 em 8h', '12 em 12h', '24 em 24h'];
 
 const doseTypes = ['comp.', 'ml'];
 
