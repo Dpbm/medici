@@ -1,23 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:medici/models/notification_settings.dart';
 
 class QuantityNotification extends StatefulWidget {
-  const QuantityNotification({super.key, required this.doseType, this.width});
+  const QuantityNotification(
+      {super.key, required this.doseType, this.width, required this.callback});
 
   final String doseType;
   final double? width;
+  final Function callback;
 
   @override
   State<QuantityNotification> createState() => _QuantityNotification();
 }
 
 class _QuantityNotification extends State<QuantityNotification> {
-  List<String> threshold = ["4", "5", "10"];
   late String selected;
 
   @override
   void initState() {
     super.initState();
-    selected = threshold.first;
+    selected = quantityOffsets.first;
   }
 
   void select(String? selection) {
@@ -25,12 +27,14 @@ class _QuantityNotification extends State<QuantityNotification> {
     setState(() {
       selected = selection;
     });
+
+    widget.callback(int.parse(selection));
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: widget.width,
+        width: widget.width,
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
             color: const Color(0xffffffff),
@@ -47,8 +51,8 @@ class _QuantityNotification extends State<QuantityNotification> {
               initialSelection: selected,
               onSelected: select,
               width: 80,
-              dropdownMenuEntries:
-                  threshold.map<DropdownMenuEntry<String>>((String value) {
+              dropdownMenuEntries: quantityOffsets
+                  .map<DropdownMenuEntry<String>>((String value) {
                 return DropdownMenuEntry<String>(value: value, label: value);
               }).toList(),
             ),

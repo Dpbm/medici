@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:medici/models/alert.dart';
 import 'package:medici/models/drug.dart';
+import 'package:medici/models/notification_settings.dart';
+import 'package:medici/utils/db.dart';
+import 'package:medici/utils/alerts.dart';
+import 'package:medici/utils/leaflet.dart';
 import 'package:medici/widgets/app_bar.dart';
 import 'package:medici/widgets/forms/image_area.dart';
 import 'package:medici/widgets/forms/input_hour.dart';
@@ -14,10 +19,13 @@ import 'package:medici/widgets/forms/switch_button.dart';
 import 'package:medici/widgets/return_button.dart';
 import 'package:medici/widgets/forms/input_date.dart';
 import 'package:medici/widgets/forms/input_type.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class Add extends StatefulWidget {
-  const Add({super.key, required this.width, required this.height});
+  const Add(
+      {super.key, required this.width, required this.height, required this.db});
   final double height, width;
+  final DB db;
 
   @override
   State<Add> createState() => _AddPage();
@@ -28,13 +36,15 @@ class _AddPage extends State<Add> {
   String type = doseTypes.first;
   String? name;
   String? image;
-  int? expirationDate;
-  int? lastDay;
+  String? expirationDate;
+  String? lastDay;
   double? quantity;
   double? dose;
-  String frequency = frequencies.first;
+  int frequency = frequencies.values.toList().first;
   bool recurrent = false;
   TimeOfDay hour = TimeOfDay.now();
+  int expirationOffset = int.parse(expirationOffsets.first);
+  int quantityOffset = int.parse(quantityOffsets.first);
 
   bool takingPicture = false;
 
@@ -50,7 +60,7 @@ class _AddPage extends State<Add> {
       });
     }
 
-    void getExpirationDate(int date) {
+    void getExpirationDate(String date) {
       setState(() {
         expirationDate = date;
       });
@@ -81,8 +91,10 @@ class _AddPage extends State<Add> {
     }
 
     void getFrequency(String inputFrequency) {
+      if (!frequencies.containsKey(inputFrequency)) return;
+
       setState(() {
-        frequency = inputFrequency;
+        frequency = frequencies[inputFrequency]!;
       });
     }
 
@@ -98,18 +110,87 @@ class _AddPage extends State<Add> {
       });
     }
 
-    void getLastDay(int inputLastDay) {
+    void getLastDay(String inputLastDay) {
       setState(() {
         lastDay = inputLastDay;
       });
     }
 
-    void _submit() {
-      //const Drug data = Drug(name: name, expirationDate: expirationDate, quantity: quantity, doseType: type, dose: dose)
+    void getExpirationOffset(int offset) {
+      setState(() {
+        expirationOffset = offset;
+      });
+    }
+
+    void getQuantityOffset(int offset) {
+      setState(() {
+        quantityOffset = offset;
+      });
+    }
+
+    Future<void> submit() async {
+      if (name == null || quantity == null || expirationDate == null) {
+        Fluttertoast.showToast(
+            msg:
+                "Você precisa preencher todos os campos obrigatórios para adicionar um medicamento!",
+            gravity: ToastGravity.CENTER,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0);
+      }
+
+      try {
+        final String? leaflet = await getLeaflet(name!);
+
+        Drug data = Drug(
+            name: name!,
+            image: image,
+            expirationDate: expirationDate!,
+            quantity: quantity!,
+            doseType: type,
+            dose: dose!,
+            recurrent: recurrent,
+            lastDay: lastDay,
+            leaflet: leaflet);
+
+        final int drugId = await widget.db.addDrug(data);
+
+        NotificationSettings notification = NotificationSettings(
+            drugId: drugId,
+            expirationOffset: expirationOffset,
+            quantityOffset: quantityOffset);
+
+        await widget.db.addNotification(notification);
+
+        List<String> hours = getAlerts(hour, frequency);
+        List<Alert> alerts =
+            hours.map((hour) => Alert(drugId: drugId, time: hour)).toList();
+
+        await widget.db.addAlerts(alerts);
+
+        Fluttertoast.showToast(
+            msg: "Medicamento adicionado com sucesso!",
+            gravity: ToastGravity.CENTER,
+            backgroundColor: Colors.green,
+            textColor: Colors.white,
+            fontSize: 16.0);
+
+        if (context.mounted) {
+          Navigator.pop(context);
+        }
+      } catch (error) {
+        Fluttertoast.showToast(
+            msg:
+                "Falha ao tentar adicionar o medicamento. Por favor, tente novamente mais tarde!",
+            gravity: ToastGravity.CENTER,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0);
+      }
     }
 
     return Scaffold(
-        appBar: getAppBar(context, const Color(0xffffffff)),
+        appBar: getAppBar(context, Colors.white),
         body: SizedBox(
             width: width,
             height: height,
@@ -153,7 +234,7 @@ class _AddPage extends State<Add> {
                           InputType(
                               options: doseTypes,
                               label: 'Tipo de Dose',
-                              requiredField: true,
+                              requiredField: false,
                               callback: getType),
                           const Separator(),
                           InputNumber(
@@ -162,9 +243,9 @@ class _AddPage extends State<Add> {
                               callback: getDose),
                           const Separator(),
                           InputSelect(
-                              options: frequencies,
+                              options: frequencies.keys.toList(),
                               label: 'Frequência',
-                              requiredField: true,
+                              requiredField: false,
                               callback: getFrequency),
                           const Separator(),
                           InputHour(
@@ -175,7 +256,7 @@ class _AddPage extends State<Add> {
                           SwitchButton(
                               callback: getRecurrent,
                               label: "Recorrente",
-                              requiredField: true),
+                              requiredField: false),
                           const Separator(),
                           recurrent
                               ? Container()
@@ -197,15 +278,19 @@ class _AddPage extends State<Add> {
                                     fontWeight: FontWeight.bold),
                               ),
                               const Separator(),
-                              ExpirationNotification(width: width),
+                              ExpirationNotification(
+                                  width: width, callback: getExpirationOffset),
                               const Separator(),
-                              QuantityNotification(doseType: type, width: width)
+                              QuantityNotification(
+                                  doseType: type,
+                                  width: width,
+                                  callback: getQuantityOffset)
                             ],
                           ),
                           const Separator(),
                           SubmitButton(
                             formState: _formState,
-                            callback: _submit,
+                            callback: submit,
                           )
                         ]),
                       ),

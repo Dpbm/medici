@@ -1,4 +1,10 @@
-const frequencies = ['4 em 4h', '6 em 6h', '8 em 8h', '12 em 12h', '24 em 24h'];
+const Map<String, int> frequencies = {
+  '4 em 4h': 4,
+  '6 em 6h': 6,
+  '8 em 8h': 8,
+  '12 em 12h': 12,
+  '24 em 24h': 24
+};
 
 const doseTypes = ['comp.', 'ml'];
 
@@ -6,13 +12,13 @@ class Drug {
   final int? id;
   final String name;
   final String? image;
-  final int expirationDate;
+  final String expirationDate;
   final double quantity;
   final String doseType;
   final double dose;
   final String? leaflet;
   final bool recurrent;
-  final int? lastDay;
+  final String? lastDay;
 
   const Drug(
       {this.id,
@@ -36,7 +42,7 @@ class Drug {
       'dose_type': doseType,
       'dose': dose,
       'leaflet': leaflet,
-      'recurrent': recurrent,
+      'recurrent': recurrent ? 1 : 0,
       'last_day': lastDay
     };
   }

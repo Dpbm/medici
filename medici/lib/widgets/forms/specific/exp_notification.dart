@@ -1,22 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:medici/models/notification_settings.dart';
 
 class ExpirationNotification extends StatefulWidget {
-  const ExpirationNotification({super.key, this.width});
+  const ExpirationNotification({super.key, this.width, required this.callback});
 
   final double? width;
+  final Function callback;
 
   @override
   State<ExpirationNotification> createState() => _ExpirationNotification();
 }
 
 class _ExpirationNotification extends State<ExpirationNotification> {
-  List<String> threshold = ["3", "4", "5"];
   late String selected;
 
   @override
   void initState() {
     super.initState();
-    selected = threshold.first;
+    selected = expirationOffsets.first;
   }
 
   void select(String? selection) {
@@ -24,6 +25,7 @@ class _ExpirationNotification extends State<ExpirationNotification> {
     setState(() {
       selected = selection;
     });
+    widget.callback(int.parse(selection));
   }
 
   @override
@@ -32,9 +34,7 @@ class _ExpirationNotification extends State<ExpirationNotification> {
         width: widget.width,
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(10)
-        ),
+            color: Colors.white, borderRadius: BorderRadius.circular(10)),
         child: Wrap(
           spacing: 10,
           crossAxisAlignment: WrapCrossAlignment.center,
@@ -47,8 +47,8 @@ class _ExpirationNotification extends State<ExpirationNotification> {
               initialSelection: selected,
               onSelected: select,
               width: 80,
-              dropdownMenuEntries:
-                  threshold.map<DropdownMenuEntry<String>>((String value) {
+              dropdownMenuEntries: expirationOffsets
+                  .map<DropdownMenuEntry<String>>((String value) {
                 return DropdownMenuEntry<String>(value: value, label: value);
               }).toList(),
             ),

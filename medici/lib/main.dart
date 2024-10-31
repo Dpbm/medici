@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:medici/home.dart';
+import 'package:medici/utils/db.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,6 +28,6 @@ class App extends StatelessWidget {
           primary: const Color(0x063E42),
           secondary: const Color(0x90DCC7),
         )),
-        home: Home(width: width, height: height));
+        home: Home(width: width, height: height, db: DB()));
   }
 }

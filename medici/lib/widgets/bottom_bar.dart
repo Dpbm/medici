@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:medici/home.dart';
 import 'package:medici/add.dart';
+import 'package:medici/utils/db.dart';
 import 'package:medici/widgets/icons.dart';
 
 class BottomBar extends StatelessWidget {
@@ -8,10 +9,12 @@ class BottomBar extends StatelessWidget {
       {super.key,
       required this.selected,
       required this.width,
-      required this.height});
+      required this.height,
+      required this.db});
 
   final int selected;
   final double width, height;
+  final DB db;
 
   @override
   Widget build(BuildContext context) {
@@ -40,11 +43,12 @@ class BottomBar extends StatelessWidget {
               builder: (context) => Home(
                     width: width,
                     height: height,
+                    db: db,
                   ));
           break;
         case 1:
           selected_widget = MaterialPageRoute(
-              builder: (context) => Add(width: width, height: height));
+              builder: (context) => Add(width: width, height: height, db: db));
           break;
         default:
           break;

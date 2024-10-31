@@ -20,11 +20,11 @@ class _SubmitButton extends State<SubmitButton> {
             shape: WidgetStatePropertyAll<RoundedRectangleBorder>(
                 RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10)))),
-        onPressed: () {
+        onPressed: () async {
           bool valid = widget.formState.currentState!.validate();
           if (!valid) return;
 
-          widget.callback();
+          await widget.callback();
         },
         child: const Text(
           "Adicionar",

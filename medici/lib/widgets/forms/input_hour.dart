@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:medici/utils/alerts.dart';
 
 class InputHour extends StatefulWidget {
   const InputHour(
@@ -17,6 +18,12 @@ class InputHour extends StatefulWidget {
 
 class _InputHour extends State<InputHour> {
   final TextEditingController _hourInputController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _hourInputController.text = buildTimeString(TimeOfDay.now());
+  }
 
   @override
   void dispose() {
@@ -49,9 +56,7 @@ class _InputHour extends State<InputHour> {
 
       if (hour == null) return;
 
-      _hourInputController.text =
-          hour.hour.toString() + ":" + hour.minute.toString();
-
+      _hourInputController.text = buildTimeString(hour);
       widget.callback(hour);
     }
 
@@ -64,7 +69,6 @@ class _InputHour extends State<InputHour> {
           autocorrect: false,
           controller: _hourInputController,
           validator: _validate,
-          initialValue: TimeOfDay.now().toString(),
           decoration: InputDecoration(
             fillColor: Colors.white,
             filled: true,

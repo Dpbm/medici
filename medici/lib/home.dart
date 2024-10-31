@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:medici/utils/db.dart';
 import 'package:medici/widgets/app_bar.dart';
 import 'package:medici/widgets/bottom_bar.dart';
 
 class Home extends StatefulWidget {
-  const Home({super.key, required this.height, required this.width});
+  const Home(
+      {super.key, required this.height, required this.width, required this.db});
   final double height, width;
+  final DB db;
 
   @override
   State<Home> createState() => _HomePage();
@@ -50,7 +53,11 @@ class _HomePage extends State<Home> {
             )
           ]),
         ),
-        bottomNavigationBar:
-            BottomBar(selected: 0, width: width, height: height));
+        bottomNavigationBar: BottomBar(
+          selected: 0,
+          width: width,
+          height: height,
+          db: widget.db,
+        ));
   }
 }
