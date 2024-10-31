@@ -72,4 +72,36 @@ class DB {
           conflictAlgorithm: ConflictAlgorithm.fail);
     }
   }
+
+  Future<List<Drug>> getDrugs() async {
+    await getDB();
+
+    final data = await database!.query('drug');
+    print(data);
+    return [
+      for (final {
+            'id': id as int,
+            'dose': dose as double,
+            'dose_type': doseType as String,
+            'expiration_date': expirationDate as String,
+            'name': name as String,
+            'quantity': quantity as double,
+            'recurrent': recurrent as bool,
+            'image': image as String?,
+            'last_day': lastDay as String?,
+            'leaflet': leaflet as String?
+          } in data)
+        Drug(
+            id: id,
+            dose: dose,
+            doseType: doseType,
+            expirationDate: expirationDate,
+            name: name,
+            quantity: quantity,
+            recurrent: recurrent,
+            image: image,
+            lastDay: lastDay,
+            leaflet: leaflet)
+    ];
+  }
 }

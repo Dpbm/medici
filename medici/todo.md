@@ -23,8 +23,15 @@
 
 ## Forms
 
-- [ ] pass a controller to each input
+- [x] pass a controller to each input
 - [x] change all elements to `Stateful`
 - [x] set input date and input time as `textFormField`s
 - [x] fix keyboard overlapping
 - [ ] check if submit is enabled or not (change styles as well)
+
+## HOME
+
+- [ ] scroll view
+- [ ] get drugs
+- [ ] create cards
+- [ ] fix `type 'int' is not a subtype of type 'double' in type cast`
