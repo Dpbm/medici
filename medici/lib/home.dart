@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:medici/models/drug.dart';
 import 'package:medici/utils/db.dart';
+import 'package:medici/utils/filter_data.dart';
 import 'package:medici/widgets/app_bar.dart';
 import 'package:medici/widgets/bottom_bar.dart';
 import 'package:medici/widgets/drug_card.dart';
@@ -22,7 +23,7 @@ class _HomePage extends State<Home> {
   @override
   void initState() {
     super.initState();
-    _data = getDrugs();
+    reload();
   }
 
   void reload() {
@@ -33,7 +34,7 @@ class _HomePage extends State<Home> {
   Future<List<DrugsScheduling>> getDrugs() async {
     try {
       final data = await widget.db.getDrugs();
-      return data;
+      return filterData(data);
     } catch (error) {
       Fluttertoast.showToast(
           msg: "Falha ao tentar listar seus medicamentos!",
@@ -97,12 +98,27 @@ class _HomePage extends State<Home> {
                   return noDrugs();
                 }
 
-                return ListView.builder(
-                    itemCount: snapshot.data?.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      DrugsScheduling drug = snapshot.data![index];
-                      return DrugCard(data: drug);
-                    });
+                return Column(
+                  children: [
+                    SizedBox(
+                        height: topBarSize,
+                        child: Container(
+                          padding: const EdgeInsets.all(30),
+                          child: const Align(
+                              alignment: Alignment.centerLeft,
+                              child: Text("Não Tomados",
+                                  style: TextStyle(
+                                      fontSize: 40, fontFamily: "Montserrat"))),
+                        )),
+                    Expanded(
+                        child: ListView.builder(
+                            itemCount: snapshot.data?.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              DrugsScheduling drug = snapshot.data![index];
+                              return DrugCard(data: drug);
+                            }))
+                  ],
+                );
               }),
         ),
         bottomNavigationBar: BottomBar(

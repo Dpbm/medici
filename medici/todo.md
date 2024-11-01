@@ -2,13 +2,14 @@
 
 ## ALL
 
-- [ ] remove appBar
+- [x] remove appBar
 - [ ] fix layout width/height
 - [ ] navbar center padding icons
 - [ ] bottom bar - remove unnecessary things
 - [ ] dose type to enum
-- [ ] create a DB as a class
-- [ ] pass an instance of a DB class throughout the application
+- [x] create a DB as a class
+- [x] pass an instance of a DB class throughout the application
+
 
 ## Add
 
@@ -36,7 +37,12 @@
 - [x] scroll view
 - [x] get drugs
 - [x] create cards
-- [ ] fix `type 'int' is not a subtype of type 'double' in type cast`
+- [x] fix `type 'int' is not a subtype of type 'double' in type cast`
 - [ ] fix card image
 - [ ] add title
 - [ ] order by time
+- [x] fix time diff, once if the next time to take is tomorrow, the diff is smaller than doses for today late
+
+## CARDS
+
+- [x] fix middle text size

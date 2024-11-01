@@ -24,6 +24,9 @@ class DrugCard extends StatelessWidget {
           color: Colors.white,
           borderRadius: BorderRadius.all(Radius.circular(10))),
       child: Row(
+        mainAxisAlignment: timeDiff < 0
+            ? MainAxisAlignment.spaceBetween
+            : MainAxisAlignment.start,
         children: [
           Container(
               margin: const EdgeInsets.all(10),
@@ -39,8 +42,8 @@ class DrugCard extends StatelessWidget {
                       ))),
           Container(
             height: 120,
+            width: 180,
             alignment: Alignment.centerLeft,
-            margin: const EdgeInsets.all(10),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -59,7 +62,18 @@ class DrugCard extends StatelessWidget {
                     style: const TextStyle(fontSize: 14))
               ],
             ),
-          )
+          ),
+          timeDiff < 0
+              ? Container(
+                  width: 60,
+                  height: 120,
+                  decoration: const BoxDecoration(
+                      color: Colors.red,
+                      borderRadius: BorderRadius.only(
+                          topRight: Radius.circular(10),
+                          bottomRight: Radius.circular(10))),
+                )
+              : Container()
         ],
       ),
     );

@@ -7,7 +7,9 @@
         "datetime",
         "fluttertoast",
         "Fluttertoast",
+        "icone",
         "LTRB",
-        "medici"
+        "medici",
+        "remedio"
     ]
 }
