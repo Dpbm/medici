@@ -19,7 +19,7 @@ class DrugCard extends StatelessWidget {
 
     return Container(
       height: 120,
-      margin: const EdgeInsets.all(10),
+      margin: const EdgeInsets.fromLTRB(20, 10, 20, 10),
       decoration: const BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.all(Radius.circular(10))),
