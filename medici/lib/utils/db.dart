@@ -19,9 +19,9 @@ class DB {
           image TEXT, 
           expiration_date INTEGER NOT NULL, 
           last_day INTEGER, 
-          quantity NUMERIC NOT NULL, 
+          quantity REAL NOT NULL, 
           dose_type TEXT NOT NULL, 
-          dose NUMERIC NOT NULL, 
+          dose REAL NOT NULL, 
           recurrent INTEGER NOT NULL,
           leaflet TEXT)
       ''');
@@ -73,35 +73,32 @@ class DB {
     }
   }
 
-  Future<List<Drug>> getDrugs() async {
+  Future<List<DrugsScheduling>> getDrugs() async {
     await getDB();
 
-    final data = await database!.query('drug');
-    print(data);
-    return [
-      for (final {
-            'id': id as int,
-            'dose': dose as double,
-            'dose_type': doseType as String,
-            'expiration_date': expirationDate as String,
-            'name': name as String,
-            'quantity': quantity as double,
-            'recurrent': recurrent as bool,
-            'image': image as String?,
-            'last_day': lastDay as String?,
-            'leaflet': leaflet as String?
-          } in data)
-        Drug(
-            id: id,
-            dose: dose,
-            doseType: doseType,
-            expirationDate: expirationDate,
-            name: name,
-            quantity: quantity,
-            recurrent: recurrent,
-            image: image,
-            lastDay: lastDay,
-            leaflet: leaflet)
-    ];
+    final data = await database!.rawQuery('''
+      SELECT 
+        alert.id,
+        alert.time,
+        drug.name, 
+        drug.image, 
+        drug.dose_type, 
+        drug.dose
+      FROM alert 
+      INNER JOIN drug ON drug.id = alert.drug_id;
+    ''');
+
+    List<DrugsScheduling> drugs = [];
+    for (final drug in data) {
+      drugs.add(DrugsScheduling(
+          id: drug['id'] as int,
+          time: drug['time'] as String,
+          name: drug['name'] as String,
+          doseType: drug['dose_type'] as String,
+          dose: drug['dose'] as double,
+          image: drug['image'] as String?));
+    }
+
+    return drugs;
   }
 }

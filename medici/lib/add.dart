@@ -98,9 +98,9 @@ class _AddPage extends State<Add> {
       });
     }
 
-    void getImage(String image) {
+    void getImage(String inputImage) {
       setState(() {
-        image = image;
+        image = inputImage;
       });
     }
 

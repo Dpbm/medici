@@ -4,6 +4,7 @@ import 'package:medici/models/drug.dart';
 import 'package:medici/utils/db.dart';
 import 'package:medici/widgets/app_bar.dart';
 import 'package:medici/widgets/bottom_bar.dart';
+import 'package:medici/widgets/drug_card.dart';
 
 class Home extends StatefulWidget {
   const Home(
@@ -16,7 +17,7 @@ class Home extends StatefulWidget {
 }
 
 class _HomePage extends State<Home> {
-  Future<List<Drug>>? _data;
+  Future<List<DrugsScheduling>>? _data;
 
   @override
   void initState() {
@@ -24,15 +25,16 @@ class _HomePage extends State<Home> {
     _data = getDrugs();
   }
 
-  Future<List<Drug>> getDrugs() async {
+  void reload() {
+    setState(() {});
+    _data = getDrugs();
+  }
+
+  Future<List<DrugsScheduling>> getDrugs() async {
     try {
       final data = await widget.db.getDrugs();
-      print("aaaaaa");
-      setState(() {});
       return data;
     } catch (error) {
-      print("asjdadajkdjkasd");
-      print(error);
       Fluttertoast.showToast(
           msg: "Falha ao tentar listar seus medicamentos!",
           gravity: ToastGravity.CENTER,
@@ -84,10 +86,10 @@ class _HomePage extends State<Home> {
         body: SizedBox(
           width: width,
           height: height,
-          child: FutureBuilder<List<Drug>>(
+          child: FutureBuilder<List<DrugsScheduling>>(
               future: _data,
-              builder:
-                  (BuildContext context, AsyncSnapshot<List<Drug>> snapshot) {
+              builder: (BuildContext context,
+                  AsyncSnapshot<List<DrugsScheduling>> snapshot) {
                 if (snapshot.hasError ||
                     !snapshot.hasData ||
                     snapshot.data == null ||
@@ -98,7 +100,8 @@ class _HomePage extends State<Home> {
                 return ListView.builder(
                     itemCount: snapshot.data?.length,
                     itemBuilder: (BuildContext context, int index) {
-                      return Text(snapshot.data![index].name);
+                      DrugsScheduling drug = snapshot.data![index];
+                      return DrugCard(data: drug);
                     });
               }),
         ),
@@ -107,6 +110,7 @@ class _HomePage extends State<Home> {
           width: width,
           height: height,
           db: widget.db,
+          callback: reload,
         ));
   }
 }
