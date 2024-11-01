@@ -10,11 +10,13 @@ class BottomBar extends StatelessWidget {
       required this.selected,
       required this.width,
       required this.height,
-      required this.db});
+      required this.db,
+      this.callback});
 
   final int selected;
   final double width, height;
   final DB db;
+  final Function? callback;
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +33,7 @@ class BottomBar extends StatelessWidget {
                 icon: index == selected ? icons[index].active() : icons[index],
                 label: ""));
 
-    Future<void> goToPage(int index) async {
+    void goToPage(int index) {
       if (index == selected) return;
 
       MaterialPageRoute<dynamic>? selected_widget =
@@ -56,7 +58,11 @@ class BottomBar extends StatelessWidget {
 
       if (selected_widget == null) return; //TODO: remove this later
 
-      await Navigator.push(context, selected_widget);
+      Navigator.push(context, selected_widget).then((_){
+        if(callback!=null){
+          callback!();
+        }
+      });
     }
 
     return BottomNavigationBar(

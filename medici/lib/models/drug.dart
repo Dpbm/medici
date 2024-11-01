@@ -47,3 +47,20 @@ class Drug {
     };
   }
 }
+
+class DrugsScheduling {
+  final int id;
+  final String time;
+  final String name;
+  final String? image;
+  final String doseType;
+  final double dose;
+
+  const DrugsScheduling(
+      {required this.id,
+      required this.time,
+      required this.name,
+      this.image,
+      required this.doseType,
+      required this.dose});
+}
