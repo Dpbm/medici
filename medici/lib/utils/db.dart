@@ -80,6 +80,7 @@ class DB {
       SELECT 
         alert.id,
         alert.time,
+        alert.drug_id,
         drug.name, 
         drug.image, 
         drug.dose_type, 
@@ -92,6 +93,7 @@ class DB {
     for (final drug in data) {
       drugs.add(DrugsScheduling(
           id: drug['id'] as int,
+          drugId: drug['drug_id'] as int,
           time: drug['time'] as String,
           name: drug['name'] as String,
           doseType: drug['dose_type'] as String,
@@ -100,5 +102,44 @@ class DB {
     }
 
     return drugs;
+  }
+
+  Future<FullDrug> getFullDrugData(int id) async {
+    await getDB();
+
+    final drug_data =
+        (await database!.query('drug', where: 'id=?', whereArgs: [id])).first;
+    final notification_data = (await database!
+            .query('notification', where: 'drug_id=?', whereArgs: [id]))
+        .first;
+    final alerts_data =
+        await database!.query('alert', where: 'drug_id=?', whereArgs: [id]);
+
+    final notification = NotificationSettings(
+        drugId: notification_data['drug_id'] as int,
+        expirationOffset: notification_data['expiration_offset'] as int,
+        quantityOffset: notification_data['quantity_offset'] as int,
+        id: notification_data['id'] as int);
+    List<Alert> schedule = [];
+    for (final alert in alerts_data) {
+      schedule.add(Alert(
+          drugId: alert['drug_id'] as int,
+          time: alert['time'] as String,
+          id: alert['id'] as int));
+    }
+
+    return FullDrug(
+        dose: drug_data['dose'] as double,
+        doseType: drug_data['dose_type'] as String,
+        expirationDate: drug_data['expiration_date'] as String,
+        name: drug_data['name'] as String,
+        id: id,
+        quantity: drug_data['quantity'] as double,
+        recurrent: drug_data['recurrent'] == 1,
+        image: drug_data['image'] as String?,
+        lastDay: drug_data['last_day'] as String?,
+        leaflet: drug_data['leaflet'] as String?,
+        notification: notification,
+        schedule: schedule);
   }
 }

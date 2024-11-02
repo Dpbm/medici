@@ -10,17 +10,16 @@
 - [x] create a DB as a class
 - [x] pass an instance of a DB class throughout the application
 
-
 ## Add
 
-- [ ] top bar
-- [ ] permissions to access camera, files and notifications
-- [ ] handle images (camera/files)
-- [ ] db insert drug function
-- [ ] add db model
-- [ ] open calendar
+- [ ] fix top bar
+- [x] permissions to access camera, files and notifications
+- [x] handle images (camera/files)
+- [x] db insert drug function
+- [x] add db model
+- [x] open calendar
 - [ ] setup notifications
-- [ ] refactor take photo func.
+- [x] refactor take photo func.
 - [ ] pad time with zeros
 
 ## Forms
@@ -46,3 +45,18 @@
 ## CARDS
 
 - [x] fix middle text size
+
+## Drugs
+
+- [ ] already taken status
+- [ ] drug status (archived, expired, drugs finished)
+- [ ] check for Tomorrow filter
+
+## Drug page
+
+- [ ] add notification settings
+- [ ] get everything related to that
+- [ ] archive
+- [ ] delete
+- [ ] edit
+- [ ] error text
