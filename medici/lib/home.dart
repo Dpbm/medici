@@ -115,7 +115,11 @@ class _HomePage extends State<Home> {
                             itemCount: snapshot.data?.length,
                             itemBuilder: (BuildContext context, int index) {
                               DrugsScheduling drug = snapshot.data![index];
-                              return DrugCard(data: drug);
+                              return DrugCard(
+                                  data: drug,
+                                  width: width,
+                                  height: height,
+                                  db: widget.db);
                             }))
                   ],
                 );

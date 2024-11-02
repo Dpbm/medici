@@ -1,3 +1,6 @@
+import 'package:medici/models/alert.dart';
+import 'package:medici/models/notification_settings.dart';
+
 const Map<String, int> frequencies = {
   '4 em 4h': 4,
   '6 em 6h': 6,
@@ -50,6 +53,7 @@ class Drug {
 
 class DrugsScheduling {
   final int id;
+  final int drugId;
   final String time;
   final String name;
   final String? image;
@@ -58,9 +62,29 @@ class DrugsScheduling {
 
   const DrugsScheduling(
       {required this.id,
+      required this.drugId,
       required this.time,
       required this.name,
       this.image,
       required this.doseType,
       required this.dose});
+}
+
+class FullDrug extends Drug {
+  final NotificationSettings notification;
+  final List<Alert> schedule;
+
+  const FullDrug(
+      {required super.dose,
+      required super.doseType,
+      required super.expirationDate,
+      required super.name,
+      required super.id,
+      required super.quantity,
+      required super.recurrent,
+      super.image,
+      super.lastDay,
+      super.leaflet,
+      required this.notification,
+      required this.schedule});
 }

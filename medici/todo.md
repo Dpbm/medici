@@ -13,9 +13,9 @@
 ## Add
 
 - [ ] fix top bar
-- [ ] permissions to access camera, files and notifications
+- [x] permissions to access camera, files and notifications
 - [x] handle images (camera/files)
-- [ ] db insert drug function
+- [x] db insert drug function
 - [x] add db model
 - [x] open calendar
 - [ ] setup notifications
@@ -50,3 +50,13 @@
 
 - [ ] already taken status
 - [ ] drug status (archived, expired, drugs finished)
+- [ ] check for Tomorrow filter
+
+## Drug page
+
+- [ ] add notification settings
+- [ ] get everything related to that
+- [ ] archive
+- [ ] delete
+- [ ] edit
+- [ ] error text
