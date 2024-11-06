@@ -51,12 +51,18 @@
 - [ ] already taken status
 - [ ] drug status (archived, expired, drugs finished)
 - [ ] check for Tomorrow filter
+- [ ] update status indicator widget
 
 ## Drug page
 
-- [ ] add notification settings
-- [ ] get everything related to that
+- [x] add notification settings
+- [x] get everything related to that
 - [ ] archive
 - [ ] delete
 - [ ] edit
 - [ ] error text
+- [ ] update default image
+
+## Leaflet
+
+- [ ] fix JWT expiration date
