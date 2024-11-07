@@ -152,7 +152,7 @@ class _DrugPage extends State<DrugPage> {
                 child: data.image != null
                     ? Image.file(File(data.image!),
                         width: sectionWidth, height: 300, fit: BoxFit.cover)
-                    : Image.asset('images/remedio_icone.png',
+                    : Image.asset('images/remedio_imagem_padrao.png',
                         width: sectionWidth, height: 300, fit: BoxFit.cover),
               ),
             ),
