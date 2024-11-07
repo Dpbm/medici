@@ -43,7 +43,7 @@
 - [ ] order by time
 - [x] fix time diff, once if the next time to take is tomorrow, the diff is smaller than doses for today late
 - [x] reload after coming back from drug page
-- [ ] get drugs that are only with the `current` status
+- [x] get drugs that are need to be taken today
 - [ ] get alerts that are neither `taken` nor `late`
 
 ## CARDS
