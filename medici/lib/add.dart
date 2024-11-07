@@ -151,7 +151,8 @@ class _AddPage extends State<Add> {
             dose: dose!,
             recurrent: recurrent,
             lastDay: lastDay,
-            leaflet: leaflet);
+            leaflet: leaflet,
+            status: 'current');
 
         final int drugId = await widget.db.addDrug(data);
 

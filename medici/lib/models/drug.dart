@@ -22,6 +22,7 @@ class Drug {
   final String? leaflet;
   final bool recurrent;
   final String? lastDay;
+  final String status;
 
   const Drug(
       {this.id,
@@ -33,7 +34,8 @@ class Drug {
       required this.dose,
       required this.recurrent,
       this.lastDay,
-      this.leaflet});
+      this.leaflet,
+      required this.status});
 
   Map<String, Object?> toMap() {
     return {
@@ -46,7 +48,8 @@ class Drug {
       'dose': dose,
       'leaflet': leaflet,
       'recurrent': recurrent ? 1 : 0,
-      'last_day': lastDay
+      'last_day': lastDay,
+      'status': status
     };
   }
 }
@@ -59,6 +62,7 @@ class DrugsScheduling {
   final String? image;
   final String doseType;
   final double dose;
+  final String status;
 
   const DrugsScheduling(
       {required this.id,
@@ -67,7 +71,8 @@ class DrugsScheduling {
       required this.name,
       this.image,
       required this.doseType,
-      required this.dose});
+      required this.dose,
+      required this.status});
 }
 
 class FullDrug extends Drug {
@@ -82,6 +87,7 @@ class FullDrug extends Drug {
       required super.id,
       required super.quantity,
       required super.recurrent,
+      required super.status,
       super.image,
       super.lastDay,
       super.leaflet,

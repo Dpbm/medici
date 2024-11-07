@@ -42,12 +42,15 @@
 - [ ] add title
 - [ ] order by time
 - [x] fix time diff, once if the next time to take is tomorrow, the diff is smaller than doses for today late
-- [ ] reload after coming back from drug page
+- [x] reload after coming back from drug page
+- [ ] get drugs that are only with the `current` status
+- [ ] get alerts that are neither `taken` nor `late`
 
 ## CARDS
 
 - [x] fix middle text size
 - [ ] fix image height
+- [ ] update default image
 
 ## Drugs
 
@@ -55,12 +58,15 @@
 - [ ] drug status (archived, expired, drugs finished)
 - [ ] check for Tomorrow filter
 - [ ] update status indicator widget
+- [ ] add status for each alert
 
 ## Drug page
 
 - [x] add notification settings
 - [x] get everything related to that
-- [ ] archive
+- [x] archive
+- [x] unarchive from drugs list
+- [ ] update style for archive/unarchive button 
 - [x] delete
 - [x] edit
 - [x] error text

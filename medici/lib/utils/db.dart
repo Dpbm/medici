@@ -23,7 +23,8 @@ class DB {
           dose_type TEXT NOT NULL, 
           dose REAL NOT NULL, 
           recurrent INTEGER NOT NULL,
-          leaflet TEXT)
+          leaflet TEXT,
+          status TEXT NOT NULL)
       ''');
 
       db.execute('''
@@ -84,7 +85,8 @@ class DB {
         drug.name, 
         drug.image, 
         drug.dose_type, 
-        drug.dose
+        drug.dose,
+        drug.status
       FROM alert 
       INNER JOIN drug ON drug.id = alert.drug_id;
     ''');
@@ -98,7 +100,8 @@ class DB {
           name: drug['name'] as String,
           doseType: drug['dose_type'] as String,
           dose: drug['dose'] as double,
-          image: drug['image'] as String?));
+          image: drug['image'] as String?,
+          status: drug['status'] as String));
     }
 
     return drugs;
@@ -139,6 +142,7 @@ class DB {
         image: drug_data['image'] as String?,
         lastDay: drug_data['last_day'] as String?,
         leaflet: drug_data['leaflet'] as String?,
+        status: drug_data['status'] as String,
         notification: notification,
         schedule: schedule);
   }
@@ -149,5 +153,19 @@ class DB {
     await database!.delete('notification', where: 'drug_id=?', whereArgs: [id]);
     await database!.delete('alert', where: 'drug_id=?', whereArgs: [id]);
     await database!.delete('drug', where: 'id=?', whereArgs: [id]);
+  }
+
+  Future<void> archiveDrug(int id) async {
+    await getDB();
+
+    await database!.update('drug', {'status': 'archived'},
+        where: 'id = ?', whereArgs: [id]);
+  }
+
+  Future<void> unarchiveDrug(int id) async {
+    await getDB();
+
+    await database!.update('drug', {'status': 'current'},
+        where: 'id = ?', whereArgs: [id]);
   }
 }

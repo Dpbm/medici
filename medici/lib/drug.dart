@@ -35,6 +35,7 @@ class _DrugPage extends State<DrugPage> {
 
   bool deleting = false;
   int? id;
+  String? status;
 
   @override
   void initState() {
@@ -70,6 +71,50 @@ class _DrugPage extends State<DrugPage> {
         .then((_) {
       setState(() {});
     });
+  }
+
+  Future<void> archiveDrug() async {
+    try {
+      await widget.db.archiveDrug(id!);
+      Fluttertoast.showToast(
+          msg: "Medicamento arquivado com sucesso!",
+          gravity: ToastGravity.CENTER,
+          backgroundColor: Colors.green,
+          textColor: Colors.white,
+          fontSize: 16.0);
+      setState(() {
+        status = 'archived';
+      });
+    } catch (error) {
+      Fluttertoast.showToast(
+          msg: "Falha ao arquivar o seu medicamento!",
+          gravity: ToastGravity.CENTER,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0);
+    }
+  }
+
+  Future<void> unarchiveDrug() async {
+    try {
+      await widget.db.unarchiveDrug(id!);
+      Fluttertoast.showToast(
+          msg: "Medicamento desarquivado com sucesso!",
+          gravity: ToastGravity.CENTER,
+          backgroundColor: Colors.green,
+          textColor: Colors.white,
+          fontSize: 16.0);
+      setState(() {
+        status = 'current';
+      });
+    } catch (error) {
+      Fluttertoast.showToast(
+          msg: "Falha ao desarquivar o seu medicamento!",
+          gravity: ToastGravity.CENTER,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0);
+    }
   }
 
   @override
@@ -297,7 +342,10 @@ class _DrugPage extends State<DrugPage> {
                         DeleteButton(
                           onPressed: deleteDrug,
                         ),
-                        const ArchiveButton()
+                        ArchiveButton(
+                            onPressed: status == null || status == 'current'
+                                ? archiveDrug
+                                : unarchiveDrug)
                       ],
                     )
                   ],
@@ -332,6 +380,7 @@ class _DrugPage extends State<DrugPage> {
                             final FullDrug data = snapshot.data!;
 
                             id = data.id;
+                            status = data.status;
 
                             return renderDrugData(data);
                           })))
