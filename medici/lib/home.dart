@@ -119,7 +119,8 @@ class _HomePage extends State<Home> {
                                   data: drug,
                                   width: width,
                                   height: height,
-                                  db: widget.db);
+                                  db: widget.db,
+                                  callback: reload);
                             }))
                   ],
                 );

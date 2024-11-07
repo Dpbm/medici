@@ -142,4 +142,12 @@ class DB {
         notification: notification,
         schedule: schedule);
   }
+
+  Future<void> deleteDrug(int id) async {
+    await getDB();
+
+    await database!.delete('notification', where: 'drug_id=?', whereArgs: [id]);
+    await database!.delete('alert', where: 'drug_id=?', whereArgs: [id]);
+    await database!.delete('drug', where: 'id=?', whereArgs: [id]);
+  }
 }

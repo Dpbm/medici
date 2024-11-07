@@ -9,6 +9,7 @@
 - [ ] dose type to enum
 - [x] create a DB as a class
 - [x] pass an instance of a DB class throughout the application
+- [ ] fix Icon Buttons Widgets. Set it as IconButton SubClasses 
 
 ## Add
 
@@ -41,10 +42,12 @@
 - [ ] add title
 - [ ] order by time
 - [x] fix time diff, once if the next time to take is tomorrow, the diff is smaller than doses for today late
+- [ ] reload after coming back from drug page
 
 ## CARDS
 
 - [x] fix middle text size
+- [ ] fix image height
 
 ## Drugs
 
@@ -58,7 +61,7 @@
 - [x] add notification settings
 - [x] get everything related to that
 - [ ] archive
-- [ ] delete
+- [x] delete
 - [ ] edit
 - [ ] error text
 - [ ] update default image

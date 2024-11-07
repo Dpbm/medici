@@ -9,13 +9,15 @@ class DrugCard extends StatelessWidget {
   final DrugsScheduling data;
   final double width, height;
   final DB db;
+  final Function callback;
 
   const DrugCard(
       {super.key,
       required this.data,
       required this.width,
       required this.height,
-      required this.db});
+      required this.db,
+      required this.callback});
 
   @override
   Widget build(BuildContext context) {
@@ -25,10 +27,15 @@ class DrugCard extends StatelessWidget {
 
     return GestureDetector(
         onTap: () => Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (BuildContext context) => DrugPage(
-                    id: data.drugId, width: width, height: height, db: db))),
+                context,
+                MaterialPageRoute(
+                    builder: (BuildContext context) => DrugPage(
+                        id: data.drugId,
+                        width: width,
+                        height: height,
+                        db: db))).then((_) {
+              callback();
+            }),
         child: Container(
           height: 120,
           margin: const EdgeInsets.fromLTRB(20, 10, 20, 10),

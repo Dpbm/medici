@@ -12,7 +12,6 @@ import 'package:medici/widgets/edit_button.dart';
 import 'package:medici/widgets/icons.dart';
 import 'package:medici/widgets/return_button.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:url_launcher/url_launcher_string.dart';
 
 class DrugPage extends StatefulWidget {
   const DrugPage(
@@ -32,6 +31,9 @@ class DrugPage extends StatefulWidget {
 
 class _DrugPage extends State<DrugPage> {
   Future<FullDrug?>? _data;
+
+  bool deleting = false;
+  int? id;
 
   @override
   void initState() {
@@ -68,6 +70,37 @@ class _DrugPage extends State<DrugPage> {
     const double topBarSize = 80.0;
 
     final double sectionWidth = width - 40;
+
+    Future<void> deleteDrug() async {
+      try {
+        Fluttertoast.showToast(
+            msg: "Deletando medicamento...",
+            gravity: ToastGravity.CENTER,
+            backgroundColor: Colors.yellow,
+            textColor: Colors.white,
+            fontSize: 16.0);
+
+        await widget.db.deleteDrug(id!);
+
+        Fluttertoast.showToast(
+            msg: "Medicamento deletado com sucesso!",
+            gravity: ToastGravity.CENTER,
+            backgroundColor: Colors.green,
+            textColor: Colors.white,
+            fontSize: 16.0);
+
+        if (context.mounted) {
+          Navigator.pop(context);
+        }
+      } catch (error) {
+        Fluttertoast.showToast(
+            msg: "Falha ao tentar deletar o  seu medicamento!",
+            gravity: ToastGravity.CENTER,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0);
+      }
+    }
 
     Future<void> _openLeaflet(String? leaflet) async {
       try {
@@ -243,12 +276,18 @@ class _DrugPage extends State<DrugPage> {
                 padding: const EdgeInsets.all(10),
                 color: Colors.white,
                 alignment: Alignment.centerLeft,
-                child: const Row(
+                child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    ReturnButton(),
+                    const ReturnButton(),
                     Row(
-                      children: [EditButton(), DeleteButton(), ArchiveButton()],
+                      children: [
+                        const EditButton(),
+                        DeleteButton(
+                          onPressed: deleteDrug,
+                        ),
+                        const ArchiveButton()
+                      ],
                     )
                   ],
                 ),
@@ -271,6 +310,8 @@ class _DrugPage extends State<DrugPage> {
                             }
 
                             final FullDrug data = snapshot.data!;
+
+                            id = data.id;
 
                             return renderDrugData(data);
                           })))
