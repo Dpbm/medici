@@ -63,8 +63,9 @@
 - [ ] archive
 - [x] delete
 - [ ] edit
-- [ ] error text
+- [x] error text
 - [ ] update default image
+- [ ] fix schedule component for one dose
 
 ## Leaflet
 

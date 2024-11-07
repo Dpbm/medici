@@ -306,7 +306,16 @@ class _DrugPage extends State<DrugPage> {
                             if (!snapshot.hasData ||
                                 snapshot.hasError ||
                                 snapshot.data == null) {
-                              return const Text("Error");
+                              return Container(
+                                  alignment: Alignment.center,
+                                  height: height - 100,
+                                  width: width,
+                                  child: const Text(
+                                    "Erro. Por favor tente novamente mais tarde!",
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                        fontSize: 30, color: Colors.red),
+                                  ));
                             }
 
                             final FullDrug data = snapshot.data!;
