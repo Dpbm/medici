@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:medici/drugs_list.dart';
 import 'package:medici/home.dart';
 import 'package:medici/add.dart';
 import 'package:medici/utils/db.dart';
@@ -52,14 +53,20 @@ class BottomBar extends StatelessWidget {
           selected_widget = MaterialPageRoute(
               builder: (context) => Add(width: width, height: height, db: db));
           break;
+
+        case 2:
+          selected_widget = MaterialPageRoute(
+              builder: (context) =>
+                  DrugsList(width: width, height: height, db: db));
+          break;
         default:
           break;
       }
 
       if (selected_widget == null) return; //TODO: remove this later
 
-      Navigator.push(context, selected_widget).then((_){
-        if(callback!=null){
+      Navigator.push(context, selected_widget).then((_) {
+        if (callback != null) {
           callback!();
         }
       });

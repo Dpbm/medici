@@ -9,7 +9,9 @@
 - [ ] dose type to enum
 - [x] create a DB as a class
 - [x] pass an instance of a DB class throughout the application
-- [ ] fix Icon Buttons Widgets. Set it as IconButton SubClasses 
+- [ ] fix Icon Buttons Widgets. Set it as IconButton SubClasses
+- [x] update icon color on bottom bar
+- [x] ensure that bottom bar won't push to the same screen
 
 ## Add
 
@@ -51,6 +53,8 @@
 - [x] fix middle text size
 - [ ] fix image height
 - [ ] update default image
+- [ ] fix red bar size
+- [ ] add an Icon to show that's archived
 
 ## Drugs
 

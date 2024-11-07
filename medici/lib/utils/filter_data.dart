@@ -2,10 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:medici/models/drug.dart';
 
 List<DrugsScheduling> filterData(List<DrugsScheduling> data) {
-  final medsForToday =
+  List<DrugsScheduling> medsForToday =
       data.where((DrugsScheduling drug) => !forTomorrow(drug)).toList();
-  medsForToday.sort(sortByHour);
+  medsForToday = orderData(medsForToday);
   return medsForToday;
+}
+
+List<DrugsScheduling> orderData(List<DrugsScheduling> data) {
+  data.sort(sortByHour);
+  return data;
 }
 
 int sortByHour(DrugsScheduling drug1, DrugsScheduling drug2) {
