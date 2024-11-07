@@ -40,6 +40,7 @@ class _AddPage extends State<Add> {
   String? lastDay;
   double? quantity;
   double? dose;
+  String frequencyString = frequencies.keys.toList().first;
   int frequency = frequencies.values.toList().first;
   bool recurrent = false;
   TimeOfDay hour = TimeOfDay.now();
@@ -95,6 +96,7 @@ class _AddPage extends State<Add> {
 
       setState(() {
         frequency = frequencies[inputFrequency]!;
+        frequencyString = inputFrequency;
       });
     }
 
@@ -152,7 +154,9 @@ class _AddPage extends State<Add> {
             recurrent: recurrent,
             lastDay: lastDay,
             leaflet: leaflet,
-            status: 'current');
+            status: 'current',
+            frequency: frequencyString,
+            startingTime: hour.hour.toString() + ":" + hour.minute.toString());
 
         final int drugId = await widget.db.addDrug(data);
 

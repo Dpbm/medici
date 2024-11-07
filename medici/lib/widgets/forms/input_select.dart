@@ -7,12 +7,12 @@ class InputSelect extends StatefulWidget {
       required this.label,
       required this.requiredField,
       required this.callback,
-      this.width});
+      this.initialValue});
 
   final List<String> options;
   final String label;
+  final String? initialValue;
   final bool requiredField;
-  final double? width;
   final Function callback;
 
   @override
@@ -25,7 +25,7 @@ class _InputSelect extends State<InputSelect> {
   @override
   void initState() {
     super.initState();
-    selected = widget.options.first;
+    selected = widget.initialValue ?? widget.options.first;
   }
 
   void select(String? selection) {
@@ -51,7 +51,6 @@ class _InputSelect extends State<InputSelect> {
               DropdownMenu<String>(
                 initialSelection: widget.options.first,
                 onSelected: select,
-                width: widget.width,
                 dropdownMenuEntries: widget.options
                     .map<DropdownMenuEntry<String>>((String value) {
                   return DropdownMenuEntry<String>(value: value, label: value);

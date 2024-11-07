@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:medici/models/notification_settings.dart';
 
 class ExpirationNotification extends StatefulWidget {
-  const ExpirationNotification({super.key, this.width, required this.callback});
+  const ExpirationNotification(
+      {super.key, this.width, required this.callback, this.initialValue});
 
   final double? width;
+  final int? initialValue;
   final Function callback;
 
   @override
@@ -17,7 +19,12 @@ class _ExpirationNotification extends State<ExpirationNotification> {
   @override
   void initState() {
     super.initState();
-    selected = expirationOffsets.first;
+    try {
+      selected = expirationOffsets[
+          expirationOffsets.indexOf(widget.initialValue.toString())];
+    } catch (error) {
+      selected = expirationOffsets.first;
+    }
   }
 
   void select(String? selection) {

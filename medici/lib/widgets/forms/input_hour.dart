@@ -6,9 +6,11 @@ class InputHour extends StatefulWidget {
       {super.key,
       required this.label,
       required this.requiredField,
-      required this.callback});
+      required this.callback,
+      this.initialValue});
 
   final String label;
+  final TimeOfDay? initialValue;
   final bool requiredField;
   final Function callback;
 
@@ -22,7 +24,8 @@ class _InputHour extends State<InputHour> {
   @override
   void initState() {
     super.initState();
-    _hourInputController.text = buildTimeString(TimeOfDay.now());
+    _hourInputController.text =
+        buildTimeString(widget.initialValue ?? TimeOfDay.now());
   }
 
   @override

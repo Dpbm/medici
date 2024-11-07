@@ -5,9 +5,11 @@ class InputNumber extends StatefulWidget {
       {super.key,
       required this.label,
       required this.requiredField,
-      required this.callback});
+      required this.callback,
+      this.initialValue});
 
   final String label;
+  final double? initialValue;
   final bool requiredField;
   final Function callback;
 
@@ -47,6 +49,7 @@ class _InputNumber extends State<InputNumber> {
       cursorColor: Colors.black,
       validator: _validate,
       onChanged: _onChange,
+      initialValue: widget.initialValue?.toString(),
       decoration: InputDecoration(
         fillColor: Colors.white,
         filled: true,

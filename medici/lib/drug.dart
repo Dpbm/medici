@@ -65,14 +65,6 @@ class _DrugPage extends State<DrugPage> {
     }
   }
 
-  Future<void> goToEdit() async {
-    Navigator.push(
-            context, MaterialPageRoute(builder: (context) => const EditDrug()))
-        .then((_) {
-      setState(() {});
-    });
-  }
-
   Future<void> archiveDrug() async {
     try {
       await widget.db.archiveDrug(id!);
@@ -124,6 +116,19 @@ class _DrugPage extends State<DrugPage> {
     const double topBarSize = 80.0;
 
     final double sectionWidth = width - 40;
+
+    Future<void> goToEdit() async {
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => EditDrug(
+                  db: widget.db,
+                  width: widget.width,
+                  height: widget.height,
+                  id: id!))).then((_) {
+        setState(() {});
+      });
+    }
 
     Future<void> deleteDrug() async {
       try {

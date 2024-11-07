@@ -24,7 +24,9 @@ class DB {
           dose REAL NOT NULL, 
           recurrent INTEGER NOT NULL,
           leaflet TEXT,
-          status TEXT NOT NULL)
+          status TEXT NOT NULL,
+          frequency TEXT NOT NULL,
+          starting_time TEXT NOT NULL)
       ''');
 
       db.execute('''
@@ -177,6 +179,8 @@ class DB {
         lastDay: drug_data['last_day'] as String?,
         leaflet: drug_data['leaflet'] as String?,
         status: drug_data['status'] as String,
+        frequency: drug_data['frequency'] as String,
+        startingTime: drug_data['starting_time'] as String,
         notification: notification,
         schedule: schedule);
   }
@@ -201,5 +205,31 @@ class DB {
 
     await database!.update('drug', {'status': 'current'},
         where: 'id = ?', whereArgs: [id]);
+  }
+
+  Future<DrugToEdit> getDataToEdit(int id) async {
+    await getDB();
+
+    final drug_data =
+        (await database!.query('drug', where: 'id=?', whereArgs: [id])).first;
+    final notification_data = (await database!
+            .query('notification', where: 'drug_id=?', whereArgs: [id]))
+        .first;
+
+    return DrugToEdit(
+        id: id,
+        name: drug_data['name'] as String,
+        expirationDate: drug_data['expiration_date'] as String,
+        quantity: drug_data['quantity'] as double,
+        doseType: drug_data['dose_type'] as String,
+        dose: drug_data['dose'] as double,
+        recurrent: drug_data['recurrent'] == 1,
+        frequency: drug_data['frequency'] as String,
+        startingTime: drug_data['starting_time'] as String,
+        expirationOffset: notification_data['expiration_offset'] as int,
+        quantityOffset: notification_data['quantity_offset'] as int,
+        image: drug_data['image'] as String?,
+        leaflet: drug_data['leaflet'] as String?,
+        lastDay: drug_data['last_day'] as String?);
   }
 }

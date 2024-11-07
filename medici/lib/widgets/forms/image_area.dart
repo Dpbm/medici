@@ -6,8 +6,9 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 
 class ImageArea extends StatefulWidget {
-  const ImageArea({super.key, required this.callback});
+  const ImageArea({super.key, required this.callback, this.initialValue});
 
+  final String? initialValue;
   final Function callback;
 
   @override
@@ -17,6 +18,16 @@ class ImageArea extends StatefulWidget {
 class _ImageArea extends State<ImageArea> {
   String? _documentsDir;
   File? _image;
+
+  @override
+  void initState() {
+    super.initState();
+    try {
+      _image = File(widget.initialValue!);
+    } catch (error) {
+      _image = null;
+    }
+  }
 
   Future<void> getImage() async {
     try {

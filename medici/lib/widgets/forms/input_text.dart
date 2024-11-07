@@ -5,9 +5,11 @@ class InputText extends StatefulWidget {
       {super.key,
       required this.label,
       required this.requiredField,
-      required this.callback});
+      required this.callback,
+      this.initialValue});
 
   final String label;
+  final String? initialValue;
   final bool requiredField;
   final Function callback;
 
@@ -33,6 +35,7 @@ class _InputText extends State<InputText> {
       autocorrect: false,
       keyboardType: TextInputType.text,
       cursorColor: Colors.black,
+      initialValue: widget.initialValue,
       onChanged: (String? input) {
         if (input == null) return;
         widget.callback(input);

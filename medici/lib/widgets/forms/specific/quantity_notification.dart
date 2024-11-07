@@ -3,10 +3,15 @@ import 'package:medici/models/notification_settings.dart';
 
 class QuantityNotification extends StatefulWidget {
   const QuantityNotification(
-      {super.key, required this.doseType, this.width, required this.callback});
+      {super.key,
+      required this.doseType,
+      this.width,
+      required this.callback,
+      this.initialValue});
 
   final String doseType;
   final double? width;
+  final int? initialValue;
   final Function callback;
 
   @override
@@ -19,7 +24,12 @@ class _QuantityNotification extends State<QuantityNotification> {
   @override
   void initState() {
     super.initState();
-    selected = quantityOffsets.first;
+    try {
+      selected = quantityOffsets[
+          quantityOffsets.indexOf(widget.initialValue.toString())];
+    } catch (error) {
+      selected = quantityOffsets.first;
+    }
   }
 
   void select(String? selection) {

@@ -5,9 +5,11 @@ class InputDate extends StatefulWidget {
       {super.key,
       required this.label,
       required this.requiredField,
-      required this.callback});
+      required this.callback,
+      this.initialValue});
 
   final String label;
+  final String? initialValue;
   final bool requiredField;
   final Function callback;
 
@@ -17,6 +19,12 @@ class InputDate extends StatefulWidget {
 
 class _InputDate extends State<InputDate> {
   final TextEditingController _textInput = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _textInput.text = widget.initialValue ?? '';
+  }
 
   @override
   void dispose() {
