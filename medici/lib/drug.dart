@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:medici/edit.dart';
 import 'package:medici/models/drug.dart';
 import 'package:medici/utils/db.dart';
 import 'package:medici/widgets/app_bar.dart';
@@ -61,6 +62,14 @@ class _DrugPage extends State<DrugPage> {
       }
       return null;
     }
+  }
+
+  Future<void> goToEdit() async {
+    Navigator.push(
+            context, MaterialPageRoute(builder: (context) => const EditDrug()))
+        .then((_) {
+      setState(() {});
+    });
   }
 
   @override
@@ -282,7 +291,9 @@ class _DrugPage extends State<DrugPage> {
                     const ReturnButton(),
                     Row(
                       children: [
-                        const EditButton(),
+                        EditButton(
+                          onPressed: goToEdit,
+                        ),
                         DeleteButton(
                           onPressed: deleteDrug,
                         ),

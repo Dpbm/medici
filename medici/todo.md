@@ -62,7 +62,7 @@
 - [x] get everything related to that
 - [ ] archive
 - [x] delete
-- [ ] edit
+- [x] edit
 - [x] error text
 - [ ] update default image
 - [ ] fix schedule component for one dose
