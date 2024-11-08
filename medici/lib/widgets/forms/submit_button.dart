@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 
 class SubmitButton extends StatefulWidget {
   const SubmitButton(
-      {super.key, required this.formState, required this.callback});
+      {super.key, required this.formState, required this.callback, this.text});
 
   final GlobalKey<FormState> formState;
   final Function callback;
+  final String? text;
 
   @override
   State<SubmitButton> createState() => _SubmitButton();
@@ -26,9 +27,9 @@ class _SubmitButton extends State<SubmitButton> {
 
           await widget.callback();
         },
-        child: const Text(
-          "Adicionar",
-          style: TextStyle(
+        child: Text(
+          widget.text ?? "Adicionar",
+          style: const TextStyle(
               fontFamily: 'Montserrat',
               fontSize: 20,
               fontWeight: FontWeight.bold,

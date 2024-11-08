@@ -34,12 +34,12 @@
 - [x] fix keyboard overlapping
 - [ ] check if submit is enabled or not (change styles as well)
 - [ ] fix image area size
-- [ ] add frequency text
-- [ ] add starting time
-- [ ] (edit page) get time offsets
+- [x] add frequency text
+- [x] add starting time
+- [x] (edit page) get time offsets
 - [ ] refactor submit to a single function in db
-- [ ] (edit page) fix: `Another exception was thrown: LateInitializationError: Field 'name' has not been initialized.`
-- [ ] (edit page) fix late
+- [x] (edit page) fix: `Another exception was thrown: LateInitializationError: Field 'name' has not been initialized.`
+- [x] (edit page) fix late
 
 ## HOME
 

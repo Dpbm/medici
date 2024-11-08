@@ -38,12 +38,11 @@ class EditDrug extends StatefulWidget {
 
 class _EditDrugPage extends State<EditDrug> {
   final _formState = GlobalKey<FormState>();
-  late String type, name, expirationDate, frequencyString;
-  String? image, lastDay;
-  late double quantity, dose;
-  late int frequency, expirationOffset, quantityOffset;
-  late bool recurrent;
-  late TimeOfDay hour;
+  String? type, name, expirationDate, frequencyString, image, lastDay, status;
+  double? quantity, dose;
+  int? frequency, expirationOffset, quantityOffset, id;
+  bool? recurrent;
+  TimeOfDay? hour;
 
   Future<void>? _loadData;
 
@@ -63,8 +62,8 @@ class _EditDrugPage extends State<EditDrug> {
   Future<void> getData() async {
     try {
       DrugToEdit data = await widget.db.getDataToEdit(widget.id);
-
       final splitTime = data.startingTime.split(':');
+
       setState(() {
         type = data.doseType;
         name = data.name;
@@ -74,12 +73,14 @@ class _EditDrugPage extends State<EditDrug> {
         lastDay = data.lastDay;
         quantity = data.quantity;
         dose = data.dose;
-        frequency = frequencies.keys.toList().indexOf(data.frequency);
+        frequency = frequencies[data.frequency];
         recurrent = data.recurrent;
         hour = TimeOfDay(
             hour: int.parse(splitTime[0]), minute: int.parse(splitTime[1]));
         expirationOffset = data.expirationOffset;
         quantityOffset = data.quantityOffset;
+        status = data.status;
+        id = data.id;
       });
     } catch (error) {
       Fluttertoast.showToast(
@@ -176,50 +177,43 @@ class _EditDrugPage extends State<EditDrug> {
     }
 
     Future<void> submit() async {
-      if (name == null || quantity == null || expirationDate == null) {
-        Fluttertoast.showToast(
-            msg:
-                "Você precisa preencher todos os campos obrigatórios para adicionar um medicamento!",
-            gravity: ToastGravity.CENTER,
-            backgroundColor: Colors.red,
-            textColor: Colors.white,
-            fontSize: 16.0);
-      }
-
       try {
+        await widget.db.deleteAlerts(id!);
+        await widget.db.deleteNotificationSettings(id!);
+
         final String? leaflet = await getLeaflet(name!);
 
         Drug data = Drug(
+            id: id!,
             name: name!,
             image: image,
             expirationDate: expirationDate!,
-            quantity: quantity,
-            doseType: type,
-            dose: dose,
-            recurrent: recurrent,
+            quantity: quantity!,
+            doseType: type!,
+            dose: dose!,
+            recurrent: recurrent!,
             lastDay: lastDay,
             leaflet: leaflet,
-            status: 'current',
-            frequency: frequencyString,
-            startingTime: hour.toString());
-
-        final int drugId = await widget.db.addDrug(data);
+            status: status!,
+            frequency: frequencyString!,
+            startingTime:
+                hour!.hour.toString() + ":" + hour!.minute.toString());
 
         NotificationSettings notification = NotificationSettings(
-            drugId: drugId,
-            expirationOffset: expirationOffset,
-            quantityOffset: quantityOffset);
+            drugId: id!,
+            expirationOffset: expirationOffset!,
+            quantityOffset: quantityOffset!);
 
+        await widget.db.updateDrug(data);
         await widget.db.addNotification(notification);
 
-        List<String> hours = getAlerts(hour, frequency);
+        List<String> hours = getAlerts(hour!, frequency!);
         List<Alert> alerts =
-            hours.map((hour) => Alert(drugId: drugId, time: hour)).toList();
-
+            hours.map((hour) => Alert(drugId: id!, time: hour)).toList();
         await widget.db.addAlerts(alerts);
 
         Fluttertoast.showToast(
-            msg: "Medicamento adicionado com sucesso!",
+            msg: "Medicamento atualizado com sucesso!",
             gravity: ToastGravity.CENTER,
             backgroundColor: Colors.green,
             textColor: Colors.white,
@@ -231,7 +225,7 @@ class _EditDrugPage extends State<EditDrug> {
       } catch (error) {
         Fluttertoast.showToast(
             msg:
-                "Falha ao tentar adicionar o medicamento. Por favor, tente novamente mais tarde!",
+                "Falha ao tentar adicionar o medicamento. Lembre-se de Preencher todos os campos Obrigatórios!",
             gravity: ToastGravity.CENTER,
             backgroundColor: Colors.red,
             textColor: Colors.white,
@@ -333,7 +327,7 @@ class _EditDrugPage extends State<EditDrug> {
                                     requiredField: false,
                                     initialValue: recurrent),
                                 const Separator(),
-                                recurrent
+                                recurrent!
                                     ? Container()
                                     : InputDate(
                                         label: 'Último Dia',
@@ -361,7 +355,7 @@ class _EditDrugPage extends State<EditDrug> {
                                     ),
                                     const Separator(),
                                     QuantityNotification(
-                                        doseType: type,
+                                        doseType: type!,
                                         width: width,
                                         callback: getQuantityOffset,
                                         initialValue: quantityOffset)
@@ -369,9 +363,9 @@ class _EditDrugPage extends State<EditDrug> {
                                 ),
                                 const Separator(),
                                 SubmitButton(
-                                  formState: _formState,
-                                  callback: submit,
-                                )
+                                    formState: _formState,
+                                    callback: submit,
+                                    text: 'Atualizar')
                               ]),
                             ),
                           ],

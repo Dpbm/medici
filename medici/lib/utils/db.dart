@@ -193,6 +193,17 @@ class DB {
     await database!.delete('drug', where: 'id=?', whereArgs: [id]);
   }
 
+  Future<void> deleteAlerts(int drugId) async {
+    await getDB();
+    await database!.delete('alert', where: 'drug_id=?', whereArgs: [drugId]);
+  }
+
+  Future<void> deleteNotificationSettings(int drugId) async {
+    await getDB();
+    await database!
+        .delete('notification', where: 'drug_id=?', whereArgs: [drugId]);
+  }
+
   Future<void> archiveDrug(int id) async {
     await getDB();
 
@@ -230,6 +241,16 @@ class DB {
         quantityOffset: notification_data['quantity_offset'] as int,
         image: drug_data['image'] as String?,
         leaflet: drug_data['leaflet'] as String?,
-        lastDay: drug_data['last_day'] as String?);
+        lastDay: drug_data['last_day'] as String?,
+        status: drug_data['status'] as String);
+  }
+
+  Future<void> updateDrug(Drug drug) async {
+    await getDB();
+
+    await database!.update('drug', drug.toMap(),
+        where: 'id=?',
+        whereArgs: [drug.id],
+        conflictAlgorithm: ConflictAlgorithm.fail);
   }
 }

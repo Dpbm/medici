@@ -118,6 +118,7 @@ class DrugToEdit {
   final String startingTime;
   final int expirationOffset;
   final int quantityOffset;
+  final String status;
 
   const DrugToEdit(
       {required this.id,
@@ -133,5 +134,6 @@ class DrugToEdit {
       required this.frequency,
       required this.startingTime,
       required this.expirationOffset,
-      required this.quantityOffset});
+      required this.quantityOffset,
+      required this.status});
 }

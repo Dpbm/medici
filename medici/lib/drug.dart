@@ -126,7 +126,7 @@ class _DrugPage extends State<DrugPage> {
                   width: widget.width,
                   height: widget.height,
                   id: id!))).then((_) {
-        setState(() {});
+        reload();
       });
     }
 
