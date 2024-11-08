@@ -77,13 +77,15 @@
 - [x] get everything related to that
 - [x] archive
 - [x] unarchive from drugs list
-- [ ] update style for archive/unarchive button 
+- [ ] update style for archive/unarchive button
 - [x] delete
 - [x] edit
 - [x] error text
 - [x] update default image
 - [ ] fix schedule component for one dose
 - [ ] add recurrent status
+- [ ] check `Null check operator used on a null value`
+- [ ] pass the drug data as a parameter
 
 ## Leaflet
 
