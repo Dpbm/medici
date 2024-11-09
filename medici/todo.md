@@ -12,15 +12,11 @@
 
 - [x] fix image area width
 
-## Forms widgets
-
-- [ ] set as stateless
-
 ## Forms
 
-- [ ] fix slowliness
-- [ ] disable button on submit
-- [ ] add a status `sending...`
+- [ ] fix slowness
+- [x] disable button on submit
+- [x] add a status `sending...`
 
 ## Input Hour
 
@@ -33,6 +29,7 @@
 ## Edit
 
 - [ ] update notifications
+- [ ] fix first update issue
 
 ## Home
 
