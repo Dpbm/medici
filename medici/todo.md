@@ -10,7 +10,7 @@
 
 ## Image Area
 
-- [ ] fix image area width
+- [x] fix image area width
 
 ## Forms widgets
 
