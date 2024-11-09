@@ -31,7 +31,8 @@ class DrugPage extends StatefulWidget {
 }
 
 class _DrugPage extends State<DrugPage> {
-  Future<FullDrug?>? _data;
+  Future<void>? _data;
+  FullDrug? drug;
 
   bool deleting = false;
   int? id;
@@ -48,9 +49,12 @@ class _DrugPage extends State<DrugPage> {
     _data = getDrug();
   }
 
-  Future<FullDrug?> getDrug() async {
+  Future<void> getDrug() async {
     try {
-      return await widget.db.getFullDrugData(widget.id);
+      final data = await widget.db.getFullDrugData(widget.id);
+      setState(() {
+        drug = data;
+      });
     } catch (error) {
       Fluttertoast.showToast(
           msg: "Falha ao tentar pegar os dados do seu medicamento!",
@@ -61,7 +65,6 @@ class _DrugPage extends State<DrugPage> {
       if (context.mounted) {
         Navigator.pop(context);
       }
-      return null;
     }
   }
 
@@ -125,7 +128,7 @@ class _DrugPage extends State<DrugPage> {
                   db: widget.db,
                   width: widget.width,
                   height: widget.height,
-                  id: id!))).then((_) {
+                  drug: drug!))).then((_) {
         reload();
       });
     }
@@ -163,11 +166,7 @@ class _DrugPage extends State<DrugPage> {
 
     Future<void> _openLeaflet(String? leaflet) async {
       try {
-        if (leaflet == null) {
-          throw Exception("Failed to open leaflet! Empty leaflet");
-        }
-
-        final success = await launchUrl(Uri.parse(leaflet));
+        final success = await launchUrl(Uri.parse(leaflet!));
         if (!success) {
           throw Exception("Failed to open leaflet");
         }
@@ -181,14 +180,14 @@ class _DrugPage extends State<DrugPage> {
       }
     }
 
-    Widget renderDrugData(FullDrug data) {
+    Widget renderDrugData() {
       return Container(
         padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              data.name,
+              drug!.name,
               textAlign: TextAlign.left,
               style: const TextStyle(
                   fontSize: 40,
@@ -199,8 +198,8 @@ class _DrugPage extends State<DrugPage> {
               margin: const EdgeInsets.only(top: 10),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(10),
-                child: data.image != null
-                    ? Image.file(File(data.image!),
+                child: drug!.image != null
+                    ? Image.file(File(drug!.image!),
                         width: sectionWidth, height: 300, fit: BoxFit.cover)
                     : Image.asset('images/remedio_imagem_padrao.png',
                         width: sectionWidth, height: 300, fit: BoxFit.cover),
@@ -209,7 +208,7 @@ class _DrugPage extends State<DrugPage> {
             Container(
               alignment: Alignment.centerRight,
               margin: const EdgeInsets.only(top: 10),
-              child: Text("Valido até " + data.expirationDate,
+              child: Text("Valido até " + drug!.expirationDate,
                   style: const TextStyle(
                       fontSize: 11,
                       fontFamily: 'Montserrat',
@@ -217,7 +216,7 @@ class _DrugPage extends State<DrugPage> {
             ),
             Container(
               width: sectionWidth,
-              height: data.schedule.length * 55 + 40,
+              height: drug!.schedule.length * 55 + 40,
               alignment: Alignment.centerLeft,
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
@@ -233,11 +232,11 @@ class _DrugPage extends State<DrugPage> {
                           fontWeight: FontWeight.bold)),
                   Expanded(
                       child: ListView.builder(
-                          itemCount: data.schedule.length,
+                          itemCount: drug!.schedule.length,
                           itemBuilder: (BuildContext context, int index) {
-                            final String timeText = data.schedule[index].time;
+                            final String timeText = drug!.schedule[index].time;
                             final String doseDescription =
-                                data.dose.toString() + data.doseType;
+                                drug!.dose.toString() + drug!.doseType;
 
                             return Container(
                               height: 50,
@@ -277,21 +276,21 @@ class _DrugPage extends State<DrugPage> {
                 alignment: Alignment.centerRight,
                 child: Text(
                     "Quantidade disponível: " +
-                        data.quantity.round().toString(),
+                        drug!.quantity.round().toString(),
                     style: const TextStyle(
                         fontSize: 15,
                         fontFamily: 'Montserrat',
                         fontWeight: FontWeight.bold))),
             Text("Notificar a faltar de medicamento ao ter apenas " +
-                data.notification.quantityOffset.toString() +
-                data.doseType),
+                drug!.notification.quantityOffset.toString() +
+                drug!.doseType),
             Text("Notificar o vencimento do medicamento antes de: " +
-                data.notification.expirationOffset.toString() +
+                drug!.notification.expirationOffset.toString() +
                 "dias"),
-            data.leaflet != null
+            drug!.leaflet != null
                 ? InkWell(
                     onTap: () async {
-                      await _openLeaflet(data.leaflet);
+                      await _openLeaflet(drug!.leaflet);
                     },
                     child: Align(
                       alignment: Alignment.center,
@@ -358,18 +357,16 @@ class _DrugPage extends State<DrugPage> {
               ),
               Expanded(
                   child: SingleChildScrollView(
-                      child: FutureBuilder<FullDrug?>(
+                      child: FutureBuilder<void>(
                           future: _data,
                           builder: (BuildContext context,
-                              AsyncSnapshot<FullDrug?> snapshot) {
+                              AsyncSnapshot<void> snapshot) {
                             if (snapshot.connectionState ==
                                 ConnectionState.waiting) {
                               return const CircularProgressIndicator();
                             }
 
-                            if (!snapshot.hasData ||
-                                snapshot.hasError ||
-                                snapshot.data == null) {
+                            if (snapshot.hasError) {
                               return Container(
                                   alignment: Alignment.center,
                                   height: height - 100,
@@ -382,12 +379,7 @@ class _DrugPage extends State<DrugPage> {
                                   ));
                             }
 
-                            final FullDrug data = snapshot.data!;
-
-                            id = data.id;
-                            status = data.status;
-
-                            return renderDrugData(data);
+                            return renderDrugData();
                           })))
             ],
           ),

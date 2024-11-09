@@ -1,6 +1,7 @@
 import 'package:medici/models/alert.dart';
 import 'package:medici/models/drug.dart';
 import 'package:medici/models/notification_settings.dart';
+import 'package:medici/utils/alerts.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -32,8 +33,9 @@ class DB {
       db.execute('''
         CREATE TABLE alert(
           id INTEGER PRIMARY KEY AUTOINCREMENT, 
-          time TEXT,
-          drug_id INTEGER,
+          time TEXT NOT NULL,
+          drug_id INTEGER NOT NULL,
+          status TEXT NOT NULL,
           FOREIGN KEY(drug_id) REFERENCES drug(id)
         )
       ''');
@@ -41,9 +43,9 @@ class DB {
       db.execute('''
         CREATE TABLE notification(
           id INTEGER PRIMARY KEY AUTOINCREMENT, 
-          expiration_offset INTEGER,
-          quantity_offset INTEGER,
-          drug_id INTEGER,
+          expiration_offset INTEGER NOT NULL,
+          quantity_offset INTEGER NOT NULL,
+          drug_id INTEGER NOT NULL,
           FOREIGN KEY(drug_id) REFERENCES drug(id)
         )
       ''');
@@ -81,14 +83,15 @@ class DB {
 
     final data = await database!.rawQuery('''
       SELECT 
-        alert.id,
+        alert.id as alert_id,
         alert.time,
-        alert.drug_id,
+        alert.status as alert_status,
+        drug.id as drug_id,
         drug.name, 
         drug.image, 
         drug.dose_type, 
         drug.dose,
-        drug.status
+        drug.status as drug_status
       FROM alert 
       INNER JOIN drug ON drug.id = alert.drug_id
       WHERE drug.status != "archived";
@@ -96,15 +99,25 @@ class DB {
 
     List<DrugsScheduling> drugs = [];
     for (final drug in data) {
+      final int id = drug['drug_id'] as int;
+      final int alertId = drug['alert_id'] as int;
+      final String time = drug['time'] as String;
+      final String status = getAlertStatus(time);
+
+      await updateAlertStatus(alertId, status);
+
       drugs.add(DrugsScheduling(
-          id: drug['id'] as int,
-          drugId: drug['drug_id'] as int,
-          time: drug['time'] as String,
+          id: id,
           name: drug['name'] as String,
           doseType: drug['dose_type'] as String,
           dose: drug['dose'] as double,
           image: drug['image'] as String?,
-          status: drug['status'] as String));
+          status: drug['drug_status'] as String,
+          alert: Alert(
+              id: drug['alert_id'] as int,
+              drugId: id,
+              status: status,
+              time: time)));
     }
 
     return drugs;
@@ -130,14 +143,17 @@ class DB {
     List<DrugsScheduling> drugs = [];
     for (final drug in data) {
       drugs.add(DrugsScheduling(
-          id: drug['id'] as int,
-          drugId: drug['drug_id'] as int,
-          time: drug['time'] as String,
+          id: drug['drug_id'] as int,
           name: drug['name'] as String,
           doseType: drug['dose_type'] as String,
           dose: drug['dose'] as double,
           image: drug['image'] as String?,
-          status: drug['status'] as String));
+          status: drug['status'] as String,
+          alert: Alert(
+              drugId: drug['drug_id'] as int,
+              status: drug['status'] as String,
+              time: drug['time'] as String,
+              id: drug['id'] as int)));
     }
 
     return drugs;
@@ -161,10 +177,14 @@ class DB {
         id: notification_data['id'] as int);
     List<Alert> schedule = [];
     for (final alert in alerts_data) {
+      final int alertId = alert['id'] as int;
+      final String time = alert['time'] as String;
+      final String status = getAlertStatus(time);
+
+      await updateAlertStatus(alertId, status);
+
       schedule.add(Alert(
-          drugId: alert['drug_id'] as int,
-          time: alert['time'] as String,
-          id: alert['id'] as int));
+          drugId: alert['drug_id'] as int, time: time, id: id, status: status));
     }
 
     return FullDrug(
@@ -218,39 +238,21 @@ class DB {
         where: 'id = ?', whereArgs: [id]);
   }
 
-  Future<DrugToEdit> getDataToEdit(int id) async {
-    await getDB();
-
-    final drug_data =
-        (await database!.query('drug', where: 'id=?', whereArgs: [id])).first;
-    final notification_data = (await database!
-            .query('notification', where: 'drug_id=?', whereArgs: [id]))
-        .first;
-
-    return DrugToEdit(
-        id: id,
-        name: drug_data['name'] as String,
-        expirationDate: drug_data['expiration_date'] as String,
-        quantity: drug_data['quantity'] as double,
-        doseType: drug_data['dose_type'] as String,
-        dose: drug_data['dose'] as double,
-        recurrent: drug_data['recurrent'] == 1,
-        frequency: drug_data['frequency'] as String,
-        startingTime: drug_data['starting_time'] as String,
-        expirationOffset: notification_data['expiration_offset'] as int,
-        quantityOffset: notification_data['quantity_offset'] as int,
-        image: drug_data['image'] as String?,
-        leaflet: drug_data['leaflet'] as String?,
-        lastDay: drug_data['last_day'] as String?,
-        status: drug_data['status'] as String);
-  }
-
   Future<void> updateDrug(Drug drug) async {
     await getDB();
 
     await database!.update('drug', drug.toMap(),
         where: 'id=?',
         whereArgs: [drug.id],
+        conflictAlgorithm: ConflictAlgorithm.fail);
+  }
+
+  Future<void> updateAlertStatus(int id, String status) async {
+    await getDB();
+
+    await database!.update('alert', {'id': id, 'status': status},
+        where: 'id=?',
+        whereArgs: [id],
         conflictAlgorithm: ConflictAlgorithm.fail);
   }
 }

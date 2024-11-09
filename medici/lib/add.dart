@@ -5,6 +5,7 @@ import 'package:medici/models/notification_settings.dart';
 import 'package:medici/utils/db.dart';
 import 'package:medici/utils/alerts.dart';
 import 'package:medici/utils/leaflet.dart';
+import 'package:medici/utils/time.dart';
 import 'package:medici/widgets/app_bar.dart';
 import 'package:medici/widgets/forms/image_area.dart';
 import 'package:medici/widgets/forms/input_hour.dart';
@@ -131,18 +132,10 @@ class _AddPage extends State<Add> {
     }
 
     Future<void> submit() async {
-      if (name == null || quantity == null || expirationDate == null) {
-        Fluttertoast.showToast(
-            msg:
-                "Você precisa preencher todos os campos obrigatórios para adicionar um medicamento!",
-            gravity: ToastGravity.CENTER,
-            backgroundColor: Colors.red,
-            textColor: Colors.white,
-            fontSize: 16.0);
-      }
-
       try {
         final String? leaflet = await getLeaflet(name!);
+
+        final startingTime = buildTimeString(hour);
 
         Drug data = Drug(
             name: name!,
@@ -156,7 +149,7 @@ class _AddPage extends State<Add> {
             leaflet: leaflet,
             status: 'current',
             frequency: frequencyString,
-            startingTime: hour.hour.toString() + ":" + hour.minute.toString());
+            startingTime: startingTime);
 
         final int drugId = await widget.db.addDrug(data);
 
@@ -168,8 +161,9 @@ class _AddPage extends State<Add> {
         await widget.db.addNotification(notification);
 
         List<String> hours = getAlerts(hour, frequency);
-        List<Alert> alerts =
-            hours.map((hour) => Alert(drugId: drugId, time: hour)).toList();
+        List<Alert> alerts = hours
+            .map((hour) => Alert(drugId: drugId, time: hour, status: 'pending'))
+            .toList();
 
         await widget.db.addAlerts(alerts);
 

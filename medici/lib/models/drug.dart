@@ -62,23 +62,21 @@ class Drug {
 
 class DrugsScheduling {
   final int id;
-  final int drugId;
-  final String time;
   final String name;
   final String? image;
   final String doseType;
   final double dose;
   final String status;
+  final Alert alert;
 
   const DrugsScheduling(
       {required this.id,
-      required this.drugId,
-      required this.time,
       required this.name,
       this.image,
       required this.doseType,
       required this.dose,
-      required this.status});
+      required this.status,
+      required this.alert});
 }
 
 class FullDrug extends Drug {
@@ -101,39 +99,4 @@ class FullDrug extends Drug {
       super.leaflet,
       required this.notification,
       required this.schedule});
-}
-
-class DrugToEdit {
-  final int id;
-  final String name;
-  final String? image;
-  final String expirationDate;
-  final double quantity;
-  final String doseType;
-  final double dose;
-  final String? leaflet;
-  final bool recurrent;
-  final String? lastDay;
-  final String frequency;
-  final String startingTime;
-  final int expirationOffset;
-  final int quantityOffset;
-  final String status;
-
-  const DrugToEdit(
-      {required this.id,
-      required this.name,
-      this.image,
-      required this.expirationDate,
-      required this.quantity,
-      required this.doseType,
-      required this.dose,
-      this.leaflet,
-      required this.recurrent,
-      this.lastDay,
-      required this.frequency,
-      required this.startingTime,
-      required this.expirationOffset,
-      required this.quantityOffset,
-      required this.status});
 }

@@ -34,15 +34,18 @@
 ## Home
 
 - [ ] Modal
-- [ ] show only the next drug or late ones
+- [x] show only the next drug and late ones
+- [x] late comes first
 
 ## Drugs
 
 - [ ] reset status after 24h
+- [ ] check last Day (archive drug and remove notifications)
 
 ## Drugs list
 
 - [ ] show only one drug each
+- [ ] refactor get all Drugs to get only the drug data of unique drugs
 
 ---
 

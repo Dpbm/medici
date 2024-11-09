@@ -21,16 +21,16 @@ class DrugCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final List<String> splitTime = data.time.split(':');
-    final hour = int.parse(splitTime[0]);
-    final timeDiff = hour - TimeOfDay.now().hour;
+    final int timeDiff = data.alert.getTimeDiff();
+    final bool isLate = data.alert.status == 'late';
+    final bool isArchived = data.status == 'archived';
 
     return GestureDetector(
         onTap: () => Navigator.push(
                 context,
                 MaterialPageRoute(
                     builder: (BuildContext context) => DrugPage(
-                        id: data.drugId,
+                        id: data.id,
                         width: width,
                         height: height,
                         db: db))).then((_) {
@@ -44,12 +44,12 @@ class DrugCard extends StatelessWidget {
               color: Colors.white,
               borderRadius: BorderRadius.all(Radius.circular(10))),
           child: Row(
-            mainAxisAlignment: timeDiff < 0
+            mainAxisAlignment: isLate
                 ? MainAxisAlignment.spaceBetween
                 : MainAxisAlignment.start,
             children: [
               Container(
-                  margin: const EdgeInsets.all(10),
+                  margin: const EdgeInsets.only(left: 10),
                   width: 100,
                   child: data.image == null
                       ? Image.asset("images/remedio_imagem_padrao.png",
@@ -64,14 +64,16 @@ class DrugCard extends StatelessWidget {
                           ))),
               Container(
                 height: 120,
-                width: 180,
+                width: 140,
                 alignment: Alignment.centerLeft,
-                child: data.status != 'archived'
+                margin: const EdgeInsets.only(left: 5),
+                child: !isArchived
                     ? Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(data.name,
+                              maxLines: 1,
                               style: const TextStyle(
                                   fontSize: 18, fontWeight: FontWeight.bold)),
                           Text(
@@ -83,7 +85,7 @@ class DrugCard extends StatelessWidget {
                               "Em " +
                                   timeDiff.abs().toString() +
                                   " horas - " +
-                                  data.time +
+                                  data.alert.time +
                                   "h",
                               style: const TextStyle(fontSize: 14))
                         ],
@@ -101,10 +103,10 @@ class DrugCard extends StatelessWidget {
                         ],
                       ),
               ),
-              timeDiff < 0 && data.status != 'archived'
+              isLate && !isArchived
                   ? Container(
                       width: 60,
-                      height: 110,
+                      height: 120,
                       decoration: const BoxDecoration(
                           color: Colors.red,
                           borderRadius: BorderRadius.only(
@@ -113,7 +115,7 @@ class DrugCard extends StatelessWidget {
                     )
                   : const SizedBox(
                       width: 60,
-                      height: 110,
+                      height: 120,
                     )
             ],
           ),

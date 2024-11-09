@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:medici/utils/time.dart';
 
 List<String> getAlerts(TimeOfDay startingTime, int step) {
   List<String> alerts = [buildTimeString(startingTime)];
@@ -18,6 +19,11 @@ int nextHour(int hour, int step) {
   return (hour + step) % 24;
 }
 
-String buildTimeString(TimeOfDay time) {
-  return time.hour.toString() + ":" + time.minute.toString();
+String getAlertStatus(String time) {
+  const int tolerance = -3;
+  final TimeOfDay parsedTime = parseStringTime(time);
+  final bool isOnTolerance =
+      (parsedTime.hour - TimeOfDay.now().hour) >= tolerance;
+
+  return passedTime(parsedTime) && isOnTolerance ? 'late' : 'pending';
 }

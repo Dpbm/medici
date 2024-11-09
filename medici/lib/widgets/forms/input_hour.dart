@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:medici/utils/alerts.dart';
+import 'package:medici/utils/time.dart';
 
 class InputHour extends StatefulWidget {
   const InputHour(
