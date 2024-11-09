@@ -274,6 +274,7 @@ class _EditDrugPage extends State<EditDrug> {
                                 ImageArea(
                                   callback: getImage,
                                   initialValue: image,
+                                  width: width,
                                 ),
                                 const Separator(),
                                 InputText(

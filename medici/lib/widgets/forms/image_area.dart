@@ -1,15 +1,18 @@
 import 'dart:io';
 
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:path/path.dart' as path;
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 
 class ImageArea extends StatefulWidget {
-  const ImageArea({super.key, required this.callback, this.initialValue});
+  const ImageArea(
+      {super.key, required this.callback, this.initialValue, this.width});
 
   final String? initialValue;
   final Function callback;
+  final double? width;
 
   @override
   State<ImageArea> createState() => _ImageArea();
@@ -48,7 +51,6 @@ class _ImageArea extends State<ImageArea> {
       await _image?.delete();
 
       final String imagePath = path.join(_documentsDir!, response.name);
-      print("Saving to: " + imagePath);
       await response.saveTo(imagePath);
 
       final File file = File(imagePath);
@@ -59,8 +61,12 @@ class _ImageArea extends State<ImageArea> {
 
       widget.callback(imagePath);
     } catch (error) {
-      print("[!] Failed on get image: ");
-      print(error);
+      Fluttertoast.showToast(
+          msg: "Falha ao tentar adicionar Imagem!",
+          gravity: ToastGravity.CENTER,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0);
     }
   }
 
@@ -97,7 +103,8 @@ class _ImageArea extends State<ImageArea> {
     return GestureDetector(
         onTap: getImage,
         child: SizedBox(
-            width: 370, child: _image == null ? noImage() : loadImage()));
+            width: widget.width ?? 370,
+            child: _image == null ? noImage() : loadImage()));
 
     /*   */
   }

@@ -209,7 +209,7 @@ class _AddPage extends State<Add> {
                         height: topBarSize,
                         width: width,
                         padding: const EdgeInsets.all(10),
-                        color: const Color(0xFFFFFFFF),
+                        color: Colors.white,
                         alignment: Alignment.centerLeft,
                         child: const ReturnButton(),
                       ),
@@ -219,6 +219,7 @@ class _AddPage extends State<Add> {
                         child: Column(children: [
                           ImageArea(
                             callback: getImage,
+                            width: width,
                           ),
                           const Separator(),
                           InputText(

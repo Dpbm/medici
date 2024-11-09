@@ -38,6 +38,7 @@ class DrugCard extends StatelessWidget {
             }),
         child: Container(
           height: 120,
+          width: width,
           margin: const EdgeInsets.fromLTRB(20, 10, 20, 10),
           decoration: const BoxDecoration(
               color: Colors.white,
@@ -51,48 +52,69 @@ class DrugCard extends StatelessWidget {
                   margin: const EdgeInsets.all(10),
                   width: 100,
                   child: data.image == null
-                      ? Image.asset("images/remedio_icone.png", width: 100)
+                      ? Image.asset("images/remedio_imagem_padrao.png",
+                          width: 100, height: 100)
                       : ClipRRect(
                           borderRadius: BorderRadius.circular(10),
                           child: Image.file(
                             File(data.image!),
                             width: 100,
+                            height: 100,
                             fit: BoxFit.cover,
                           ))),
               Container(
                 height: 120,
                 width: 180,
                 alignment: Alignment.centerLeft,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(data.name,
-                        style: const TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold)),
-                    Text(data.dose.round().toString() + " " + data.doseType,
-                        style: const TextStyle(fontSize: 14)),
-                    Text(
-                        "Em " +
-                            timeDiff.abs().toString() +
-                            " horas - " +
-                            data.time +
-                            "h",
-                        style: const TextStyle(fontSize: 14))
-                  ],
-                ),
+                child: data.status != 'archived'
+                    ? Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(data.name,
+                              style: const TextStyle(
+                                  fontSize: 18, fontWeight: FontWeight.bold)),
+                          Text(
+                              data.dose.round().toString() +
+                                  " " +
+                                  data.doseType,
+                              style: const TextStyle(fontSize: 14)),
+                          Text(
+                              "Em " +
+                                  timeDiff.abs().toString() +
+                                  " horas - " +
+                                  data.time +
+                                  "h",
+                              style: const TextStyle(fontSize: 14))
+                        ],
+                      )
+                    : Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(data.name,
+                              style: const TextStyle(
+                                  fontSize: 18, fontWeight: FontWeight.bold)),
+                          const Text("Arquivado",
+                              style:
+                                  TextStyle(fontSize: 18, color: Colors.red)),
+                        ],
+                      ),
               ),
-              timeDiff < 0
+              timeDiff < 0 && data.status != 'archived'
                   ? Container(
                       width: 60,
-                      height: 120,
+                      height: 110,
                       decoration: const BoxDecoration(
                           color: Colors.red,
                           borderRadius: BorderRadius.only(
                               topRight: Radius.circular(10),
                               bottomRight: Radius.circular(10))),
                     )
-                  : Container()
+                  : const SizedBox(
+                      width: 60,
+                      height: 110,
+                    )
             ],
           ),
         ));

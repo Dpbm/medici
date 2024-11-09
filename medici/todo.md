@@ -1,5 +1,51 @@
 # TODOS
 
+## Cards
+
+- [x] update default image
+- [x] fix middle text size
+- [x] fix image height
+- [x] fix red bar size
+- [x] add an Icon to show that's archived
+
+## Image Area
+
+- [x] fix image area width
+
+## Forms
+
+- [ ] fix slowness
+- [x] disable button on submit
+- [x] add a status `sending...`
+
+## Input Hour
+
+- [ ] zero padding
+
+## Add
+
+- [ ] setup notifications
+
+## Edit
+
+- [ ] update notifications
+- [ ] fix first update issue
+
+## Home
+
+- [ ] Modal
+- [ ] show only the next drug or late ones
+
+## Drugs
+
+- [ ] reset status after 24h
+
+## Drugs list
+
+- [ ] show only one drug each
+
+---
+
 ## ALL
 
 - [x] remove appBar
@@ -70,6 +116,10 @@
 - [ ] check for Tomorrow filter
 - [ ] update status indicator widget
 - [ ] add status for each alert
+- [ ] remove notifications after deleting the medicine
+- [ ] delete and add new notifications after updating drug
+
+- `aware`, `taken`, `late`, `pending`
 
 ## Drug page
 
@@ -77,7 +127,7 @@
 - [x] get everything related to that
 - [x] archive
 - [x] unarchive from drugs list
-- [ ] update style for archive/unarchive button 
+- [ ] update style for archive/unarchive button
 - [x] delete
 - [x] edit
 - [x] error text
