@@ -104,8 +104,11 @@ class DB {
       final int alertId = drug['alert_id'] as int;
       final String time = drug['time'] as String;
       final String status = getAlertStatus(time);
+      final String lastStatus = drug['alert_status'] as String;
 
-      await updateAlertStatus(alertId, status);
+      if (lastStatus == 'pending') {
+        await updateAlertStatus(alertId, status);
+      }
 
       drugs.add(DrugsScheduling(
           id: id,
@@ -238,7 +241,7 @@ class DB {
   Future<void> updateAlertStatus(int id, String status) async {
     await getDB();
 
-    await database!.update('alert', {'id': id, 'status': status},
+    await database!.update('alert', {'status': status},
         where: 'id=?',
         whereArgs: [id],
         conflictAlgorithm: ConflictAlgorithm.fail);

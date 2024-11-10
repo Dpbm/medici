@@ -40,6 +40,7 @@
 - [x] check if there's enough
 - [x] show only the next drug and late ones
 - [x] late comes first
+- [ ] change `RestartableTimer` to `Timer.Periodic`
 
 ## Drugs
 

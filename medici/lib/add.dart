@@ -205,7 +205,9 @@ class _AddPage extends State<Add> {
                         padding: const EdgeInsets.all(10),
                         color: Colors.white,
                         alignment: Alignment.centerLeft,
-                        child: const ReturnButton(),
+                        child: ReturnButton(
+                          onPressed: () => Navigator.pop(context),
+                        ),
                       ),
                       Container(
                         //forms

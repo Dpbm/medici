@@ -287,6 +287,10 @@ class _DrugPage extends State<DrugPage> {
             Text("Notificar o vencimento do medicamento antes de: " +
                 drug!.notification.expirationOffset.toString() +
                 "dias"),
+            (drug?.recurrent ?? false) ? const Text("Recorrente") : Container(),
+            drug?.lastDay != null
+                ? Text("Último dia " + drug!.lastDay.toString())
+                : Container(),
             drug!.leaflet != null
                 ? InkWell(
                     onTap: () async {
@@ -337,7 +341,9 @@ class _DrugPage extends State<DrugPage> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const ReturnButton(),
+                    ReturnButton(
+                      onPressed: () => Navigator.pop(context),
+                    ),
                     Row(
                       children: [
                         EditButton(
