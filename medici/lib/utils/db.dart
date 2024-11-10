@@ -125,39 +125,23 @@ class DB {
     return drugs;
   }
 
-  Future<List<DrugsScheduling>> getAllDrugs() async {
+  Future<List<DrugTinyData>> getAllDrugs() async {
     await getDB();
 
     final data = await database!.rawQuery('''
       SELECT 
-        alert.id,
-        alert.time,
-        alert.drug_id,
-        drug.name, 
-        drug.image, 
-        drug.dose_type, 
-        drug.dose,
-        drug.status,
-        drug.quantity
-      FROM alert 
-      INNER JOIN drug ON drug.id = alert.drug_id;
+        id,
+        name, 
+        image
+      FROM drug; 
     ''');
 
-    List<DrugsScheduling> drugs = [];
+    List<DrugTinyData> drugs = [];
     for (final drug in data) {
-      drugs.add(DrugsScheduling(
-          id: drug['drug_id'] as int,
+      drugs.add(DrugTinyData(
+          id: drug['id'] as int,
           name: drug['name'] as String,
-          doseType: drug['dose_type'] as String,
-          dose: drug['dose'] as double,
-          image: drug['image'] as String?,
-          status: drug['status'] as String,
-          quantity: drug['quantity'] as double,
-          alert: Alert(
-              drugId: drug['drug_id'] as int,
-              status: drug['status'] as String,
-              time: drug['time'] as String,
-              id: drug['id'] as int)));
+          image: drug['image'] as String?));
     }
 
     return drugs;

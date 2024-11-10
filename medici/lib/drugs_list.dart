@@ -2,10 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:medici/models/drug.dart';
 import 'package:medici/utils/db.dart';
-import 'package:medici/utils/filter_data.dart';
 import 'package:medici/widgets/app_bar.dart';
 import 'package:medici/widgets/bottom_bar.dart';
-import 'package:medici/widgets/drug_card.dart';
+import 'package:medici/widgets/tiny_drug_card.dart';
 
 class DrugsList extends StatefulWidget {
   const DrugsList(
@@ -18,7 +17,7 @@ class DrugsList extends StatefulWidget {
 }
 
 class _DrugsListPage extends State<DrugsList> {
-  Future<List<DrugsScheduling>>? _data;
+  Future<List<DrugTinyData>>? _data;
 
   @override
   void initState() {
@@ -31,10 +30,9 @@ class _DrugsListPage extends State<DrugsList> {
     _data = getDrugs();
   }
 
-  Future<List<DrugsScheduling>> getDrugs() async {
+  Future<List<DrugTinyData>> getDrugs() async {
     try {
-      final data = await widget.db.getAllDrugs();
-      return orderData(data);
+      return await widget.db.getAllDrugs();
     } catch (error) {
       Fluttertoast.showToast(
           msg: "Falha ao tentar listar seus medicamentos!",
@@ -90,10 +88,10 @@ class _DrugsListPage extends State<DrugsList> {
         body: SizedBox(
           width: width,
           height: height,
-          child: FutureBuilder<List<DrugsScheduling>>(
+          child: FutureBuilder<List<DrugTinyData>>(
               future: _data,
               builder: (BuildContext context,
-                  AsyncSnapshot<List<DrugsScheduling>> snapshot) {
+                  AsyncSnapshot<List<DrugTinyData>> snapshot) {
                 if (snapshot.hasError ||
                     !snapshot.hasData ||
                     snapshot.data == null ||
@@ -117,8 +115,8 @@ class _DrugsListPage extends State<DrugsList> {
                         child: ListView.builder(
                             itemCount: snapshot.data?.length,
                             itemBuilder: (BuildContext context, int index) {
-                              DrugsScheduling drug = snapshot.data![index];
-                              return DrugCard(
+                              DrugTinyData drug = snapshot.data![index];
+                              return TinyDrugCard(
                                   data: drug,
                                   width: width,
                                   height: height,

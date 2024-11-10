@@ -60,6 +60,14 @@ class Drug {
   }
 }
 
+class DrugTinyData {
+  final int id;
+  final String name;
+  final String? image;
+
+  const DrugTinyData({required this.id, required this.name, this.image});
+}
+
 class DrugsScheduling {
   final int id;
   final String name;

@@ -50,8 +50,8 @@
 
 ## Drugs list
 
-- [ ] show only one drug each
-- [ ] refactor get all Drugs to get only the drug data of unique drugs
+- [x] show only one drug each
+- [x] refactor get all Drugs to get only the drug data of unique drugs
 
 ---
 

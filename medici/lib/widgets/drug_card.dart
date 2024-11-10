@@ -44,9 +44,7 @@ class DrugCard extends StatelessWidget {
               color: Colors.white,
               borderRadius: BorderRadius.all(Radius.circular(10))),
           child: Row(
-            mainAxisAlignment: isLate
-                ? MainAxisAlignment.spaceBetween
-                : MainAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Container(
                   margin: const EdgeInsets.only(left: 10),
