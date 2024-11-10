@@ -7,6 +7,7 @@
 - [x] fix image height
 - [x] fix red bar size
 - [x] add an Icon to show that's archived
+- [ ] change text for late meds from `Em x horas` to `Atrasado a x horas`
 
 ## Image Area
 
@@ -33,7 +34,10 @@
 
 ## Home
 
-- [ ] Modal
+- [x] Modal
+- [x] update alert status on modal button click (aware and taken)
+- [x] update amount
+- [x] check if there's enough
 - [x] show only the next drug and late ones
 - [x] late comes first
 
@@ -41,6 +45,8 @@
 
 - [ ] reset status after 24h
 - [ ] check last Day (archive drug and remove notifications)
+- [ ] add recurrent mark
+- [ ] add a lastDay mark
 
 ## Drugs list
 

@@ -91,10 +91,11 @@ class DB {
         drug.image, 
         drug.dose_type, 
         drug.dose,
-        drug.status as drug_status
+        drug.status as drug_status,
+        drug.quantity
       FROM alert 
       INNER JOIN drug ON drug.id = alert.drug_id
-      WHERE drug.status != "archived";
+      WHERE drug.status != "archived" && alert.status != "aware" && alert.status != "taken";
     ''');
 
     List<DrugsScheduling> drugs = [];
@@ -113,6 +114,7 @@ class DB {
           dose: drug['dose'] as double,
           image: drug['image'] as String?,
           status: drug['drug_status'] as String,
+          quantity: drug['quantity'] as double,
           alert: Alert(
               id: drug['alert_id'] as int,
               drugId: id,
@@ -135,7 +137,8 @@ class DB {
         drug.image, 
         drug.dose_type, 
         drug.dose,
-        drug.status
+        drug.status,
+        drug.quantity
       FROM alert 
       INNER JOIN drug ON drug.id = alert.drug_id;
     ''');
@@ -149,6 +152,7 @@ class DB {
           dose: drug['dose'] as double,
           image: drug['image'] as String?,
           status: drug['status'] as String,
+          quantity: drug['quantity'] as double,
           alert: Alert(
               drugId: drug['drug_id'] as int,
               status: drug['status'] as String,

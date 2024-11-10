@@ -68,6 +68,7 @@ class DrugsScheduling {
   final double dose;
   final String status;
   final Alert alert;
+  final double quantity;
 
   const DrugsScheduling(
       {required this.id,
@@ -76,7 +77,8 @@ class DrugsScheduling {
       required this.doseType,
       required this.dose,
       required this.status,
-      required this.alert});
+      required this.alert,
+      required this.quantity});
 }
 
 class FullDrug extends Drug {

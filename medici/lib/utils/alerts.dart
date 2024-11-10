@@ -27,3 +27,11 @@ String getAlertStatus(String time) {
 
   return passedTime(parsedTime) && isOnTolerance ? 'late' : 'pending';
 }
+
+bool itsTimeToTake(String time) {
+  final TimeOfDay parsedTime = parseStringTime(time);
+  final TimeOfDay now = TimeOfDay.now();
+  final int diff = parsedTime.hour - now.hour;
+
+  return diff <= 0 && diff.abs() <= 3;
+}
