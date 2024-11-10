@@ -10,6 +10,8 @@
         "icone",
         "LTRB",
         "medici",
-        "remedio"
+        "meds",
+        "remedio",
+        "sqflite"
     ]
 }

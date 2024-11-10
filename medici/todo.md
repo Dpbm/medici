@@ -7,7 +7,7 @@
 - [x] fix image height
 - [x] fix red bar size
 - [x] add an Icon to show that's archived
-- [ ] change text for late meds from `Em x horas` to `Atrasado a x horas`
+- [x] change text for late meds from `Em x horas` to `Atrasado a x horas`
 
 ## Image Area
 

@@ -95,7 +95,7 @@ class DB {
         drug.quantity
       FROM alert 
       INNER JOIN drug ON drug.id = alert.drug_id
-      WHERE drug.status != "archived" && alert.status != "aware" && alert.status != "taken";
+      WHERE drug.status != "archived" AND alert.status != "aware" AND alert.status != "taken";
     ''');
 
     List<DrugsScheduling> drugs = [];

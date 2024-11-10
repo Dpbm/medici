@@ -131,7 +131,7 @@ class _HomePage extends State<Home> {
   }
 
   void setupPeriodicCheck() {
-    final timeCheckerTimer = RestartableTimer(const Duration(minutes: 2), () {
+    final timeCheckerTimer = RestartableTimer(const Duration(minutes: 1), () {
       if (remainingDrugsIndexes.isEmpty) {
         for (final (index, drug) in drugs.indexed) {
           if (itsTimeToTake(drug.alert.time)) {

@@ -82,7 +82,7 @@ class DrugCard extends StatelessWidget {
                                   data.doseType,
                               style: const TextStyle(fontSize: 14)),
                           Text(
-                              "Em " +
+                              (isLate ? "Atrasado à " : "Em ") +
                                   timeDiff.abs().toString() +
                                   " horas - " +
                                   data.alert.time +
