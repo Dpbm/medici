@@ -7,15 +7,21 @@ import 'package:medici/models/drug.dart';
 import 'package:medici/utils/alerts.dart';
 import 'package:medici/utils/db.dart';
 import 'package:medici/utils/filter_data.dart';
+import 'package:medici/utils/notifications.dart';
 import 'package:medici/widgets/app_bar.dart';
 import 'package:medici/widgets/bottom_bar.dart';
 import 'package:medici/widgets/drug_card.dart';
 
 class Home extends StatefulWidget {
   const Home(
-      {super.key, required this.height, required this.width, required this.db});
+      {super.key,
+      required this.height,
+      required this.width,
+      required this.db,
+      required this.notifications});
   final double height, width;
   final DB db;
+  final NotificationService notifications;
 
   @override
   State<Home> createState() => _HomePage();
@@ -166,6 +172,7 @@ class _HomePage extends State<Home> {
 
   Future<void> getDrugs() async {
     try {
+      await widget.notifications.schedule();
       final data = await widget.db.getDrugs();
       final filteredData = filterData(data);
       setState(() {

@@ -37,35 +37,8 @@ class BottomBar extends StatelessWidget {
     void goToPage(int index) {
       if (index == selected) return;
 
-      MaterialPageRoute<dynamic>? selected_widget =
-          null; //TODO: update this later
-
-      switch (index) {
-        case 0:
-          selected_widget = MaterialPageRoute(
-              builder: (context) => Home(
-                    width: width,
-                    height: height,
-                    db: db,
-                  ));
-          break;
-        case 1:
-          selected_widget = MaterialPageRoute(
-              builder: (context) => Add(width: width, height: height, db: db));
-          break;
-
-        case 2:
-          selected_widget = MaterialPageRoute(
-              builder: (context) =>
-                  DrugsList(width: width, height: height, db: db));
-          break;
-        default:
-          break;
-      }
-
-      if (selected_widget == null) return; //TODO: remove this later
-
-      Navigator.push(context, selected_widget).then((_) {
+      List<String> routes = ['home', 'add', 'list'];
+      Navigator.pushNamed(context, routes[index]).then((_) {
         if (callback != null) {
           callback!();
         }

@@ -50,6 +50,7 @@ class _EditDrugPage extends State<EditDrug> {
   @override
   void initState() {
     super.initState();
+
     type = widget.drug.doseType;
     name = widget.drug.name;
     expirationDate = widget.drug.expirationDate;
