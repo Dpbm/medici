@@ -12,16 +12,35 @@ import 'package:medici/utils/db.dart';
 import 'package:medici/utils/notifications.dart';
 
 @pragma('vm:entry-point')
-void notificationTapBackground(NotificationResponse notificationResponse) {
-  // ignore: avoid_print
-  print('notification(${notificationResponse.id}) action tapped: '
-      '${notificationResponse.actionId} with'
-      ' payload: ${notificationResponse.payload}');
-  if (notificationResponse.input?.isNotEmpty ?? false) {
-    // ignore: avoid_print
-    print(
-        'notification action tapped with input: ${notificationResponse.input}');
+Future<void> notificationTapBackground(NotificationResponse response) async {
+  final DB tmpDb = DB();
+
+  final String? action = response.actionId;
+  final String? drugId = response.payload;
+
+  final int? drugIdInt = drugId != null ? int.parse(drugId) : null;
+
+  if (action != null && action.isNotEmpty && drugIdInt != null) {
+    try {
+      switch (action) {
+        case 'take_it':
+          await tmpDb.updateAlertStatus(drugIdInt, 'taken');
+          await tmpDb.reduceQuantity(drugIdInt);
+          break;
+
+        case 'delay_it':
+          await tmpDb.updateAlertStatus(drugIdInt, 'late');
+          break;
+
+        default:
+          break;
+      }
+    } catch (error) {
+      debugPrint("Failed on update alert status!");
+    }
   }
+
+  tmpDb.close();
 }
 
 final NotificationService notifications = NotificationService();
@@ -57,7 +76,8 @@ class App extends StatelessWidget {
       routes: {
         'home': (context) => Home(
             width: width, height: height, db: db, notifications: notifications),
-        'add': (context) => Add(width: width, height: height, db: db),
+        'add': (context) => Add(
+            width: width, height: height, db: db, notifications: notifications),
         'list': (context) => DrugsList(height: height, width: width, db: db),
         'edit': (context) {
           final args = ModalRoute.of(context)?.settings.arguments
@@ -66,13 +86,18 @@ class App extends StatelessWidget {
               width: width,
               height: height,
               db: db,
-              drug: args['drug'] as FullDrug);
+              drug: args['drug'] as FullDrug,
+              notifications: notifications);
         },
         'drug': (context) {
           final args = ModalRoute.of(context)?.settings.arguments
               as Map<String, dynamic>;
           return DrugPage(
-              width: width, height: height, db: db, id: args['id'] as int);
+              width: width,
+              height: height,
+              db: db,
+              id: args['id'] as int,
+              notifications: notifications);
         }
       },
     );

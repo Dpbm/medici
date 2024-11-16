@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/timezone.dart' as tz;
@@ -8,8 +7,6 @@ import 'package:timezone/data/latest.dart' as tz;
 class NotificationService {
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
-  final StreamController<String?> selectNotificationStream =
-      StreamController<String?>.broadcast();
   final MethodChannel platform =
       const MethodChannel('medici/drugs_notification');
   final String navigationActionId = 'drugs_notification';
@@ -48,20 +45,16 @@ class NotificationService {
 
     await flutterLocalNotificationsPlugin.initialize(
       initializationSettings,
-      onDidReceiveNotificationResponse: (NotificationResponse response) {
-        print(response.payload);
-        print(response.actionId);
-        //flutterLocalNotificationsPlugin.cancel(response.id!);
-      },
+      onDidReceiveNotificationResponse: notificationTapResponse,
       onDidReceiveBackgroundNotificationResponse: notificationTapResponse,
     );
   }
 
-  Future<void> schedule() async {
-    final tz.TZDateTime scheduledTime = tz.TZDateTime.from(
-        tz.TZDateTime.from(
-            DateTime(2024, 11, 15, 14, 40), timeZone ?? tz.local),
-        timeZone ?? tz.local);
+  Future<void> scheduleDrug(DateTime time, int drugId, String drugName,
+      double dose, String doseType, int alertId) async {
+    final tz.Location location = timeZone ?? tz.local;
+    final tz.TZDateTime scheduledTime =
+        tz.TZDateTime.from(tz.TZDateTime.from(time, location), location);
 
     final notificationDetails = NotificationDetails(
         android: AndroidNotificationDetails('notify', platform.name,
@@ -71,24 +64,28 @@ class NotificationService {
             enableVibration: true,
             ongoing: true,
             autoCancel: false,
-            actions: [const AndroidNotificationAction('0', 'tomado')]));
+            actions: [
+          const AndroidNotificationAction('take_it', 'take the medicine now',
+              showsUserInterface: true),
+          const AndroidNotificationAction(
+              'delay_it', 'delay the medicine intake',
+              showsUserInterface: true)
+        ]));
 
-    try {
-      await flutterLocalNotificationsPlugin.zonedSchedule(
-          0,
-          "notification title",
-          "notification body",
-          scheduledTime,
-          notificationDetails,
-          androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-          uiLocalNotificationDateInterpretation:
-              UILocalNotificationDateInterpretation.absoluteTime,
-          matchDateTimeComponents: DateTimeComponents.time,
-          payload: '1');
+    await flutterLocalNotificationsPlugin.zonedSchedule(
+        alertId,
+        'Hora do seu remédio!',
+        "Tomar $dose$doseType de $drugName",
+        scheduledTime,
+        notificationDetails,
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.absoluteTime,
+        matchDateTimeComponents: DateTimeComponents.time,
+        payload: drugId.toString());
+  }
 
-      debugPrint('Notification scheduled successfully');
-    } catch (e) {
-      debugPrint('Error scheduling notification: $e');
-    }
+  Future<void> cancelNotification(int id) async {
+    await flutterLocalNotificationsPlugin.cancel(id);
   }
 }

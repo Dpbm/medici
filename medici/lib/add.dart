@@ -5,6 +5,7 @@ import 'package:medici/models/notification_settings.dart';
 import 'package:medici/utils/db.dart';
 import 'package:medici/utils/alerts.dart';
 import 'package:medici/utils/leaflet.dart';
+import 'package:medici/utils/notifications.dart';
 import 'package:medici/utils/time.dart';
 import 'package:medici/widgets/app_bar.dart';
 import 'package:medici/widgets/forms/image_area.dart';
@@ -24,9 +25,14 @@ import 'package:fluttertoast/fluttertoast.dart';
 
 class Add extends StatefulWidget {
   const Add(
-      {super.key, required this.width, required this.height, required this.db});
+      {super.key,
+      required this.width,
+      required this.height,
+      required this.db,
+      required this.notifications});
   final double height, width;
   final DB db;
+  final NotificationService notifications;
 
   @override
   State<Add> createState() => _AddPage();
@@ -165,7 +171,19 @@ class _AddPage extends State<Add> {
             .map((hour) => Alert(drugId: drugId, time: hour, status: 'pending'))
             .toList();
 
-        await widget.db.addAlerts(alerts);
+        List<int> alertsIds = await widget.db.addAlerts(alerts);
+
+        for (int i = 0; i < hours.length; i++) {
+          final TimeOfDay time = parseStringTime(hours[i]);
+          await widget.notifications.scheduleDrug(
+              DateTime.now()
+                  .add(Duration(hours: time.hour, minutes: time.minute)),
+              drugId,
+              name!,
+              dose!,
+              type,
+              alertsIds[i]);
+        }
 
         Fluttertoast.showToast(
             msg: "Medicamento adicionado com sucesso!",

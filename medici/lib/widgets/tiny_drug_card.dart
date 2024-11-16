@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:medici/drug.dart';
 import 'package:medici/models/drug.dart';
 import 'package:medici/utils/db.dart';
 
@@ -21,14 +20,9 @@ class TinyDrugCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-        onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (BuildContext context) => DrugPage(
-                        id: data.id,
-                        width: width,
-                        height: height,
-                        db: db))).then((_) {
+        onTap: () =>
+            Navigator.pushNamed(context, 'drug', arguments: {'id': data.id})
+                .then((_) {
               callback();
             }),
         child: Container(

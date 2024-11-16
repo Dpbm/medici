@@ -52,6 +52,7 @@
 - [ ] check last Day (archive drug and remove notifications)
 - [ ] add recurrent mark
 - [ ] add a lastDay mark
+- [ ] quantity alert action to refill amount
 
 ## Drugs list
 

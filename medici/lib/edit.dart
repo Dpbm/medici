@@ -5,6 +5,7 @@ import 'package:medici/models/notification_settings.dart';
 import 'package:medici/utils/db.dart';
 import 'package:medici/utils/alerts.dart';
 import 'package:medici/utils/leaflet.dart';
+import 'package:medici/utils/notifications.dart';
 import 'package:medici/utils/time.dart';
 import 'package:medici/widgets/app_bar.dart';
 import 'package:medici/widgets/forms/image_area.dart';
@@ -28,10 +29,12 @@ class EditDrug extends StatefulWidget {
       required this.width,
       required this.height,
       required this.db,
-      required this.drug});
+      required this.drug,
+      required this.notifications});
   final double height, width;
   final DB db;
   final FullDrug drug;
+  final NotificationService notifications;
 
   @override
   State<EditDrug> createState() => _EditDrugPage();
@@ -155,6 +158,10 @@ class _EditDrugPage extends State<EditDrug> {
 
     Future<void> submit() async {
       try {
+        for (final Alert alert in widget.drug.schedule) {
+          await widget.notifications.cancelNotification(alert.id!);
+        }
+
         await widget.db.deleteAlerts(id!);
         await widget.db.deleteNotificationSettings(id!);
 
@@ -188,7 +195,19 @@ class _EditDrugPage extends State<EditDrug> {
         List<Alert> alerts = hours
             .map((hour) => Alert(drugId: id!, time: hour, status: 'pending'))
             .toList();
-        await widget.db.addAlerts(alerts);
+        List<int> alertsIds = await widget.db.addAlerts(alerts);
+
+        for (int i = 0; i < hours.length; i++) {
+          final TimeOfDay time = parseStringTime(hours[i]);
+          await widget.notifications.scheduleDrug(
+              DateTime.now()
+                  .add(Duration(hours: time.hour, minutes: time.minute)),
+              id!,
+              name!,
+              dose!,
+              type!,
+              alertsIds[i]);
+        }
 
         Fluttertoast.showToast(
             msg: "Medicamento atualizado com sucesso!",

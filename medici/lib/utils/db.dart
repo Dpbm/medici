@@ -69,13 +69,18 @@ class DB {
     return id;
   }
 
-  Future<void> addAlerts(List<Alert> alerts) async {
+  Future<List<int>> addAlerts(List<Alert> alerts) async {
     await getDB();
 
+    List<int> ids = [];
+
     for (Alert alert in alerts) {
-      await database!.insert('alert', alert.toMap(),
+      int id = await database!.insert('alert', alert.toMap(),
           conflictAlgorithm: ConflictAlgorithm.fail);
+      ids.add(id);
     }
+
+    return ids;
   }
 
   Future<List<DrugsScheduling>> getDrugs() async {
@@ -238,6 +243,23 @@ class DB {
         conflictAlgorithm: ConflictAlgorithm.fail);
   }
 
+  Future<void> reduceQuantity(int id) async {
+    await getDB();
+
+    await database!.rawUpdate('''
+      UPDATE drug
+      SET quantity = quantity - dose
+      WHERE id=?;
+    ''', [id]);
+  }
+
+  Future<void> refillDrugAmount(int id, double amount) async {
+    await getDB();
+
+    await database!
+        .update('drug', {'quantity': amount}, where: 'id=?', whereArgs: [id]);
+  }
+
   Future<void> updateAlertStatus(int id, String status) async {
     await getDB();
 
@@ -245,5 +267,9 @@ class DB {
         where: 'id=?',
         whereArgs: [id],
         conflictAlgorithm: ConflictAlgorithm.fail);
+  }
+
+  Future<void> close() async {
+    database?.close();
   }
 }

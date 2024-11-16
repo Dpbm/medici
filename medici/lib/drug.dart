@@ -2,9 +2,11 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:medici/edit.dart';
+import 'package:medici/models/alert.dart';
 import 'package:medici/models/drug.dart';
 import 'package:medici/utils/db.dart';
+import 'package:medici/utils/notifications.dart';
+import 'package:medici/utils/time.dart';
 import 'package:medici/widgets/app_bar.dart';
 import 'package:medici/widgets/archive_button.dart';
 import 'package:medici/widgets/delete_button.dart';
@@ -20,11 +22,13 @@ class DrugPage extends StatefulWidget {
       required this.width,
       required this.height,
       required this.id,
-      required this.db});
+      required this.db,
+      required this.notifications});
 
   final double width, height;
   final int id;
   final DB db;
+  final NotificationService notifications;
 
   @override
   State<DrugPage> createState() => _DrugPage();
@@ -68,9 +72,16 @@ class _DrugPage extends State<DrugPage> {
     }
   }
 
+  Future<void> cancelNotifications() async {
+    for (final Alert alert in (drug?.schedule ?? [])) {
+      await widget.notifications.cancelNotification(alert.id!);
+    }
+  }
+
   Future<void> archiveDrug() async {
     try {
       await widget.db.archiveDrug(id!);
+      await cancelNotifications();
       Fluttertoast.showToast(
           msg: "Medicamento arquivado com sucesso!",
           gravity: ToastGravity.CENTER,
@@ -93,6 +104,19 @@ class _DrugPage extends State<DrugPage> {
   Future<void> unarchiveDrug() async {
     try {
       await widget.db.unarchiveDrug(id!);
+
+      for (final Alert alert in (drug?.schedule ?? [])) {
+        final TimeOfDay time = parseStringTime(alert.time);
+        await widget.notifications.scheduleDrug(
+            DateTime.now()
+                .add(Duration(hours: time.hour, minutes: time.minute)),
+            id!,
+            drug!.name,
+            drug!.dose,
+            drug!.doseType,
+            alert.id!);
+      }
+
       Fluttertoast.showToast(
           msg: "Medicamento desarquivado com sucesso!",
           gravity: ToastGravity.CENTER,
@@ -121,14 +145,7 @@ class _DrugPage extends State<DrugPage> {
     final double sectionWidth = width - 40;
 
     Future<void> goToEdit() async {
-      Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => EditDrug(
-                  db: widget.db,
-                  width: widget.width,
-                  height: widget.height,
-                  drug: drug!))).then((_) {
+      Navigator.pushNamed(context, 'edit', arguments: {'drug': drug}).then((_) {
         reload();
       });
     }
@@ -143,6 +160,7 @@ class _DrugPage extends State<DrugPage> {
             fontSize: 16.0);
 
         await widget.db.deleteDrug(id!);
+        await cancelNotifications();
 
         Fluttertoast.showToast(
             msg: "Medicamento deletado com sucesso!",
