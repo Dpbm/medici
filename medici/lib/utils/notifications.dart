@@ -65,10 +65,9 @@ class NotificationService {
             ongoing: true,
             autoCancel: false,
             actions: [
-          const AndroidNotificationAction('take_it', 'take the medicine now',
+          const AndroidNotificationAction('take_it', 'tomar',
               showsUserInterface: true),
-          const AndroidNotificationAction(
-              'delay_it', 'delay the medicine intake',
+          const AndroidNotificationAction('delay_it', 'adiar',
               showsUserInterface: true)
         ]));
 

@@ -2,7 +2,7 @@
 
 ## ALL
 
-- [ ] use named routing
+- [x] use named routing
 
 ## Cards
 
@@ -29,11 +29,11 @@
 
 ## Add
 
-- [ ] setup notifications
+- [x] setup notifications
 
 ## Edit
 
-- [ ] update notifications
+- [x] update notifications
 - [ ] fix first update issue
 
 ## Home
@@ -50,8 +50,8 @@
 
 - [ ] reset status after 24h
 - [ ] check last Day (archive drug and remove notifications)
-- [ ] add recurrent mark
-- [ ] add a lastDay mark
+- [x] add recurrent mark
+- [x] add a lastDay mark
 - [ ] quantity alert action to refill amount
 
 ## Drugs list
