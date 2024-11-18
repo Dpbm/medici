@@ -271,8 +271,17 @@ class DB {
         conflictAlgorithm: ConflictAlgorithm.fail);
   }
 
-  Future<void> reduceQuantity(int id) async {
+  Future<void> reduceQuantity(int id, int alertId) async {
     await getDB();
+
+    final alertData = (await database!.query('alert',
+            columns: ['status'], where: 'id=?', whereArgs: [alertId]))
+        .first;
+
+    if (alertData.isEmpty) throw Exception('Invalid Alert data');
+
+    final String status = alertData['status'] as String;
+    if (status == 'taken') return;
 
     await database!.rawUpdate('''
       UPDATE drug

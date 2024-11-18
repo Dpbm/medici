@@ -51,7 +51,7 @@
 - [x] change `RestartableTimer` to `Timer.Periodic`
 - [ ] fix get data
 - [x] update time period to check remaining drugs to take(use 5s)
-- [ ] reduce the amount of medicine when click on modal
+- [x] reduce the amount of medicine when click on modal
 
 ## Drugs
 
@@ -61,7 +61,7 @@
 - [x] add a lastDay mark
 - [ ] quantity alert action to refill amount
 - [x] fix scheduled alarms
-- [ ] what happens when you confirm you have taken the medicine in both modal and notification (check if the difference of time between `last_interaction` and `.now()` is, at least, the same as the time division)
+- [x] what happens when you confirm you have taken the medicine in both modal and notification (check if the difference of time between `last_interaction` and `.now()` is, at least, the same as the time division)
 - [x] update last interaction
 
 ## Drugs list

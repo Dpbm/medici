@@ -18,14 +18,18 @@ Future<void> notificationTapBackground(NotificationResponse response) async {
   final String? action = response.actionId;
   final String? drugId = response.payload;
 
+  final int? alertId = response.id;
   final int? drugIdInt = drugId != null ? int.parse(drugId) : null;
 
-  if (action != null && action.isNotEmpty && drugIdInt != null) {
+  if (action != null &&
+      action.isNotEmpty &&
+      drugIdInt != null &&
+      alertId != null) {
     try {
       switch (action) {
         case 'take_it':
+          await tmpDb.reduceQuantity(drugIdInt, alertId);
           await tmpDb.updateAlertStatus(drugIdInt, 'taken');
-          await tmpDb.reduceQuantity(drugIdInt);
           break;
 
         case 'delay_it':
