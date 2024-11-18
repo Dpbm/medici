@@ -9,9 +9,16 @@ import 'package:timezone/data/latest.dart' as tz;
 class NotificationService {
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
-  final MethodChannel platform =
+
+  final MethodChannel drugsChannel =
       const MethodChannel('medici/drugs_notification');
-  final String navigationActionId = 'drugs_notification';
+
+  final MethodChannel quantityChannel =
+      const MethodChannel('medici/quantity_notification');
+
+  final MethodChannel expirationChannel =
+      const MethodChannel('medici/expiration_notification');
+
   final AndroidInitializationSettings initializationSettingsAndroid =
       const AndroidInitializationSettings('@mipmap/ic_launcher');
   tz.Location? timeZone;
@@ -60,7 +67,7 @@ class NotificationService {
         tz.TZDateTime.from(tz.TZDateTime.from(time, location), location);
 
     final notificationDetails = NotificationDetails(
-        android: AndroidNotificationDetails('notify', platform.name,
+        android: AndroidNotificationDetails('notify_drug', drugsChannel.name,
             importance: Importance.high,
             priority: Priority.high,
             playSound: true,
@@ -68,10 +75,8 @@ class NotificationService {
             ongoing: true,
             autoCancel: false,
             actions: [
-          const AndroidNotificationAction('take_it', 'tomar',
-              showsUserInterface: true),
-          const AndroidNotificationAction('delay_it', 'adiar',
-              showsUserInterface: true)
+          const AndroidNotificationAction('take_it', 'tomar'),
+          const AndroidNotificationAction('delay_it', 'adiar')
         ]));
 
     await flutterLocalNotificationsPlugin.zonedSchedule(
@@ -109,5 +114,68 @@ class NotificationService {
     for (final int id in ids) {
       cancelNotification(id);
     }
+  }
+
+  Future<void> scheduleQuantity(
+      DateTime time, int drugId, String drugName) async {
+    final tz.Location location = timeZone ?? tz.local;
+    final tz.TZDateTime scheduledTime = tz.TZDateTime.from(
+        tz.TZDateTime.from(DateTime(time.year, time.month, time.day), location),
+        location);
+
+    final notificationDetails = NotificationDetails(
+        android: AndroidNotificationDetails(
+            'notify_quantity', quantityChannel.name,
+            importance: Importance.high,
+            priority: Priority.high,
+            playSound: true,
+            enableVibration: true,
+            ongoing: true,
+            autoCancel: false,
+            actions: [
+          const AndroidNotificationAction('refill', 'repor'),
+        ]));
+
+    await flutterLocalNotificationsPlugin.zonedSchedule(
+        -1,
+        'Seu remédio está acabando!',
+        "Você precisa comprar mais $drugName",
+        scheduledTime,
+        notificationDetails,
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.absoluteTime,
+        matchDateTimeComponents: DateTimeComponents.dayOfMonthAndTime,
+        payload: drugId.toString());
+  }
+
+  Future<void> scheduleExpiration(
+      DateTime time, int drugId, String drugName) async {
+    final tz.Location location = timeZone ?? tz.local;
+    final tz.TZDateTime scheduledTime = tz.TZDateTime.from(
+        tz.TZDateTime.from(DateTime(time.year, time.month, time.day), location),
+        location);
+
+    final notificationDetails = NotificationDetails(
+        android: AndroidNotificationDetails(
+            'notify_expiration', expirationChannel.name,
+            importance: Importance.high,
+            priority: Priority.high,
+            playSound: true,
+            enableVibration: true,
+            ongoing: true,
+            autoCancel: false));
+
+    await flutterLocalNotificationsPlugin.zonedSchedule(
+        -2,
+        'Seu remédio venceu',
+        "Descarte o $drugName e compre mais",
+        scheduledTime,
+        notificationDetails,
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.absoluteTime,
+        matchDateTimeComponents: DateTimeComponents.dayOfMonthAndTime,
+        payload: drugId.toString());
   }
 }

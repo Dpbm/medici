@@ -63,6 +63,8 @@
 - [x] fix scheduled alarms
 - [x] what happens when you confirm you have taken the medicine in both modal and notification (check if the difference of time between `last_interaction` and `.now()` is, at least, the same as the time division)
 - [x] update last interaction
+- [ ] don't let the quantity be less than 1
+- [ ] handle new drug (after expiration)
 
 ## Drugs list
 
