@@ -26,7 +26,7 @@ String buildTimeString(TimeOfDay time) {
 }
 
 String buildDateString(DateTime date) {
-  return '${date.day}-${date.month}-${date.year}';
+  return '${date.day}/${date.month}/${date.year}';
 }
 
 DateTime parseStringDate(String date) {
@@ -41,4 +41,8 @@ bool passedAtLeastOneDay(DateTime lastInteraction) {
   return (now.year > lastInteraction.year ||
       now.month > lastInteraction.month ||
       now.day > lastInteraction.day);
+}
+
+bool equalDate(DateTime date1, DateTime date2) {
+  return buildDateString(date1) == buildDateString(date2);
 }

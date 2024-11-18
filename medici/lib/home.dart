@@ -168,7 +168,7 @@ class _HomePage extends State<Home> {
 
   Future<void> getDrugs() async {
     try {
-      final data = await widget.db.getDrugs();
+      final data = await widget.db.getDrugs(widget.notifications);
       final filteredData = filterData(data);
       setState(() {
         drugs = filteredData;

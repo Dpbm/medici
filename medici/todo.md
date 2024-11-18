@@ -56,7 +56,7 @@
 ## Drugs
 
 - [x] reset status after 24h
-- [ ] check last Day (archive drug and remove notifications)
+- [x] check last Day (archive drug and remove notifications)
 - [x] add recurrent mark
 - [x] add a lastDay mark
 - [ ] quantity alert action to refill amount

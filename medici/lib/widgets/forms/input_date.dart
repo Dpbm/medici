@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:medici/utils/time.dart';
 
 class InputDate extends StatefulWidget {
   const InputDate(
@@ -58,10 +59,11 @@ class _InputDate extends State<InputDate> {
         },
       );
 
-      final selectedDate =
-          date?.toString().split(' ')[0].split('-').reversed.join('/');
+      if (date == null) return;
 
-      if (selectedDate == null || selectedDate.isEmpty) return;
+      final selectedDate = buildDateString(date);
+
+      if (selectedDate.isEmpty) return;
 
       _textInput.text = selectedDate;
 
