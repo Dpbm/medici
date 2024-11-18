@@ -28,8 +28,7 @@ class DB {
           leaflet TEXT,
           status TEXT NOT NULL,
           frequency TEXT NOT NULL,
-          starting_time TEXT NOT NULL,
-          last_interaction TEXT NOT NULL)
+          starting_time TEXT NOT NULL)
       ''');
 
       db.execute('''
@@ -38,6 +37,7 @@ class DB {
           time TEXT NOT NULL,
           drug_id INTEGER NOT NULL,
           status TEXT NOT NULL,
+          last_interaction TEXT NOT NULL,
           FOREIGN KEY(drug_id) REFERENCES drug(id)
         )
       ''');
@@ -93,6 +93,7 @@ class DB {
         alert.id as alert_id,
         alert.time,
         alert.status as alert_status,
+        alert.last_interaction
         drug.id as drug_id,
         drug.name, 
         drug.image, 
@@ -100,7 +101,6 @@ class DB {
         drug.dose,
         drug.status as drug_status,
         drug.quantity,
-        drug.last_interaction
       FROM alert 
       INNER JOIN drug ON drug.id = alert.drug_id
       WHERE drug.status != "archived" AND alert.status != "aware" AND alert.status != "taken";
@@ -111,12 +111,11 @@ class DB {
       final int id = drug['drug_id'] as int;
       final int alertId = drug['alert_id'] as int;
       final String time = drug['time'] as String;
-      final DateTime lastInteraction =
-          parseStringDate(drug['last_interaction'] as String);
+      final String lastInteraction = drug['last_interaction'] as String;
 
       String status = 'pending';
 
-      if (passedAtLeastOneDay(lastInteraction)) {
+      if (passedAtLeastOneDay(parseStringDate(lastInteraction))) {
         await updateAlertStatus(alertId, 'pending');
       } else {
         status = getAlertStatus(time);
@@ -139,7 +138,8 @@ class DB {
               id: drug['alert_id'] as int,
               drugId: id,
               status: status,
-              time: time)));
+              time: time,
+              lastInteraction: lastInteraction)));
     }
 
     return drugs;
@@ -187,12 +187,17 @@ class DB {
     for (final alert in alerts_data) {
       final int alertId = alert['id'] as int;
       final String time = alert['time'] as String;
+      final String lastInteraction = alert['last_interaction'] as String;
       final String status = getAlertStatus(time);
 
       await updateAlertStatus(alertId, status);
 
       schedule.add(Alert(
-          drugId: alert['drug_id'] as int, time: time, id: id, status: status));
+          drugId: alert['drug_id'] as int,
+          time: time,
+          id: id,
+          status: status,
+          lastInteraction: lastInteraction));
     }
 
     return FullDrug(
@@ -209,7 +214,6 @@ class DB {
         status: drug_data['status'] as String,
         frequency: drug_data['frequency'] as String,
         startingTime: drug_data['starting_time'] as String,
-        lastInteraction: drug_data['last_interaction'] as String,
         notification: notification,
         schedule: schedule);
   }
@@ -263,9 +267,8 @@ class DB {
       UPDATE drug
       SET 
         quantity = quantity - dose,
-        last_interaction = ? 
       WHERE id=?;
-    ''', [id, buildDateString(DateTime.now())]);
+    ''', [id]);
   }
 
   Future<void> refillDrugAmount(int id, double amount) async {
@@ -278,7 +281,8 @@ class DB {
   Future<void> updateAlertStatus(int id, String status) async {
     await getDB();
 
-    await database!.update('alert', {'status': status},
+    await database!.update('alert',
+        {'status': status, 'last_interaction': buildDateString(DateTime.now())},
         where: 'id=?',
         whereArgs: [id],
         conflictAlgorithm: ConflictAlgorithm.fail);

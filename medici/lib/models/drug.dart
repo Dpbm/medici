@@ -25,7 +25,6 @@ class Drug {
   final String status;
   final String frequency;
   final String startingTime;
-  final String lastInteraction;
 
   const Drug(
       {this.id,
@@ -40,8 +39,7 @@ class Drug {
       this.leaflet,
       required this.status,
       required this.frequency,
-      required this.startingTime,
-      required this.lastInteraction});
+      required this.startingTime});
 
   Map<String, Object?> toMap() {
     return {
@@ -58,7 +56,6 @@ class Drug {
       'status': status,
       'frequency': frequency,
       'starting_time': startingTime,
-      'last_interaction': lastInteraction
     };
   }
 }
@@ -107,7 +104,6 @@ class FullDrug extends Drug {
     required super.status,
     required super.frequency,
     required super.startingTime,
-    required super.lastInteraction,
     super.image,
     super.lastDay,
     super.leaflet,

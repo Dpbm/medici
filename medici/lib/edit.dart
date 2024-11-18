@@ -169,20 +169,20 @@ class _EditDrugPage extends State<EditDrug> {
         final String startingTime = buildTimeString(hour!);
 
         Drug data = Drug(
-            id: id!,
-            name: name!,
-            image: image,
-            expirationDate: expirationDate!,
-            quantity: quantity!,
-            doseType: type!,
-            dose: dose!,
-            recurrent: recurrent!,
-            lastDay: lastDay,
-            leaflet: leaflet,
-            status: status!,
-            frequency: frequencyString!,
-            startingTime: startingTime,
-            lastInteraction: buildDateString(DateTime.now()));
+          id: id!,
+          name: name!,
+          image: image,
+          expirationDate: expirationDate!,
+          quantity: quantity!,
+          doseType: type!,
+          dose: dose!,
+          recurrent: recurrent!,
+          lastDay: lastDay,
+          leaflet: leaflet,
+          status: status!,
+          frequency: frequencyString!,
+          startingTime: startingTime,
+        );
 
         NotificationSettings notification = NotificationSettings(
             drugId: id!,
@@ -194,7 +194,11 @@ class _EditDrugPage extends State<EditDrug> {
 
         List<String> hours = getAlerts(hour!, frequency!);
         List<Alert> alerts = hours
-            .map((hour) => Alert(drugId: id!, time: hour, status: 'pending'))
+            .map((hour) => Alert(
+                drugId: id!,
+                time: hour,
+                status: 'pending',
+                lastInteraction: buildDateString(DateTime.now())))
             .toList();
         List<int> alertsIds = await widget.db.addAlerts(alerts);
         await widget.notifications

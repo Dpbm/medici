@@ -155,8 +155,7 @@ class _AddPage extends State<Add> {
             leaflet: leaflet,
             status: 'current',
             frequency: frequencyString,
-            startingTime: startingTime,
-            lastInteraction: buildDateString(DateTime.now()));
+            startingTime: startingTime);
 
         final int drugId = await widget.db.addDrug(data);
 
@@ -169,7 +168,11 @@ class _AddPage extends State<Add> {
 
         List<String> hours = getAlerts(hour, frequency);
         List<Alert> alerts = hours
-            .map((hour) => Alert(drugId: drugId, time: hour, status: 'pending'))
+            .map((hour) => Alert(
+                drugId: drugId,
+                time: hour,
+                status: 'pending',
+                lastInteraction: buildDateString(DateTime.now())))
             .toList();
 
         List<int> alertsIds = await widget.db.addAlerts(alerts);
