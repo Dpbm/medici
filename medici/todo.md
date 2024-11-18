@@ -45,6 +45,8 @@
 - [x] show only the next drug and late ones
 - [x] late comes first
 - [ ] change `RestartableTimer` to `Timer.Periodic`
+- [ ] fix get data
+- [ ] update time period to check remaining drugs to take(use 5s)
 
 ## Drugs
 
@@ -53,6 +55,7 @@
 - [x] add recurrent mark
 - [x] add a lastDay mark
 - [ ] quantity alert action to refill amount
+- [ ] fix scheduled alarms
 
 ## Drugs list
 
