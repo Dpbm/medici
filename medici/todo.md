@@ -4,6 +4,10 @@
 
 - [x] use named routing
 
+## Notifications
+
+- [ ] identify why sometimes the app freezes on splash screen after calling `Datetime.now().timeZoneName`
+
 ## Cards
 
 - [x] update default image
@@ -25,7 +29,7 @@
 
 ## Input Hour
 
-- [ ] zero padding
+- [x] zero padding
 
 ## Add
 
@@ -44,9 +48,10 @@
 - [x] check if there's enough
 - [x] show only the next drug and late ones
 - [x] late comes first
-- [ ] change `RestartableTimer` to `Timer.Periodic`
+- [x] change `RestartableTimer` to `Timer.Periodic`
 - [ ] fix get data
-- [ ] update time period to check remaining drugs to take(use 5s)
+- [x] update time period to check remaining drugs to take(use 5s)
+- [ ] reduce the amount of medicine when click on modal
 
 ## Drugs
 
@@ -55,7 +60,7 @@
 - [x] add recurrent mark
 - [x] add a lastDay mark
 - [ ] quantity alert action to refill amount
-- [ ] fix scheduled alarms
+- [x] fix scheduled alarms
 
 ## Drugs list
 
@@ -86,7 +91,7 @@
 - [x] db insert drug function
 - [x] add db model
 - [x] open calendar
-- [ ] setup notifications
+- [x] setup notifications
 - [x] refactor take photo func.
 - [ ] pad time with zeros
 

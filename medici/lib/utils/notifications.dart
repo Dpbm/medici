@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:medici/utils/time.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
 
@@ -24,9 +26,10 @@ class NotificationService {
     accepted = acceptedPermission ?? false;
   }
 
-  void setupTz() {
+  Future<void> setupTz() async {
     tz.initializeTimeZones();
-    timeZone = tz.getLocation('America/Sao_Paulo');
+    final String localTimeZone = DateTime.now().timeZoneName;
+    timeZone = tz.getLocation(localTimeZone);
     tz.setLocalLocation(timeZone ?? tz.local);
   }
 
@@ -84,7 +87,27 @@ class NotificationService {
         payload: drugId.toString());
   }
 
+  Future<void> scheduleMultiple(List<String> hours, int drugId, String drugName,
+      double dose, String doseType, List<int> alertsIds) async {
+    DateTime now = DateTime.now();
+
+    for (int i = 0; i < hours.length; i++) {
+      final TimeOfDay time = parseStringTime(hours[i]);
+
+      DateTime newDate =
+          DateTime(now.year, now.month, now.day, time.hour, time.minute);
+      await scheduleDrug(
+          newDate, drugId, drugName, dose, doseType, alertsIds[i]);
+    }
+  }
+
   Future<void> cancelNotification(int id) async {
     await flutterLocalNotificationsPlugin.cancel(id);
+  }
+
+  Future<void> cancelMultiple(List<int> ids) async {
+    for (final int id in ids) {
+      cancelNotification(id);
+    }
   }
 }

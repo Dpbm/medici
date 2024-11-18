@@ -196,18 +196,8 @@ class _EditDrugPage extends State<EditDrug> {
             .map((hour) => Alert(drugId: id!, time: hour, status: 'pending'))
             .toList();
         List<int> alertsIds = await widget.db.addAlerts(alerts);
-
-        for (int i = 0; i < hours.length; i++) {
-          final TimeOfDay time = parseStringTime(hours[i]);
-          await widget.notifications.scheduleDrug(
-              DateTime.now()
-                  .add(Duration(hours: time.hour, minutes: time.minute)),
-              id!,
-              name!,
-              dose!,
-              type!,
-              alertsIds[i]);
-        }
+        await widget.notifications
+            .scheduleMultiple(hours, id!, name!, dose!, type!, alertsIds);
 
         Fluttertoast.showToast(
             msg: "Medicamento atualizado com sucesso!",

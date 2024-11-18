@@ -172,18 +172,8 @@ class _AddPage extends State<Add> {
             .toList();
 
         List<int> alertsIds = await widget.db.addAlerts(alerts);
-
-        for (int i = 0; i < hours.length; i++) {
-          final TimeOfDay time = parseStringTime(hours[i]);
-          await widget.notifications.scheduleDrug(
-              DateTime.now()
-                  .add(Duration(hours: time.hour, minutes: time.minute)),
-              drugId,
-              name!,
-              dose!,
-              type,
-              alertsIds[i]);
-        }
+        await widget.notifications
+            .scheduleMultiple(hours, drugId, name!, dose!, type, alertsIds);
 
         Fluttertoast.showToast(
             msg: "Medicamento adicionado com sucesso!",

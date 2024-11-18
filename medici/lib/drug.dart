@@ -6,7 +6,6 @@ import 'package:medici/models/alert.dart';
 import 'package:medici/models/drug.dart';
 import 'package:medici/utils/db.dart';
 import 'package:medici/utils/notifications.dart';
-import 'package:medici/utils/time.dart';
 import 'package:medici/widgets/app_bar.dart';
 import 'package:medici/widgets/archive_button.dart';
 import 'package:medici/widgets/delete_button.dart';
@@ -42,6 +41,9 @@ class _DrugPage extends State<DrugPage> {
   int? id;
   String? status;
 
+  List<String> alertsHours = [];
+  List<int> alertsIds = [];
+
   @override
   void initState() {
     super.initState();
@@ -55,9 +57,15 @@ class _DrugPage extends State<DrugPage> {
 
   Future<void> getDrug() async {
     try {
-      final data = await widget.db.getFullDrugData(widget.id);
+      final FullDrug data = await widget.db.getFullDrugData(widget.id);
+
       setState(() {
         drug = data;
+
+        for (final Alert alert in data.schedule) {
+          alertsIds.add(alert.id!);
+          alertsHours.add(alert.time);
+        }
       });
     } catch (error) {
       Fluttertoast.showToast(
@@ -66,22 +74,18 @@ class _DrugPage extends State<DrugPage> {
           backgroundColor: Colors.red,
           textColor: Colors.white,
           fontSize: 16.0);
+
       if (context.mounted) {
         Navigator.pop(context);
       }
     }
   }
 
-  Future<void> cancelNotifications() async {
-    for (final Alert alert in (drug?.schedule ?? [])) {
-      await widget.notifications.cancelNotification(alert.id!);
-    }
-  }
-
   Future<void> archiveDrug() async {
     try {
       await widget.db.archiveDrug(id!);
-      await cancelNotifications();
+      await widget.notifications.cancelMultiple(alertsIds);
+
       Fluttertoast.showToast(
           msg: "Medicamento arquivado com sucesso!",
           gravity: ToastGravity.CENTER,
@@ -105,17 +109,8 @@ class _DrugPage extends State<DrugPage> {
     try {
       await widget.db.unarchiveDrug(id!);
 
-      for (final Alert alert in (drug?.schedule ?? [])) {
-        final TimeOfDay time = parseStringTime(alert.time);
-        await widget.notifications.scheduleDrug(
-            DateTime.now()
-                .add(Duration(hours: time.hour, minutes: time.minute)),
-            id!,
-            drug!.name,
-            drug!.dose,
-            drug!.doseType,
-            alert.id!);
-      }
+      await widget.notifications.scheduleMultiple(
+          alertsHours, id!, drug!.name, drug!.dose, drug!.doseType, alertsIds);
 
       Fluttertoast.showToast(
           msg: "Medicamento desarquivado com sucesso!",
@@ -123,6 +118,7 @@ class _DrugPage extends State<DrugPage> {
           backgroundColor: Colors.green,
           textColor: Colors.white,
           fontSize: 16.0);
+
       setState(() {
         status = 'current';
       });
@@ -160,7 +156,7 @@ class _DrugPage extends State<DrugPage> {
             fontSize: 16.0);
 
         await widget.db.deleteDrug(id!);
-        await cancelNotifications();
+        await widget.notifications.cancelMultiple(alertsIds);
 
         Fluttertoast.showToast(
             msg: "Medicamento deletado com sucesso!",

@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:medici/drugs_list.dart';
-import 'package:medici/home.dart';
-import 'package:medici/add.dart';
 import 'package:medici/utils/db.dart';
 import 'package:medici/widgets/icons.dart';
 

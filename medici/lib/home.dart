@@ -1,6 +1,4 @@
 import 'dart:async';
-// ignore: depend_on_referenced_packages
-import 'package:async/async.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:medici/models/drug.dart';
@@ -32,7 +30,7 @@ class _HomePage extends State<Home> {
   late List<DrugsScheduling> drugs;
   late List<int> remainingDrugsIndexes;
   late int totalModalsOpen;
-  RestartableTimer? timeChecker, listChecker;
+  Timer? timeChecker, listChecker;
 
   @override
   void initState() {
@@ -137,7 +135,8 @@ class _HomePage extends State<Home> {
   }
 
   void setupPeriodicCheck() {
-    final timeCheckerTimer = RestartableTimer(const Duration(minutes: 1), () {
+    final timeCheckerTimer =
+        Timer.periodic(const Duration(seconds: 3), (Timer clock) {
       if (remainingDrugsIndexes.isEmpty) {
         for (final (index, drug) in drugs.indexed) {
           if (itsTimeToTake(drug.alert.time)) {
@@ -147,11 +146,10 @@ class _HomePage extends State<Home> {
           }
         }
       }
-
-      timeChecker?.reset();
     });
 
-    final listCheckerTimer = RestartableTimer(const Duration(seconds: 30), () {
+    final listCheckerTimer =
+        Timer.periodic(const Duration(seconds: 5), (Timer clock) {
       if (totalModalsOpen <= 0 && remainingDrugsIndexes.isNotEmpty) {
         for (final int index in remainingDrugsIndexes) {
           showModal(index);
@@ -160,8 +158,6 @@ class _HomePage extends State<Home> {
           });
         }
       }
-
-      listChecker?.reset();
     });
 
     setState(() {
