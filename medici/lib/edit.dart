@@ -181,7 +181,8 @@ class _EditDrugPage extends State<EditDrug> {
             leaflet: leaflet,
             status: status!,
             frequency: frequencyString!,
-            startingTime: startingTime);
+            startingTime: startingTime,
+            lastInteraction: buildDateString(DateTime.now()));
 
         NotificationSettings notification = NotificationSettings(
             drugId: id!,

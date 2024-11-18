@@ -55,12 +55,14 @@
 
 ## Drugs
 
-- [ ] reset status after 24h
+- [x] reset status after 24h
 - [ ] check last Day (archive drug and remove notifications)
 - [x] add recurrent mark
 - [x] add a lastDay mark
 - [ ] quantity alert action to refill amount
 - [x] fix scheduled alarms
+- [ ] what happens when you confirm you have taken the medicine in both modal and notification (check if the difference of time between `last_interaction` and `.now()` is, at least, the same as the time division)
+- [x] update last interaction
 
 ## Drugs list
 

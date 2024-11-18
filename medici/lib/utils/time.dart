@@ -15,12 +15,30 @@ bool passedTime(TimeOfDay baseTime) {
 }
 
 TimeOfDay parseStringTime(String time) {
-  final List<String> splitTime = time.split(':');
+  final List<int> splitTime =
+      time.split(':').map((part) => int.parse(part)).toList();
 
-  return TimeOfDay(
-      hour: int.parse(splitTime[0]), minute: int.parse(splitTime[1]));
+  return TimeOfDay(hour: splitTime[0], minute: splitTime[1]);
 }
 
 String buildTimeString(TimeOfDay time) {
-  return time.hour.toString() + ":" + time.minute.toString();
+  return '${time.hour.toString()}:${time.minute.toString()}';
+}
+
+String buildDateString(DateTime date) {
+  return '${date.day}-${date.month}-${date.year}';
+}
+
+DateTime parseStringDate(String date) {
+  final List<int> splitTime =
+      date.split('-').map((part) => int.parse(part)).toList();
+  return DateTime(splitTime[2], splitTime[1], splitTime[0]);
+}
+
+bool passedAtLeastOneDay(DateTime lastInteraction) {
+  final DateTime now = DateTime.now();
+
+  return (now.year > lastInteraction.year ||
+      now.month > lastInteraction.month ||
+      now.day > lastInteraction.day);
 }

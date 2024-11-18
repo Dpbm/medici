@@ -2,6 +2,7 @@ import 'package:medici/models/alert.dart';
 import 'package:medici/models/drug.dart';
 import 'package:medici/models/notification_settings.dart';
 import 'package:medici/utils/alerts.dart';
+import 'package:medici/utils/time.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -27,7 +28,8 @@ class DB {
           leaflet TEXT,
           status TEXT NOT NULL,
           frequency TEXT NOT NULL,
-          starting_time TEXT NOT NULL)
+          starting_time TEXT NOT NULL,
+          last_interaction TEXT NOT NULL)
       ''');
 
       db.execute('''
@@ -97,7 +99,8 @@ class DB {
         drug.dose_type, 
         drug.dose,
         drug.status as drug_status,
-        drug.quantity
+        drug.quantity,
+        drug.last_interaction
       FROM alert 
       INNER JOIN drug ON drug.id = alert.drug_id
       WHERE drug.status != "archived" AND alert.status != "aware" AND alert.status != "taken";
@@ -108,11 +111,20 @@ class DB {
       final int id = drug['drug_id'] as int;
       final int alertId = drug['alert_id'] as int;
       final String time = drug['time'] as String;
-      final String status = getAlertStatus(time);
-      final String lastStatus = drug['alert_status'] as String;
+      final DateTime lastInteraction =
+          parseStringDate(drug['last_interaction'] as String);
 
-      if (lastStatus == 'pending') {
-        await updateAlertStatus(alertId, status);
+      String status = 'pending';
+
+      if (passedAtLeastOneDay(lastInteraction)) {
+        await updateAlertStatus(alertId, 'pending');
+      } else {
+        status = getAlertStatus(time);
+        final String lastStatus = drug['alert_status'] as String;
+
+        if (lastStatus == 'pending') {
+          await updateAlertStatus(alertId, status);
+        }
       }
 
       drugs.add(DrugsScheduling(
@@ -197,6 +209,7 @@ class DB {
         status: drug_data['status'] as String,
         frequency: drug_data['frequency'] as String,
         startingTime: drug_data['starting_time'] as String,
+        lastInteraction: drug_data['last_interaction'] as String,
         notification: notification,
         schedule: schedule);
   }
@@ -248,9 +261,11 @@ class DB {
 
     await database!.rawUpdate('''
       UPDATE drug
-      SET quantity = quantity - dose
+      SET 
+        quantity = quantity - dose,
+        last_interaction = ? 
       WHERE id=?;
-    ''', [id]);
+    ''', [id, buildDateString(DateTime.now())]);
   }
 
   Future<void> refillDrugAmount(int id, double amount) async {

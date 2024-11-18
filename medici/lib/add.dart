@@ -155,7 +155,8 @@ class _AddPage extends State<Add> {
             leaflet: leaflet,
             status: 'current',
             frequency: frequencyString,
-            startingTime: startingTime);
+            startingTime: startingTime,
+            lastInteraction: buildDateString(DateTime.now()));
 
         final int drugId = await widget.db.addDrug(data);
 
