@@ -10,13 +10,10 @@ import 'package:medici/home.dart';
 import 'package:medici/models/drug.dart';
 import 'package:medici/utils/db.dart';
 import 'package:medici/utils/notifications.dart';
+import 'package:medici/utils/notifications_ids.dart';
 
-Future<void> takeMed(NotificationResponse response) async {
-  final DB tmpDb = DB();
-
-  NotificationService service = NotificationService();
-  await service.init(notificationTapBackground);
-
+Future<void> takeMed(NotificationResponse response, DB db,
+    NotificationService notification) async {
   final String? action = response.actionId;
   final String? drugId = response.payload;
 
@@ -30,12 +27,12 @@ Future<void> takeMed(NotificationResponse response) async {
     try {
       switch (action) {
         case 'take_it':
-          await tmpDb.reduceQuantity(drugIdInt, alertId, service);
-          await tmpDb.updateAlertStatus(drugIdInt, 'taken');
+          await db.reduceQuantity(drugIdInt, alertId, notification);
+          await db.updateAlertStatus(drugIdInt, 'taken');
           break;
 
         case 'delay_it':
-          await tmpDb.updateAlertStatus(drugIdInt, 'late');
+          await db.updateAlertStatus(drugIdInt, 'late');
           break;
 
         default:
@@ -45,20 +42,27 @@ Future<void> takeMed(NotificationResponse response) async {
       debugPrint("Failed on update alert status!");
     }
   }
-
-  tmpDb.close();
 }
 
 @pragma('vm:entry-point')
 Future<void> notificationTapBackground(NotificationResponse response) async {
-  final int parsedId = response.id ?? 0;
+  final DB tmpDb = DB();
+  NotificationService service = NotificationService();
+  await service.init(notificationTapBackground);
 
-  if (parsedId > 0) {
-    await takeMed(response);
-  } else if (parsedId.abs().isEven) {
-    ///TODO
+  final int parsedId = response.id ?? 0;
+  if (parsedId >= 0) {
+    await takeMed(response, tmpDb, service);
+    tmpDb.close();
   } else {
-    //TODO
+    final int drugId = parsedId.abs().isEven
+        ? getInverseQuantityNotification(parsedId)
+        : getInverseExpirationNotification(parsedId);
+
+    final FullDrug drug = await tmpDb.getFullDrugData(drugId);
+    tmpDb.close();
+
+    App.navigateToEditBackgroundTask(drug);
   }
 }
 
@@ -74,6 +78,13 @@ Future<void> main() async {
 class App extends StatelessWidget {
   const App({super.key});
 
+  static final GlobalKey<NavigatorState> navigatorKey =
+      GlobalKey<NavigatorState>();
+
+  static void navigateToEditBackgroundTask(FullDrug drug) {
+    navigatorKey.currentState?.pushNamed('edit', arguments: {'drug': drug});
+  }
+
   @override
   Widget build(BuildContext context) {
     final double heightMarginTop = MediaQuery.of(context).padding.top;
@@ -85,6 +96,7 @@ class App extends StatelessWidget {
     return MaterialApp(
       title: 'Medici',
       debugShowCheckedModeBanner: false,
+      navigatorKey: navigatorKey,
       theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(
         seedColor: const Color(0xF2F1E9),

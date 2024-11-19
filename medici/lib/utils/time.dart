@@ -31,7 +31,7 @@ String buildDateString(DateTime date) {
 
 DateTime parseStringDate(String date) {
   final List<int> splitTime =
-      date.split('-').map((part) => int.parse(part)).toList();
+      date.split('/').map((part) => int.parse(part)).toList();
   return DateTime(splitTime[2], splitTime[1], splitTime[0]);
 }
 

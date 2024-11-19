@@ -95,7 +95,7 @@ class DB {
         alert.id as alert_id,
         alert.time,
         alert.status as alert_status,
-        alert.last_interaction
+        alert.last_interaction,
         drug.id as drug_id,
         drug.last_day,
         drug.name, 
@@ -103,7 +103,7 @@ class DB {
         drug.dose_type, 
         drug.dose,
         drug.status as drug_status,
-        drug.quantity,
+        drug.quantity
       FROM alert 
       INNER JOIN drug ON drug.id = alert.drug_id
       WHERE drug.status != "archived" AND alert.status != "aware" AND alert.status != "taken";
@@ -298,7 +298,7 @@ class DB {
 
     final double quantity = drugData['quantity'] as double;
     final double dose = drugData['dose'] as double;
-    final double quantityOffset = notificationData['quantity_offset'] as double;
+    final int quantityOffset = notificationData['quantity_offset'] as int;
 
     final double updatedQuantity = quantity - dose;
     final double newQuantity = updatedQuantity <= 0 ? 0 : updatedQuantity;
@@ -310,7 +310,7 @@ class DB {
     await database!.rawUpdate('''
       UPDATE drug
       SET 
-        quantity = ?,
+        quantity = ?
       WHERE id=?;
     ''', [newQuantity, id]);
   }

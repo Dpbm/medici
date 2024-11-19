@@ -78,6 +78,7 @@ class _HomePage extends State<Home> {
         Navigator.pop(context);
       }
     } catch (error) {
+      print("OOOO $error");
       Fluttertoast.showToast(
           msg: "Falha ao tentar modificar o status do alerta!",
           gravity: ToastGravity.CENTER,

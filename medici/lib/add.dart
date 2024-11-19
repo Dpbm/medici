@@ -195,6 +195,7 @@ class _AddPage extends State<Add> {
           Navigator.pop(context);
         }
       } catch (error) {
+        print("caceta $error");
         Fluttertoast.showToast(
             msg:
                 "Falha ao tentar adicionar o medicamento. Por favor, tente novamente mais tarde!",

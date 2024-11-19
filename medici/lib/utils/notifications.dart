@@ -36,8 +36,8 @@ class NotificationService {
 
   Future<void> setupTz() async {
     tz.initializeTimeZones();
-    final String localTimeZone = DateTime.now().timeZoneName;
-    timeZone = tz.getLocation(localTimeZone);
+    timeZone = tz.getLocation(
+        "America/Sao_Paulo"); //It's a good idea to handle multiple timezones, but for now it's ok
     tz.setLocalLocation(timeZone ?? tz.local);
   }
 
@@ -126,8 +126,6 @@ class NotificationService {
       priority: Priority.high,
       playSound: true,
       enableVibration: true,
-      ongoing: true,
-      autoCancel: false,
     ));
 
     await flutterLocalNotificationsPlugin.show(
@@ -154,9 +152,7 @@ class NotificationService {
             importance: Importance.high,
             priority: Priority.high,
             playSound: true,
-            enableVibration: true,
-            ongoing: true,
-            autoCancel: false));
+            enableVibration: true));
 
     await flutterLocalNotificationsPlugin.zonedSchedule(
         getExpirationNotificationId(drugId),
