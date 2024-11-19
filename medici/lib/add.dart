@@ -179,6 +179,11 @@ class _AddPage extends State<Add> {
         await widget.notifications
             .scheduleMultiple(hours, drugId, name!, dose!, type, alertsIds);
 
+        if (!recurrent) {
+          await widget.notifications.scheduleExpiration(
+              parseStringDate(lastDay!), drugId, name!, expirationOffset);
+        }
+
         Fluttertoast.showToast(
             msg: "Medicamento adicionado com sucesso!",
             gravity: ToastGravity.CENTER,

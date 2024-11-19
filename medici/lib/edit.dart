@@ -204,6 +204,11 @@ class _EditDrugPage extends State<EditDrug> {
         await widget.notifications
             .scheduleMultiple(hours, id!, name!, dose!, type!, alertsIds);
 
+        if (!recurrent!) {
+          await widget.notifications.scheduleExpiration(
+              parseStringDate(lastDay!), id!, name!, expirationOffset!);
+        }
+
         Fluttertoast.showToast(
             msg: "Medicamento atualizado com sucesso!",
             gravity: ToastGravity.CENTER,

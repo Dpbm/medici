@@ -63,8 +63,16 @@
 - [x] fix scheduled alarms
 - [x] what happens when you confirm you have taken the medicine in both modal and notification (check if the difference of time between `last_interaction` and `.now()` is, at least, the same as the time division)
 - [x] update last interaction
-- [ ] don't let the quantity be less than 1
-- [ ] handle new drug (after expiration)
+- [x] don't let the quantity be less than 1
+- [ ] handle new drug (after expiration) and new quantity, create a page for that
+- [x] quantity notifications have even negative numbers as ID and expiration ones have odd negative IDs
+- [ ] quantity and expiration notifications redirect to another pages
+- [x] create notification for expiration before `expiration_offset` days
+- [x] add and remove quantity and expiration notifications
+  - [x] add.dart
+  - [x] edit.dart
+  - [x] drug.dart
+- [ ] add a way to refill/renew drug on drug screen
 
 ## Drugs list
 

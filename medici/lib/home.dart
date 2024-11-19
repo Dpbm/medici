@@ -64,7 +64,8 @@ class _HomePage extends State<Home> {
 
       final DrugsScheduling drug = drugs[drugIndex];
 
-      await widget.db.reduceQuantity(drug.id, drug.alert.id!);
+      await widget.db
+          .reduceQuantity(drug.id, drug.alert.id!, widget.notifications);
       await widget.db.updateAlertStatus(drug.alert.id!, status);
 
       setState(() {

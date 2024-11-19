@@ -271,7 +271,8 @@ class DB {
         conflictAlgorithm: ConflictAlgorithm.fail);
   }
 
-  Future<void> reduceQuantity(int id, int alertId) async {
+  Future<void> reduceQuantity(
+      int id, int alertId, NotificationService notification) async {
     await getDB();
 
     final alertData = (await database!.query('alert',
@@ -283,12 +284,35 @@ class DB {
     final String status = alertData['status'] as String;
     if (status == 'taken') return;
 
+    final drugData = (await database!.query('drug',
+            columns: ['quantity', 'dose', 'name'],
+            where: 'id=?',
+            whereArgs: [id]))
+        .first;
+
+    final notificationData = (await database!.query('notification',
+            columns: ['quantity_offset'], where: 'drug_id=?', whereArgs: [id]))
+        .first;
+
+    final String drugName = drugData['name'] as String;
+
+    final double quantity = drugData['quantity'] as double;
+    final double dose = drugData['dose'] as double;
+    final double quantityOffset = notificationData['quantity_offset'] as double;
+
+    final double updatedQuantity = quantity - dose;
+    final double newQuantity = updatedQuantity <= 0 ? 0 : updatedQuantity;
+
+    if (newQuantity <= quantityOffset) {
+      await notification.showQuantityNotification(id, drugName);
+    }
+
     await database!.rawUpdate('''
       UPDATE drug
       SET 
-        quantity = quantity - dose,
+        quantity = ?,
       WHERE id=?;
-    ''', [id]);
+    ''', [newQuantity, id]);
   }
 
   Future<void> refillDrugAmount(int id, double amount) async {

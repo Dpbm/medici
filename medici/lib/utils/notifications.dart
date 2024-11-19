@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:medici/utils/notifications_ids.dart';
 import 'package:medici/utils/time.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
@@ -116,44 +117,35 @@ class NotificationService {
     }
   }
 
-  Future<void> scheduleQuantity(
-      DateTime time, int drugId, String drugName) async {
-    final tz.Location location = timeZone ?? tz.local;
-    final tz.TZDateTime scheduledTime = tz.TZDateTime.from(
-        tz.TZDateTime.from(DateTime(time.year, time.month, time.day), location),
-        location);
-
+  Future<void> showQuantityNotification(int drugId, String drugName) async {
     final notificationDetails = NotificationDetails(
         android: AndroidNotificationDetails(
-            'notify_quantity', quantityChannel.name,
-            importance: Importance.high,
-            priority: Priority.high,
-            playSound: true,
-            enableVibration: true,
-            ongoing: true,
-            autoCancel: false,
-            actions: [
-          const AndroidNotificationAction('refill', 'repor'),
-        ]));
+      'notify_quantity',
+      quantityChannel.name,
+      importance: Importance.high,
+      priority: Priority.high,
+      playSound: true,
+      enableVibration: true,
+      ongoing: true,
+      autoCancel: false,
+    ));
 
-    await flutterLocalNotificationsPlugin.zonedSchedule(
-        -1,
+    await flutterLocalNotificationsPlugin.show(
+        getQuantityNotificationId(drugId),
         'Seu remédio está acabando!',
         "Você precisa comprar mais $drugName",
-        scheduledTime,
-        notificationDetails,
-        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-        uiLocalNotificationDateInterpretation:
-            UILocalNotificationDateInterpretation.absoluteTime,
-        matchDateTimeComponents: DateTimeComponents.dayOfMonthAndTime,
-        payload: drugId.toString());
+        notificationDetails);
   }
 
   Future<void> scheduleExpiration(
-      DateTime time, int drugId, String drugName) async {
+      DateTime time, int drugId, String drugName, int expirationOffset) async {
     final tz.Location location = timeZone ?? tz.local;
     final tz.TZDateTime scheduledTime = tz.TZDateTime.from(
-        tz.TZDateTime.from(DateTime(time.year, time.month, time.day), location),
+        tz.TZDateTime.from(
+            DateTime(time.year, time.month, time.day).subtract(Duration(
+                days:
+                    expirationOffset)), // EX: use expiration offset to show this notification x days before the expiration
+            location),
         location);
 
     final notificationDetails = NotificationDetails(
@@ -167,7 +159,7 @@ class NotificationService {
             autoCancel: false));
 
     await flutterLocalNotificationsPlugin.zonedSchedule(
-        -2,
+        getExpirationNotificationId(drugId),
         'Seu remédio venceu',
         "Descarte o $drugName e compre mais",
         scheduledTime,

@@ -11,9 +11,11 @@ import 'package:medici/models/drug.dart';
 import 'package:medici/utils/db.dart';
 import 'package:medici/utils/notifications.dart';
 
-@pragma('vm:entry-point')
-Future<void> notificationTapBackground(NotificationResponse response) async {
+Future<void> takeMed(NotificationResponse response) async {
   final DB tmpDb = DB();
+
+  NotificationService service = NotificationService();
+  await service.init(notificationTapBackground);
 
   final String? action = response.actionId;
   final String? drugId = response.payload;
@@ -28,7 +30,7 @@ Future<void> notificationTapBackground(NotificationResponse response) async {
     try {
       switch (action) {
         case 'take_it':
-          await tmpDb.reduceQuantity(drugIdInt, alertId);
+          await tmpDb.reduceQuantity(drugIdInt, alertId, service);
           await tmpDb.updateAlertStatus(drugIdInt, 'taken');
           break;
 
@@ -45,6 +47,19 @@ Future<void> notificationTapBackground(NotificationResponse response) async {
   }
 
   tmpDb.close();
+}
+
+@pragma('vm:entry-point')
+Future<void> notificationTapBackground(NotificationResponse response) async {
+  final int parsedId = response.id ?? 0;
+
+  if (parsedId > 0) {
+    await takeMed(response);
+  } else if (parsedId.abs().isEven) {
+    ///TODO
+  } else {
+    //TODO
+  }
 }
 
 final NotificationService notifications = NotificationService();

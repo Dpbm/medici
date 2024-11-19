@@ -6,6 +6,8 @@ import 'package:medici/models/alert.dart';
 import 'package:medici/models/drug.dart';
 import 'package:medici/utils/db.dart';
 import 'package:medici/utils/notifications.dart';
+import 'package:medici/utils/notifications_ids.dart';
+import 'package:medici/utils/time.dart';
 import 'package:medici/widgets/app_bar.dart';
 import 'package:medici/widgets/archive_button.dart';
 import 'package:medici/widgets/delete_button.dart';
@@ -85,6 +87,8 @@ class _DrugPage extends State<DrugPage> {
     try {
       await widget.db.archiveDrug(id!);
       await widget.notifications.cancelMultiple(alertsIds);
+      await widget.notifications
+          .cancelNotification(getExpirationNotificationId(id!));
 
       Fluttertoast.showToast(
           msg: "Medicamento arquivado com sucesso!",
@@ -111,6 +115,13 @@ class _DrugPage extends State<DrugPage> {
 
       await widget.notifications.scheduleMultiple(
           alertsHours, id!, drug!.name, drug!.dose, drug!.doseType, alertsIds);
+      if (!drug!.recurrent) {
+        await widget.notifications.scheduleExpiration(
+            parseStringDate(drug!.lastDay!),
+            id!,
+            drug!.name,
+            drug!.notification.expirationOffset);
+      }
 
       Fluttertoast.showToast(
           msg: "Medicamento desarquivado com sucesso!",
@@ -157,6 +168,8 @@ class _DrugPage extends State<DrugPage> {
 
         await widget.db.deleteDrug(id!);
         await widget.notifications.cancelMultiple(alertsIds);
+        await widget.notifications
+            .cancelNotification(getExpirationNotificationId(id!));
 
         Fluttertoast.showToast(
             msg: "Medicamento deletado com sucesso!",
@@ -178,7 +191,7 @@ class _DrugPage extends State<DrugPage> {
       }
     }
 
-    Future<void> _openLeaflet(String? leaflet) async {
+    Future<void> openLeaflet(String? leaflet) async {
       try {
         final success = await launchUrl(Uri.parse(leaflet!));
         if (!success) {
@@ -308,7 +321,7 @@ class _DrugPage extends State<DrugPage> {
             drug!.leaflet != null
                 ? InkWell(
                     onTap: () async {
-                      await _openLeaflet(drug!.leaflet);
+                      await openLeaflet(drug!.leaflet);
                     },
                     child: Align(
                       alignment: Alignment.center,
