@@ -131,7 +131,7 @@ class NotificationService {
     await flutterLocalNotificationsPlugin.show(
         getQuantityNotificationId(drugId),
         'Seu remédio está acabando!',
-        "Você precisa comprar mais $drugName",
+        "Você precisa comprar mais $drugName. Clique para atualizar a quantidade do remédio.",
         notificationDetails);
   }
 
@@ -157,7 +157,7 @@ class NotificationService {
     await flutterLocalNotificationsPlugin.zonedSchedule(
         getExpirationNotificationId(drugId),
         'Seu remédio venceu',
-        "Descarte o $drugName e compre mais",
+        "Descarte o $drugName e compre mais. Clique para atualizar a data de vencimento do remédio.",
         scheduledTime,
         notificationDetails,
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,

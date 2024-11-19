@@ -18,6 +18,7 @@
 ## Notifications
 
 - [ ] identify why sometimes the app freezes on splash screen after calling `Datetime.now().timeZoneName`
+- [ ] test don't allow notifications
 
 ## Cards
 
@@ -100,6 +101,7 @@
 - [x] reload after coming back from drug page
 - [x] get drugs that are need to be taken today
 - [x] get alerts that are neither `taken` nor `late`
+- [ ] fix filter that is not showing the new med as late at first
 
 ## Drugs
 
