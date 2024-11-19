@@ -34,12 +34,15 @@ class _DrugsListPage extends State<DrugsList> {
     try {
       return await widget.db.getAllDrugs();
     } catch (error) {
+      debugPrint("Get Drugs list error: $error");
+
       Fluttertoast.showToast(
           msg: "Falha ao tentar listar seus medicamentos!",
           gravity: ToastGravity.CENTER,
           backgroundColor: Colors.red,
           textColor: Colors.white,
           fontSize: 16.0);
+
       return [];
     }
   }

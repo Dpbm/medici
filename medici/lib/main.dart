@@ -12,8 +12,10 @@ import 'package:medici/utils/db.dart';
 import 'package:medici/utils/notifications.dart';
 import 'package:medici/utils/notifications_ids.dart';
 
-Future<void> takeMed(NotificationResponse response, DB db,
-    NotificationService notification) async {
+NotificationService notifications = NotificationService();
+DB db = DB();
+
+Future<void> takeMed(NotificationResponse response) async {
   final String? action = response.actionId;
   final String? drugId = response.payload;
 
@@ -27,7 +29,7 @@ Future<void> takeMed(NotificationResponse response, DB db,
     try {
       switch (action) {
         case 'take_it':
-          await db.reduceQuantity(drugIdInt, alertId, notification);
+          await db.reduceQuantity(drugIdInt, alertId, notifications);
           await db.updateAlertStatus(drugIdInt, 'taken');
           break;
 
@@ -46,28 +48,19 @@ Future<void> takeMed(NotificationResponse response, DB db,
 
 @pragma('vm:entry-point')
 Future<void> notificationTapBackground(NotificationResponse response) async {
-  final DB tmpDb = DB();
-  NotificationService service = NotificationService();
-  await service.init(notificationTapBackground);
-
   final int parsedId = response.id ?? 0;
   if (parsedId >= 0) {
-    await takeMed(response, tmpDb, service);
-    tmpDb.close();
+    await takeMed(response);
   } else {
     final int drugId = parsedId.abs().isEven
         ? getInverseQuantityNotification(parsedId)
         : getInverseExpirationNotification(parsedId);
 
-    final FullDrug drug = await tmpDb.getFullDrugData(drugId);
-    tmpDb.close();
+    final FullDrug drug = await db.getFullDrugData(drugId);
 
     App.navigateToEditBackgroundTask(drug);
   }
 }
-
-final NotificationService notifications = NotificationService();
-final DB db = DB();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

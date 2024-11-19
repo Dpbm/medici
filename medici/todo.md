@@ -2,6 +2,7 @@
 
 ## ALL
 
+- [ ] add `debugPrint` for each error
 - [x] use named routing
 - [x] remove appBar
 - [x] fix layout width/height

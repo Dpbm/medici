@@ -159,13 +159,8 @@ class DB {
   Future<List<DrugTinyData>> getAllDrugs() async {
     await getDB();
 
-    final data = await database!.rawQuery('''
-      SELECT 
-        id,
-        name, 
-        image
-      FROM drug; 
-    ''');
+    final data =
+        await database!.query('drug', columns: ['id', 'name', 'image']);
 
     List<DrugTinyData> drugs = [];
     for (final drug in data) {
