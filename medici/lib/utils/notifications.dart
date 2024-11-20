@@ -5,6 +5,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:medici/utils/debug.dart';
 import 'package:medici/utils/notifications_ids.dart';
 import 'package:medici/utils/time.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
 
@@ -47,11 +48,11 @@ class NotificationService {
   }
 
   Future<void> getPermission() async {
-    final bool? acceptedPermission = await flutterLocalNotificationsPlugin
-        .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
-        ?.requestNotificationsPermission();
-    accepted = acceptedPermission ?? false;
+    await Permission.ignoreBatteryOptimizations.request();
+    PermissionStatus status = await Permission.notification.request();
+    flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin>();
+    accepted = status.isGranted;
   }
 
   void setupTz() {

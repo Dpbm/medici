@@ -5,6 +5,7 @@
         "autofocus",
         "botao",
         "datetime",
+        "flutterlocalnotifications",
         "fluttertoast",
         "Fluttertoast",
         "icone",
@@ -13,6 +14,8 @@
         "meds",
         "mipmap",
         "padrao",
+        "POWERON",
+        "QUICKBOOT",
         "remedio",
         "sqflite"
     ]

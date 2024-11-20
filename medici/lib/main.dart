@@ -13,61 +13,6 @@ import 'package:medici/utils/debug.dart';
 import 'package:medici/utils/notifications.dart';
 import 'package:medici/utils/notifications_ids.dart';
 
-Future<void> takeMed(NotificationResponse response, DB db) async {
-  final String? action = response.actionId;
-  final String? drugId = response.payload;
-
-  final int? alertId = response.id;
-  final int? drugIdInt = drugId != null ? int.parse(drugId) : null;
-
-  final NotificationService tmpNotifications =
-      NotificationService(notificationTapBackground);
-
-  simpleLog("In TakeMed");
-
-  if (action != null &&
-      action.isNotEmpty &&
-      drugIdInt != null &&
-      alertId != null) {
-    try {
-      switch (action) {
-        case 'take_it':
-          simpleLog("Take Action!");
-          await db.reduceQuantity(drugIdInt, alertId, tmpNotifications);
-          await db.updateAlertStatus(alertId, 'taken');
-          simpleLog("taken");
-          break;
-
-        case 'delay_it':
-          simpleLog("Delay Action!");
-          await db.updateAlertStatus(alertId, 'aware');
-          simpleLog("delayed");
-          break;
-
-        default:
-          break;
-      }
-    } catch (error) {
-      logError("failed on Take med", error as Exception);
-    }
-  }
-
-  db.close();
-}
-
-Future<void> navigateToEdit(int id, DB db) async {
-  simpleLog("Getting data to edit");
-
-  final int drugId = id.abs().isEven
-      ? getInverseQuantityNotification(id)
-      : getInverseExpirationNotification(id);
-  final FullDrug drug = await db.getFullDrugData(drugId);
-  await db.close();
-
-  simpleLog("Navigate to Edit");
-  App.navigateToEditBackgroundTask(drug);
-}
-
 @pragma('vm:entry-point')
 Future<void> notificationTapBackground(NotificationResponse response) async {
   final int parsedId = response.id ?? 0;
@@ -76,9 +21,55 @@ Future<void> notificationTapBackground(NotificationResponse response) async {
   simpleLog("Called entry point with id $parsedId");
 
   if (parsedId >= 0) {
-    await takeMed(response, tmpDb);
+    final String? action = response.actionId;
+    final String? drugId = response.payload;
+
+    final int? alertId = response.id;
+    final int? drugIdInt = drugId != null ? int.parse(drugId) : null;
+
+    final NotificationService tmpNotifications =
+        NotificationService(notificationTapBackground);
+
+    simpleLog("In TakeMed");
+
+    if (action != null &&
+        action.isNotEmpty &&
+        drugIdInt != null &&
+        alertId != null) {
+      try {
+        switch (action) {
+          case 'take_it':
+            simpleLog("Take Action!");
+            await tmpDb.reduceQuantity(drugIdInt, alertId, tmpNotifications);
+            await tmpDb.updateAlertStatus(alertId, 'taken');
+            simpleLog("taken");
+            break;
+
+          case 'delay_it':
+            simpleLog("Delay Action!");
+            await tmpDb.updateAlertStatus(alertId, 'aware');
+            simpleLog("delayed");
+            break;
+
+          default:
+            break;
+        }
+      } catch (error) {
+        logError("failed on Take med", error as Exception);
+      }
+    }
+    tmpDb.close();
   } else {
-    await navigateToEdit(parsedId, tmpDb);
+    simpleLog("Getting data to edit");
+
+    final int drugId = parsedId.abs().isEven
+        ? getInverseQuantityNotification(parsedId)
+        : getInverseExpirationNotification(parsedId);
+    final FullDrug drug = await tmpDb.getFullDrugData(drugId);
+    await tmpDb.close();
+
+    simpleLog("Navigate to Edit");
+    App.navigateToEditBackgroundTask(drug);
   }
 }
 
