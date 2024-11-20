@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:medici/models/alert.dart';
 
 class StatusIndicator extends StatelessWidget {
   const StatusIndicator({super.key, required this.status});
@@ -11,7 +12,8 @@ class StatusIndicator extends StatelessWidget {
       width: 20,
       height: 20,
       decoration: BoxDecoration(
-          color: Colors.green, borderRadius: BorderRadius.circular(100)),
+          color: statusesColors[status],
+          borderRadius: BorderRadius.circular(100)),
     );
   }
 }

@@ -9,18 +9,21 @@ import 'package:medici/edit.dart';
 import 'package:medici/home.dart';
 import 'package:medici/models/drug.dart';
 import 'package:medici/utils/db.dart';
+import 'package:medici/utils/debug.dart';
 import 'package:medici/utils/notifications.dart';
 import 'package:medici/utils/notifications_ids.dart';
 
-NotificationService notifications = NotificationService();
-DB db = DB();
-
-Future<void> takeMed(NotificationResponse response) async {
+Future<void> takeMed(NotificationResponse response, DB db) async {
   final String? action = response.actionId;
   final String? drugId = response.payload;
 
   final int? alertId = response.id;
   final int? drugIdInt = drugId != null ? int.parse(drugId) : null;
+
+  final NotificationService tmpNotifications =
+      NotificationService(notificationTapBackground);
+
+  simpleLog("In TakeMed");
 
   if (action != null &&
       action.isNotEmpty &&
@@ -29,42 +32,62 @@ Future<void> takeMed(NotificationResponse response) async {
     try {
       switch (action) {
         case 'take_it':
-          await db.reduceQuantity(drugIdInt, alertId, notifications);
-          await db.updateAlertStatus(drugIdInt, 'taken');
+          simpleLog("Take Action!");
+          await db.reduceQuantity(drugIdInt, alertId, tmpNotifications);
+          await db.updateAlertStatus(alertId, 'taken');
+          simpleLog("taken");
           break;
 
         case 'delay_it':
-          await db.updateAlertStatus(drugIdInt, 'late');
+          simpleLog("Delay Action!");
+          await db.updateAlertStatus(alertId, 'aware');
+          simpleLog("delayed");
           break;
 
         default:
           break;
       }
     } catch (error) {
-      debugPrint("Failed on update alert status!");
+      logError("failed on Take med", error as Exception);
     }
   }
+
+  db.close();
+}
+
+Future<void> navigateToEdit(int id, DB db) async {
+  simpleLog("Getting data to edit");
+
+  final int drugId = id.abs().isEven
+      ? getInverseQuantityNotification(id)
+      : getInverseExpirationNotification(id);
+  final FullDrug drug = await db.getFullDrugData(drugId);
+  await db.close();
+
+  simpleLog("Navigate to Edit");
+  App.navigateToEditBackgroundTask(drug);
 }
 
 @pragma('vm:entry-point')
 Future<void> notificationTapBackground(NotificationResponse response) async {
   final int parsedId = response.id ?? 0;
+  final DB tmpDb = DB();
+
+  simpleLog("Called entry point with id $parsedId");
+
   if (parsedId >= 0) {
-    await takeMed(response);
+    await takeMed(response, tmpDb);
   } else {
-    final int drugId = parsedId.abs().isEven
-        ? getInverseQuantityNotification(parsedId)
-        : getInverseExpirationNotification(parsedId);
-
-    final FullDrug drug = await db.getFullDrugData(drugId);
-
-    App.navigateToEditBackgroundTask(drug);
+    await navigateToEdit(parsedId, tmpDb);
   }
 }
 
+final NotificationService notifications =
+    NotificationService(notificationTapBackground);
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await notifications.init(notificationTapBackground);
+  await notifications.init();
   runApp(const App());
 }
 
@@ -73,6 +96,8 @@ class App extends StatelessWidget {
 
   static final GlobalKey<NavigatorState> navigatorKey =
       GlobalKey<NavigatorState>();
+
+  static final DB db = DB();
 
   static void navigateToEditBackgroundTask(FullDrug drug) {
     navigatorKey.currentState?.pushNamed('edit', arguments: {'drug': drug});

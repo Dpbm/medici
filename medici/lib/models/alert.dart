@@ -1,5 +1,12 @@
 import 'package:flutter/material.dart';
 
+const Map<String, Color> statusesColors = {
+  'pending': Colors.grey,
+  'taken': Colors.green,
+  'late': Colors.red,
+  'aware': Colors.yellow
+};
+
 class Alert {
   final int? id;
   final int drugId;

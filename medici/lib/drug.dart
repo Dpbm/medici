@@ -262,6 +262,8 @@ class _DrugPage extends State<DrugPage> {
                           itemCount: drug!.schedule.length,
                           itemBuilder: (BuildContext context, int index) {
                             final String timeText = drug!.schedule[index].time;
+                            final String timeStatus =
+                                drug!.schedule[index].status;
                             final String doseDescription =
                                 drug!.dose.toString() + drug!.doseType;
 
@@ -275,7 +277,7 @@ class _DrugPage extends State<DrugPage> {
                                 children: [
                                   Row(
                                     children: [
-                                      const StatusIndicator(status: "taken"),
+                                      StatusIndicator(status: timeStatus),
                                       Container(
                                           margin:
                                               const EdgeInsets.only(left: 5),

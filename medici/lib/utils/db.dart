@@ -2,6 +2,7 @@ import 'package:medici/models/alert.dart';
 import 'package:medici/models/drug.dart';
 import 'package:medici/models/notification_settings.dart';
 import 'package:medici/utils/alerts.dart';
+import 'package:medici/utils/debug.dart';
 import 'package:medici/utils/notifications.dart';
 import 'package:medici/utils/time.dart';
 import 'package:path/path.dart';
@@ -106,7 +107,7 @@ class DB {
         drug.quantity
       FROM alert 
       INNER JOIN drug ON drug.id = alert.drug_id
-      WHERE drug.status != "archived" AND alert.status != "aware" AND alert.status != "taken";
+      WHERE drug.status != 'archived' AND alert.status != 'aware' AND alert.status != 'taken';
     ''');
 
     List<DrugsScheduling> drugs = [];
@@ -176,6 +177,8 @@ class DB {
   Future<FullDrug> getFullDrugData(int id) async {
     await getDB();
 
+    simpleLog("Getting Full Drug Data");
+
     final drugData =
         (await database!.query('drug', where: 'id=?', whereArgs: [id])).first;
     final notificationData = (await database!
@@ -184,29 +187,22 @@ class DB {
     final alertsData =
         await database!.query('alert', where: 'drug_id=?', whereArgs: [id]);
 
+    final List<Alert> alerts = alertsData
+        .map((data) => Alert(
+            drugId: data['drug_id'] as int,
+            lastInteraction: data['last_interaction'] as String,
+            status: data['status'] as String,
+            time: data['time'] as String,
+            id: data['id'] as int))
+        .toList();
+
     final notification = NotificationSettings(
         drugId: notificationData['drug_id'] as int,
         expirationOffset: notificationData['expiration_offset'] as int,
         quantityOffset: notificationData['quantity_offset'] as int,
         id: notificationData['id'] as int);
-    List<Alert> schedule = [];
-    for (final alert in alertsData) {
-      final int alertId = alert['id'] as int;
-      final String time = alert['time'] as String;
-      final String lastInteraction = alert['last_interaction'] as String;
-      final String status = getAlertStatus(time);
 
-      await updateAlertStatus(alertId, status);
-
-      schedule.add(Alert(
-          drugId: alert['drug_id'] as int,
-          time: time,
-          id: id,
-          status: status,
-          lastInteraction: lastInteraction));
-    }
-
-    return FullDrug(
+    FullDrug drug = FullDrug(
         dose: drugData['dose'] as double,
         doseType: drugData['dose_type'] as String,
         expirationDate: drugData['expiration_date'] as String,
@@ -221,7 +217,11 @@ class DB {
         frequency: drugData['frequency'] as String,
         startingTime: drugData['starting_time'] as String,
         notification: notification,
-        schedule: schedule);
+        schedule: alerts);
+
+    successLog("Got all data!");
+
+    return drug;
   }
 
   Future<void> deleteDrug(int id) async {
@@ -320,11 +320,15 @@ class DB {
   Future<void> updateAlertStatus(int id, String status) async {
     await getDB();
 
+    simpleLog("updating alert $id to status $status");
+
     await database!.update('alert',
         {'status': status, 'last_interaction': buildDateString(DateTime.now())},
         where: 'id=?',
         whereArgs: [id],
         conflictAlgorithm: ConflictAlgorithm.fail);
+
+    successLog("Updated!");
   }
 
   Future<void> close() async {

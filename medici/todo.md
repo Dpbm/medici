@@ -1,5 +1,17 @@
 # TODOS
 
+## Main
+
+- [x] check notification denied
+- [x] check notification denied then accepted when already open ['user may need to restart the app']
+- [x] check notification denied then accepted when closed
+- [x] check takeMed function when click on `delay`
+- [x] check takeMed function when click on `take`
+- [ ] check the edit when expired foreground and background
+- [x] check the edit when quantity foreground and background
+- [ ] check take med notification foreground and background
+- [x] check if background notifications work when accepted at first
+
 ## ALL
 
 - [ ] add `debugPrint` for each error
@@ -20,6 +32,8 @@
 
 - [ ] identify why sometimes the app freezes on splash screen after calling `Datetime.now().timeZoneName`
 - [ ] test don't allow notifications
+- [ ] add `showUserInterface=true`
+- [ ] fix open on edit page when clicked
 
 ## Cards
 
@@ -103,6 +117,7 @@
 - [x] get drugs that are need to be taken today
 - [x] get alerts that are neither `taken` nor `late`
 - [ ] fix filter that is not showing the new med as late at first
+- [ ] fix modal text padding and margin
 
 ## Drugs
 
@@ -142,6 +157,8 @@
 - [x] update default image
 - [ ] fix schedule component for one dose
 - [x] add recurrent status
+- [ ] handle when expiration is today
+- [ ] handle when lastDay is today
 
 - `aware`, `taken`, `late`, `pending` statuses
 

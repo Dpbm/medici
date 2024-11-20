@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:medici/utils/debug.dart';
 import 'package:medici/utils/notifications_ids.dart';
 import 'package:medici/utils/time.dart';
 import 'package:timezone/timezone.dart' as tz;
@@ -22,9 +23,28 @@ class NotificationService {
 
   final AndroidInitializationSettings initializationSettingsAndroid =
       const AndroidInitializationSettings('@mipmap/ic_launcher');
-  tz.Location? timeZone;
+  late tz.Location timeZone;
 
   bool accepted = false;
+  bool initialized = false;
+
+  late Function(NotificationResponse) handleFunction;
+
+  NotificationService(Function(NotificationResponse) callback) {
+    handleFunction = callback;
+  }
+
+  Future<void> setup() async {
+    if (!initialized) {
+      warning("Notifications wasn't initialized!");
+
+      await init();
+      return;
+    }
+
+    setupTz();
+    await getPermission();
+  }
 
   Future<void> getPermission() async {
     final bool? acceptedPermission = await flutterLocalNotificationsPlugin
@@ -34,38 +54,58 @@ class NotificationService {
     accepted = acceptedPermission ?? false;
   }
 
-  Future<void> setupTz() async {
+  void setupTz() {
     tz.initializeTimeZones();
     timeZone = tz.getLocation(
         "America/Sao_Paulo"); //It's a good idea to handle multiple timezones, but for now it's ok
-    tz.setLocalLocation(timeZone ?? tz.local);
+    tz.setLocalLocation(timeZone);
   }
 
-  Future<void> init(
-      Function(NotificationResponse) notificationTapResponse) async {
-    setupTz();
-    await getPermission();
+  Future<void> init() async {
+    try {
+      // these two following lines are now the best way, but it's just to avoid function call loops
+      setupTz();
+      await getPermission();
 
-    if (!accepted) return;
+      if (!accepted) {
+        warning("notifications not accepted from [init]");
+        return;
+      }
 
-    await flutterLocalNotificationsPlugin.getNotificationAppLaunchDetails();
-    final InitializationSettings initializationSettings =
-        InitializationSettings(
-      android: initializationSettingsAndroid,
-    );
+      await flutterLocalNotificationsPlugin.getNotificationAppLaunchDetails();
+      final InitializationSettings initializationSettings =
+          InitializationSettings(
+        android: initializationSettingsAndroid,
+      );
 
-    await flutterLocalNotificationsPlugin.initialize(
-      initializationSettings,
-      onDidReceiveNotificationResponse: notificationTapResponse,
-      onDidReceiveBackgroundNotificationResponse: notificationTapResponse,
-    );
+      await flutterLocalNotificationsPlugin.initialize(
+        initializationSettings,
+        onDidReceiveNotificationResponse: handleFunction,
+        onDidReceiveBackgroundNotificationResponse: handleFunction,
+      );
+
+      initialized = true;
+      successLog("Initialized Notification Service");
+    } catch (error) {
+      logError("Error on init NotificationService!", error as Exception);
+    }
   }
 
   Future<void> scheduleDrug(DateTime time, int drugId, String drugName,
       double dose, String doseType, int alertId) async {
-    final tz.Location location = timeZone ?? tz.local;
+    await setup();
+    if (!accepted) {
+      warning("notifications not accepted from [scheduleDrug]!");
+      return;
+    }
+
+    if (!initialized) {
+      warning("notifications wasn't initialized [scheduleDrug]!");
+      return;
+    }
+
     final tz.TZDateTime scheduledTime =
-        tz.TZDateTime.from(tz.TZDateTime.from(time, location), location);
+        tz.TZDateTime.from(tz.TZDateTime.from(time, timeZone), timeZone);
 
     final notificationDetails = NotificationDetails(
         android: AndroidNotificationDetails('notify_drug', drugsChannel.name,
@@ -76,8 +116,14 @@ class NotificationService {
             ongoing: true,
             autoCancel: false,
             actions: [
-          const AndroidNotificationAction('take_it', 'tomar'),
-          const AndroidNotificationAction('delay_it', 'adiar')
+          const AndroidNotificationAction(
+            'take_it',
+            'tomar',
+          ),
+          const AndroidNotificationAction(
+            'delay_it',
+            'adiar',
+          )
         ]));
 
     await flutterLocalNotificationsPlugin.zonedSchedule(
@@ -91,33 +137,59 @@ class NotificationService {
             UILocalNotificationDateInterpretation.absoluteTime,
         matchDateTimeComponents: DateTimeComponents.time,
         payload: drugId.toString());
+
+    successLog("Drug Scheduled to ${scheduledTime.toIso8601String()}");
   }
 
   Future<void> scheduleMultiple(List<String> hours, int drugId, String drugName,
       double dose, String doseType, List<int> alertsIds) async {
+    if (!accepted) {
+      warning("notifications not accepted from [schedule multiple]!");
+      return;
+    }
+
+    if (!initialized) {
+      warning("notifications wasn't initialized [schedule multiple]!");
+      return;
+    }
+
     DateTime now = DateTime.now();
 
     for (int i = 0; i < hours.length; i++) {
       final TimeOfDay time = parseStringTime(hours[i]);
-
       DateTime newDate =
           DateTime(now.year, now.month, now.day, time.hour, time.minute);
+
       await scheduleDrug(
           newDate, drugId, drugName, dose, doseType, alertsIds[i]);
     }
   }
 
   Future<void> cancelNotification(int id) async {
+    if (!accepted || !initialized) return;
     await flutterLocalNotificationsPlugin.cancel(id);
   }
 
   Future<void> cancelMultiple(List<int> ids) async {
+    if (!accepted || !initialized) return;
+
     for (final int id in ids) {
       cancelNotification(id);
     }
   }
 
   Future<void> showQuantityNotification(int drugId, String drugName) async {
+    await setup();
+    if (!accepted) {
+      warning("notifications not accepted from [showQuantityNotification]!");
+      return;
+    }
+
+    if (!initialized) {
+      warning("notifications wasn't initialized [showQuantityNotification]!");
+      return;
+    }
+
     final notificationDetails = NotificationDetails(
         android: AndroidNotificationDetails(
       'notify_quantity',
@@ -137,14 +209,25 @@ class NotificationService {
 
   Future<void> scheduleExpiration(
       DateTime time, int drugId, String drugName, int expirationOffset) async {
-    final tz.Location location = timeZone ?? tz.local;
+    await getPermission();
+    if (!accepted) {
+      warning("notifications not accepted from [scheduleExpiration]!");
+      return;
+    }
+
+    if (!initialized) {
+      warning("notifications wasn't initialized [scheduleExpiration]!");
+      return;
+    }
+
+    final DateTime timeToExpire = DateTime(time.year, time.month, time.day)
+        .subtract(Duration(days: expirationOffset));
+
     final tz.TZDateTime scheduledTime = tz.TZDateTime.from(
         tz.TZDateTime.from(
-            DateTime(time.year, time.month, time.day).subtract(Duration(
-                days:
-                    expirationOffset)), // EX: use expiration offset to show this notification x days before the expiration
-            location),
-        location);
+            timeToExpire, // EX: use expiration offset to show this notification x days before the expiration
+            timeZone),
+        timeZone);
 
     final notificationDetails = NotificationDetails(
         android: AndroidNotificationDetails(
