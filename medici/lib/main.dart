@@ -17,6 +17,8 @@ import 'package:medici/utils/notifications_ids.dart';
 Future<void> notificationTapBackground(NotificationResponse response) async {
   final int parsedId = response.id ?? 0;
   final DB tmpDb = DB();
+  final NotificationService tmpNotifications =
+      NotificationService(notificationTapBackground);
 
   simpleLog("Called entry point with id $parsedId");
 
@@ -26,9 +28,6 @@ Future<void> notificationTapBackground(NotificationResponse response) async {
 
     final int? alertId = response.id;
     final int? drugIdInt = drugId != null ? int.parse(drugId) : null;
-
-    final NotificationService tmpNotifications =
-        NotificationService(notificationTapBackground);
 
     simpleLog("In TakeMed");
 
@@ -65,7 +64,7 @@ Future<void> notificationTapBackground(NotificationResponse response) async {
     final int drugId = parsedId.abs().isEven
         ? getInverseQuantityNotification(parsedId)
         : getInverseExpirationNotification(parsedId);
-    final FullDrug drug = await tmpDb.getFullDrugData(drugId);
+    final FullDrug drug = await tmpDb.getFullDrugData(drugId, tmpNotifications);
     await tmpDb.close();
 
     simpleLog("Navigate to Edit");

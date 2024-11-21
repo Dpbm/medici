@@ -1,21 +1,19 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:medici/models/alert.dart';
 import 'package:medici/models/drug.dart';
 import 'package:medici/utils/db.dart';
+import 'package:medici/utils/debug.dart';
 import 'package:medici/utils/notifications.dart';
 import 'package:medici/utils/notifications_ids.dart';
 import 'package:medici/utils/time.dart';
 import 'package:medici/widgets/app_bar.dart';
 import 'package:medici/widgets/archive_button.dart';
 import 'package:medici/widgets/delete_button.dart';
-import 'package:medici/widgets/drug_status_indicator.dart';
+import 'package:medici/widgets/drug_page/drug.dart';
+import 'package:medici/widgets/drug_page/error.dart';
 import 'package:medici/widgets/edit_button.dart';
-import 'package:medici/widgets/icons.dart';
 import 'package:medici/widgets/return_button.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class DrugPage extends StatefulWidget {
   const DrugPage(
@@ -36,7 +34,7 @@ class DrugPage extends StatefulWidget {
 }
 
 class _DrugPage extends State<DrugPage> {
-  Future<void>? _data;
+  late Future<void> _data;
   FullDrug? drug;
 
   bool deleting = false;
@@ -59,17 +57,24 @@ class _DrugPage extends State<DrugPage> {
 
   Future<void> getDrug() async {
     try {
-      final FullDrug data = await widget.db.getFullDrugData(widget.id);
+      final FullDrug data =
+          await widget.db.getFullDrugData(widget.id, widget.notifications);
 
       setState(() {
         drug = data;
+        status = data.status;
+        id = data.id;
 
         for (final Alert alert in data.schedule) {
           alertsIds.add(alert.id!);
           alertsHours.add(alert.time);
         }
       });
+
+      successLog("Got full drug on Drug Page!");
     } catch (error) {
+      logError("Failed on get data from Drug", error.toString());
+
       Fluttertoast.showToast(
           msg: "Falha ao tentar pegar os dados do seu medicamento!",
           gravity: ToastGravity.CENTER,
@@ -96,10 +101,14 @@ class _DrugPage extends State<DrugPage> {
           backgroundColor: Colors.green,
           textColor: Colors.white,
           fontSize: 16.0);
+
       setState(() {
         status = 'archived';
       });
+
+      successLog("archived drug on Page successfully");
     } catch (error) {
+      logError("Failed on archive drug Page", error.toString());
       Fluttertoast.showToast(
           msg: "Falha ao arquivar o seu medicamento!",
           gravity: ToastGravity.CENTER,
@@ -115,6 +124,7 @@ class _DrugPage extends State<DrugPage> {
 
       await widget.notifications.scheduleMultiple(
           alertsHours, id!, drug!.name, drug!.dose, drug!.doseType, alertsIds);
+
       if (!drug!.recurrent) {
         await widget.notifications.scheduleExpiration(
             parseStringDate(drug!.lastDay!),
@@ -133,7 +143,10 @@ class _DrugPage extends State<DrugPage> {
       setState(() {
         status = 'current';
       });
+
+      successLog("UNarchived on page successfully");
     } catch (error) {
+      logError("Failed on UNarchive drug on Page", error.toString());
       Fluttertoast.showToast(
           msg: "Falha ao desarquivar o seu medicamento!",
           gravity: ToastGravity.CENTER,
@@ -143,214 +156,56 @@ class _DrugPage extends State<DrugPage> {
     }
   }
 
+  Future<void> deleteDrug() async {
+    try {
+      Fluttertoast.showToast(
+          msg: "Deletando medicamento...",
+          gravity: ToastGravity.CENTER,
+          backgroundColor: Colors.yellow,
+          textColor: Colors.white,
+          fontSize: 16.0);
+
+      await widget.db.deleteDrug(id!);
+      await widget.notifications.cancelMultiple(alertsIds);
+      await widget.notifications
+          .cancelNotification(getExpirationNotificationId(id!));
+
+      Fluttertoast.showToast(
+          msg: "Medicamento deletado com sucesso!",
+          gravity: ToastGravity.CENTER,
+          backgroundColor: Colors.green,
+          textColor: Colors.white,
+          fontSize: 16.0);
+
+      successLog("Deleted drug on Page");
+
+      if (context.mounted) {
+        Navigator.pop(context);
+      }
+    } catch (error) {
+      logError("Error during deleting drug on Page", error.toString());
+      Fluttertoast.showToast(
+          msg: "Falha ao tentar deletar o  seu medicamento!",
+          gravity: ToastGravity.CENTER,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0);
+    }
+  }
+
+  Future<void> goToEdit() async {
+    if (!context.mounted) return;
+
+    Navigator.pushNamed(context, 'edit', arguments: {'drug': drug}).then((_) {
+      reload();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final double width = widget.width;
     final double height = widget.height;
     const double topBarSize = 80.0;
-
-    final double sectionWidth = width - 40;
-
-    Future<void> goToEdit() async {
-      Navigator.pushNamed(context, 'edit', arguments: {'drug': drug}).then((_) {
-        reload();
-      });
-    }
-
-    Future<void> deleteDrug() async {
-      try {
-        Fluttertoast.showToast(
-            msg: "Deletando medicamento...",
-            gravity: ToastGravity.CENTER,
-            backgroundColor: Colors.yellow,
-            textColor: Colors.white,
-            fontSize: 16.0);
-
-        await widget.db.deleteDrug(id!);
-        await widget.notifications.cancelMultiple(alertsIds);
-        await widget.notifications
-            .cancelNotification(getExpirationNotificationId(id!));
-
-        Fluttertoast.showToast(
-            msg: "Medicamento deletado com sucesso!",
-            gravity: ToastGravity.CENTER,
-            backgroundColor: Colors.green,
-            textColor: Colors.white,
-            fontSize: 16.0);
-
-        if (context.mounted) {
-          Navigator.pop(context);
-        }
-      } catch (error) {
-        Fluttertoast.showToast(
-            msg: "Falha ao tentar deletar o  seu medicamento!",
-            gravity: ToastGravity.CENTER,
-            backgroundColor: Colors.red,
-            textColor: Colors.white,
-            fontSize: 16.0);
-      }
-    }
-
-    Future<void> openLeaflet(String? leaflet) async {
-      try {
-        final success = await launchUrl(Uri.parse(leaflet!));
-        if (!success) {
-          throw Exception("Failed to open leaflet");
-        }
-      } catch (error) {
-        Fluttertoast.showToast(
-            msg: "Falha ao Carregar a bula",
-            gravity: ToastGravity.CENTER,
-            backgroundColor: Colors.red,
-            textColor: Colors.white,
-            fontSize: 16.0);
-      }
-    }
-
-    Widget renderDrugData() {
-      return Container(
-        padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              drug!.name,
-              textAlign: TextAlign.left,
-              style: const TextStyle(
-                  fontSize: 40,
-                  fontFamily: 'Montserrat',
-                  fontWeight: FontWeight.bold),
-            ),
-            Container(
-              margin: const EdgeInsets.only(top: 10),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(10),
-                child: drug!.image != null
-                    ? Image.file(File(drug!.image!),
-                        width: sectionWidth, height: 300, fit: BoxFit.cover)
-                    : Image.asset('images/remedio_imagem_padrao.png',
-                        width: sectionWidth, height: 300, fit: BoxFit.cover),
-              ),
-            ),
-            Container(
-              alignment: Alignment.centerRight,
-              margin: const EdgeInsets.only(top: 10),
-              child: Text("Valido até " + drug!.expirationDate,
-                  style: const TextStyle(
-                      fontSize: 11,
-                      fontFamily: 'Montserrat',
-                      fontWeight: FontWeight.bold)),
-            ),
-            Container(
-              width: sectionWidth,
-              height: drug!.schedule.length * 55 + 40,
-              alignment: Alignment.centerLeft,
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Column(
-                children: [
-                  const Text("Horários",
-                      style: TextStyle(
-                          fontSize: 32,
-                          fontFamily: 'Montserrat',
-                          fontWeight: FontWeight.bold)),
-                  Expanded(
-                      child: ListView.builder(
-                          itemCount: drug!.schedule.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            final String timeText = drug!.schedule[index].time;
-                            final String timeStatus =
-                                drug!.schedule[index].status;
-                            final String doseDescription =
-                                drug!.dose.toString() + drug!.doseType;
-
-                            return Container(
-                              height: 50,
-                              padding:
-                                  const EdgeInsets.only(left: 5, right: 10),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Row(
-                                    children: [
-                                      StatusIndicator(status: timeStatus),
-                                      Container(
-                                          margin:
-                                              const EdgeInsets.only(left: 5),
-                                          child: Text(
-                                            timeText,
-                                            style: const TextStyle(
-                                                fontSize: 20,
-                                                fontFamily: 'Montserrat'),
-                                          )),
-                                    ],
-                                  ),
-                                  Text(
-                                    doseDescription,
-                                    style: const TextStyle(
-                                        fontSize: 20, fontFamily: 'Montserrat'),
-                                  ),
-                                ],
-                              ),
-                            );
-                          }))
-                ],
-              ),
-            ),
-            Container(
-                alignment: Alignment.centerRight,
-                child: Text(
-                    "Quantidade disponível: " +
-                        drug!.quantity.round().toString(),
-                    style: const TextStyle(
-                        fontSize: 15,
-                        fontFamily: 'Montserrat',
-                        fontWeight: FontWeight.bold))),
-            Text("Notificar a faltar de medicamento ao ter apenas " +
-                drug!.notification.quantityOffset.toString() +
-                drug!.doseType),
-            Text("Notificar o vencimento do medicamento antes de: " +
-                drug!.notification.expirationOffset.toString() +
-                "dias"),
-            (drug?.recurrent ?? false) ? const Text("Recorrente") : Container(),
-            drug?.lastDay != null
-                ? Text("Último dia " + drug!.lastDay.toString())
-                : Container(),
-            drug!.leaflet != null
-                ? InkWell(
-                    onTap: () async {
-                      await openLeaflet(drug!.leaflet);
-                    },
-                    child: Align(
-                      alignment: Alignment.center,
-                      child: Container(
-                          color: Colors.white,
-                          padding: const EdgeInsets.all(10),
-                          child: const Row(
-                            children: [
-                              Text("Consultar Bula",
-                                  style: TextStyle(
-                                      fontSize: 24,
-                                      fontFamily: 'Montserrat',
-                                      fontWeight: FontWeight.bold)),
-                              LocalIcon(
-                                name: "link",
-                                label: "Link",
-                                width: 24,
-                                height: 24,
-                              )
-                            ],
-                          )),
-                    ))
-                : Container()
-          ],
-        ),
-      );
-    }
 
     return Scaffold(
         resizeToAvoidBottomInset: false,
@@ -382,9 +237,11 @@ class _DrugPage extends State<DrugPage> {
                           onPressed: deleteDrug,
                         ),
                         ArchiveButton(
-                            onPressed: status == null || status == 'current'
-                                ? archiveDrug
-                                : unarchiveDrug)
+                          onPressed: status != 'archived'
+                              ? archiveDrug
+                              : unarchiveDrug,
+                          active: status == 'archived',
+                        )
                       ],
                     )
                   ],
@@ -401,20 +258,18 @@ class _DrugPage extends State<DrugPage> {
                               return const CircularProgressIndicator();
                             }
 
-                            if (snapshot.hasError) {
-                              return Container(
-                                  alignment: Alignment.center,
-                                  height: height - 100,
-                                  width: width,
-                                  child: const Text(
-                                    "Erro. Por favor tente novamente mais tarde!",
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                        fontSize: 30, color: Colors.red),
-                                  ));
+                            if (snapshot.hasError ||
+                                drug == null ||
+                                status == null) {
+                              return DrugLoadError(
+                                  height: height, width: width);
                             }
 
-                            return renderDrugData();
+                            return DrugData(
+                                drug: drug!,
+                                width: width,
+                                callback: reload,
+                                drugStatus: status!);
                           })))
             ],
           ),

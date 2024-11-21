@@ -29,5 +29,5 @@ bool passedAtLeastOneDay(DateTime lastInteraction) {
 }
 
 bool equalDate(DateTime date1, DateTime date2) {
-  return buildDateString(date1) == buildDateString(date2);
+  return date1.compareTo(date2) == 0;
 }
