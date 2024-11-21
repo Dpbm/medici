@@ -4,6 +4,7 @@ import 'package:medici/models/drug.dart';
 import 'package:medici/models/notification_settings.dart';
 import 'package:medici/utils/db.dart';
 import 'package:medici/utils/alerts.dart';
+import 'package:medici/utils/debug.dart';
 import 'package:medici/utils/leaflet.dart';
 import 'package:medici/utils/notifications.dart';
 import 'package:medici/utils/time.dart';
@@ -41,12 +42,8 @@ class Add extends StatefulWidget {
 class _AddPage extends State<Add> {
   final _formState = GlobalKey<FormState>();
   String type = doseTypes.first;
-  String? name;
-  String? image;
-  String? expirationDate;
-  String? lastDay;
-  double? quantity;
-  double? dose;
+  String? name, image, expirationDate, lastDay;
+  double? quantity, dose;
   String frequencyString = frequencies.keys.toList().first;
   int frequency = frequencies.values.toList().first;
   bool recurrent = false;
@@ -159,12 +156,10 @@ class _AddPage extends State<Add> {
 
         final int drugId = await widget.db.addDrug(data);
 
-        NotificationSettings notification = NotificationSettings(
+        await widget.db.addNotification(NotificationSettings(
             drugId: drugId,
             expirationOffset: expirationOffset,
-            quantityOffset: quantityOffset);
-
-        await widget.db.addNotification(notification);
+            quantityOffset: quantityOffset));
 
         List<String> hours = getAlerts(hour, frequency);
         List<Alert> alerts = hours
@@ -195,7 +190,7 @@ class _AddPage extends State<Add> {
           Navigator.pop(context);
         }
       } catch (error) {
-        print("caceta $error");
+        logError("Failed on Submit data addDrug", error.toString());
         Fluttertoast.showToast(
             msg:
                 "Falha ao tentar adicionar o medicamento. Por favor, tente novamente mais tarde!",
