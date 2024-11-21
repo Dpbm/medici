@@ -365,6 +365,8 @@ class DB {
         where: 'id=?',
         whereArgs: [drug.id],
         conflictAlgorithm: ConflictAlgorithm.fail);
+
+    successLog("Updated drug ${drug.id}");
   }
 
   Future<void> reduceQuantity(

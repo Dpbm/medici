@@ -4,6 +4,7 @@ import 'package:medici/models/drug.dart';
 import 'package:medici/models/notification_settings.dart';
 import 'package:medici/utils/db.dart';
 import 'package:medici/utils/alerts.dart';
+import 'package:medici/utils/debug.dart';
 import 'package:medici/utils/leaflet.dart';
 import 'package:medici/utils/notifications.dart';
 import 'package:medici/utils/time.dart';
@@ -164,6 +165,21 @@ class _EditDrugPage extends State<EditDrug> {
         final String? leaflet = await getLeaflet(name!);
         final String startingTime = buildTimeString(hour!);
 
+        String newStatus = 'pending';
+
+        final DateTime now = DateTime.now();
+        final DateTime today = DateTime(now.year, now.month, now.day);
+
+        if (status! == 'archived' ||
+            (!recurrent! && equalDate(today, parseStringDate(lastDay!)))) {
+          newStatus = 'archived';
+        } else if (today.isAfter(parseStringDate(expirationDate!)) ||
+            equalDate(today, parseStringDate(expirationDate!))) {
+          newStatus = 'expired';
+        } else if (quantity! <= quantityOffset!) {
+          newStatus = 'refill';
+        }
+
         Drug data = Drug(
           id: id!,
           name: name!,
@@ -175,7 +191,7 @@ class _EditDrugPage extends State<EditDrug> {
           recurrent: recurrent!,
           lastDay: lastDay,
           leaflet: leaflet,
-          status: status!,
+          status: newStatus,
           frequency: frequencyString!,
           startingTime: startingTime,
         );
@@ -205,6 +221,8 @@ class _EditDrugPage extends State<EditDrug> {
               parseStringDate(lastDay!), id!, name!, expirationOffset!);
         }
 
+        successLog("Updated drug on page");
+
         Fluttertoast.showToast(
             msg: "Medicamento atualizado com sucesso!",
             gravity: ToastGravity.CENTER,
@@ -216,6 +234,7 @@ class _EditDrugPage extends State<EditDrug> {
           Navigator.pop(context);
         }
       } catch (error) {
+        logError("Failed during updating drug on page", error.toString());
         Fluttertoast.showToast(
             msg:
                 "Falha ao tentar adicionar o medicamento. Lembre-se de Preencher todos os campos Obrigatórios!",

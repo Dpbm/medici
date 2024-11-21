@@ -7,29 +7,29 @@
 - [x] check notification denied then accepted when closed
 - [x] check takeMed function when click on `delay`
 - [x] check takeMed function when click on `take`
-- [ ] check the edit when expired foreground and background
+- [x] check the edit when expired foreground and background
 - [x] check the edit when quantity foreground and background
 - [x] check take med notification foreground and background
 - [x] check if background notifications work when accepted at first
 
 ## ALL
 
-- [ ] use DateTime parse
+- [ ] use DateTime for everything
 - [ ] extract getTopBar to a class
 - [x] fix logError
-- [ ] add `debugPrint` for each error
+- [x] add `debugPrint` for each error
 - [x] use named routing
 - [x] remove appBar
 - [x] fix layout width/height
-- [ ] navbar center padding icons
+- [x] navbar center padding icons
 - [x] bottom bar - remove unnecessary things
-- [ ] dose type to enum
+- [x] dose type to enum
 - [x] create a DB as a class
 - [x] pass an instance of a DB class throughout the application
 - [x] fix Icon Buttons Widgets. Set it as IconButton SubClasses
 - [x] update icon color on bottom bar
 - [x] ensure that bottom bar won't push to the same screen
-- [ ] extract error message to a separated widget
+- [x] extract error message to a separated widget
 
 ## Notifications
 
@@ -52,7 +52,7 @@
 - [x] update default image
 - [x] fix red bar size
 - [x] add an Icon to show that's archived
-- [ ] added expired and not enough status
+- [x] added expired and not enough status
 
 ## Image Area
 
@@ -60,7 +60,7 @@
 
 ## Forms
 
-- [ ] fix slowness
+- [x] fix slowness
 - [x] disable button on submit
 - [x] add a status `sending...`
 - [x] pass a controller to each input
@@ -96,7 +96,7 @@
 ## Edit
 
 - [x] update notifications
-- [ ] fix first update issue
+- [x] fix first update issue
 
 ## Home
 
