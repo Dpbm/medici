@@ -23,11 +23,19 @@ int nextHour(int hour, int step) {
 
 String getAlertStatus(String time) {
   final DateTime parsedTime = parseStringTime(time);
-  final int diff = DateTime.now().difference(parsedTime).inHours;
-  return diff <= timeTolerance ? 'late' : 'pending';
+  final int diff = DateTime.now().difference(parsedTime).inMinutes;
+  return diff >= 5 && diff <= (timeTolerance * 60) ? 'late' : 'pending';
 }
 
 bool itsTimeToTake(String time) {
   final DateTime parsedTime = parseStringTime(time);
-  return DateTime.now().difference(parsedTime).inHours <= timeTolerance;
+  final DateTime now = DateTime.now();
+  final int diff = DateTime.now().difference(parsedTime).inHours;
+  return diff <= timeTolerance && now.compareTo(parsedTime) != -1;
+}
+
+bool passedTolerance(String time) {
+  final DateTime parsedTime = parseStringTime(time);
+  final int diff = DateTime.now().difference(parsedTime).inMinutes;
+  return diff > timeTolerance;
 }

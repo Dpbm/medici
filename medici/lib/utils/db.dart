@@ -139,6 +139,10 @@ class DB {
       final String lastStatus = drug['alert_status'] as String;
       String status = lastStatus;
 
+      if (passedTolerance(time)) {
+        continue;
+      }
+
       try {
         status =
             await autoUpdateStatus(lastInteraction, alertId, lastStatus, time);
@@ -183,7 +187,7 @@ class DB {
 
   Future<String> autoUpdateStatus(String lastInteraction, int alertId,
       String lastStatus, String time) async {
-    if (passedAtLeastOneDay(parseStringDate(lastInteraction))) {
+    if (passedAtLeastOneDay(DateTime.parse(lastInteraction))) {
       await updateAlertStatus(alertId, 'pending');
       successLog("Reset the alert status to pending after days!");
       return 'pending';
@@ -208,6 +212,8 @@ class DB {
           name: drug['name'] as String,
           image: drug['image'] as String?));
     }
+
+    successLog("Got tiny drug data!");
 
     return drugs;
   }

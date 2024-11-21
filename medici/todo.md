@@ -14,6 +14,8 @@
 
 ## ALL
 
+- [ ] use DateTime parse
+- [ ] extract getTopBar to a class
 - [x] fix logError
 - [ ] add `debugPrint` for each error
 - [x] use named routing
@@ -50,6 +52,7 @@
 - [x] update default image
 - [x] fix red bar size
 - [x] add an Icon to show that's archived
+- [ ] added expired and not enough status
 
 ## Image Area
 

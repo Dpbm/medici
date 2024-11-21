@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:medici/models/drug.dart';
 import 'package:medici/utils/db.dart';
+import 'package:medici/utils/debug.dart';
 import 'package:medici/widgets/app_bar.dart';
 import 'package:medici/widgets/bottom_bar.dart';
+import 'package:medici/widgets/drugs_list/no_drugs.dart';
 import 'package:medici/widgets/tiny_drug_card.dart';
 
 class DrugsList extends StatefulWidget {
@@ -17,7 +19,7 @@ class DrugsList extends StatefulWidget {
 }
 
 class _DrugsListPage extends State<DrugsList> {
-  Future<List<DrugTinyData>>? _data;
+  late Future<List<DrugTinyData>> _data;
 
   @override
   void initState() {
@@ -34,7 +36,7 @@ class _DrugsListPage extends State<DrugsList> {
     try {
       return await widget.db.getAllDrugs();
     } catch (error) {
-      debugPrint("Get Drugs list error: $error");
+      logError("Failed on get All drugs at DrugsList", error.toString());
 
       Fluttertoast.showToast(
           msg: "Falha ao tentar listar seus medicamentos!",
@@ -55,36 +57,6 @@ class _DrugsListPage extends State<DrugsList> {
     const double bottomBarHeight = 140;
     final double bodySize = height - topBarSize - bottomBarHeight;
 
-    Widget noDrugs() {
-      return Column(children: [
-        SizedBox(
-            height: topBarSize,
-            child: Container(
-              padding: const EdgeInsets.all(30),
-              child: const Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text("Seus remédios",
-                      style:
-                          TextStyle(fontSize: 40, fontFamily: "Montserrat"))),
-            )),
-        SizedBox(
-          height: bodySize,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Image.asset(
-                "images/lista_remedios.png",
-                width: width - 80,
-              ),
-              const Text("Nenhum medicamento adicionado!",
-                  style: TextStyle(fontFamily: "Montserrat", fontSize: 36),
-                  textAlign: TextAlign.center)
-            ],
-          ),
-        )
-      ]);
-    }
-
     return Scaffold(
         resizeToAvoidBottomInset: false,
         appBar: getAppBar(context),
@@ -99,7 +71,8 @@ class _DrugsListPage extends State<DrugsList> {
                     !snapshot.hasData ||
                     snapshot.data == null ||
                     snapshot.data!.isEmpty) {
-                  return noDrugs();
+                  return NoDrugs(
+                      width: width, topBarSize: topBarSize, bodySize: bodySize);
                 }
 
                 return Column(
