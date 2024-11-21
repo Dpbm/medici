@@ -4,11 +4,13 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:medici/models/drug.dart';
 import 'package:medici/utils/alerts.dart';
 import 'package:medici/utils/db.dart';
+import 'package:medici/utils/debug.dart';
 import 'package:medici/utils/filter_data.dart';
 import 'package:medici/utils/notifications.dart';
 import 'package:medici/widgets/app_bar.dart';
 import 'package:medici/widgets/bottom_bar.dart';
 import 'package:medici/widgets/drug_card.dart';
+import 'package:medici/widgets/home/no_drugs.dart';
 
 class Home extends StatefulWidget {
   const Home(
@@ -17,6 +19,7 @@ class Home extends StatefulWidget {
       required this.width,
       required this.db,
       required this.notifications});
+
   final double height, width;
   final DB db;
   final NotificationService notifications;
@@ -27,9 +30,11 @@ class Home extends StatefulWidget {
 
 class _HomePage extends State<Home> {
   Future<void>? _data;
+
   late List<DrugsScheduling> drugs;
-  late List<int> remainingDrugsIndexes;
+  late List<bool> drugsToTake;
   late int totalModalsOpen;
+
   Timer? timeChecker, listChecker;
 
   @override
@@ -46,11 +51,13 @@ class _HomePage extends State<Home> {
 
   void reload() {
     setState(() {});
-    remainingDrugsIndexes = [];
-    drugs = [];
-    totalModalsOpen = 0;
+    setState(() {
+      drugs = [];
+      drugsToTake = [];
+      totalModalsOpen = 0;
+      _data = getDrugs();
+    });
     resetTimers();
-    _data = getDrugs();
   }
 
   void resetTimers() {
@@ -58,33 +65,41 @@ class _HomePage extends State<Home> {
     listChecker?.cancel();
   }
 
-  void takeMed(int index, String status) async {
-    try {
-      final int drugIndex = remainingDrugsIndexes[index];
+  void closeModal() {
+    if (context.mounted) {
+      Navigator.pop(context);
+    }
+  }
 
-      final DrugsScheduling drug = drugs[drugIndex];
+  Future<void> takeMed(int index, String status) async {
+    try {
+      final DrugsScheduling drug = drugs[index];
 
       await widget.db
           .reduceQuantity(drug.id, drug.alert.id!, widget.notifications);
       await widget.db.updateAlertStatus(drug.alert.id!, status);
 
+      successLog("Updated drug Status and quantity from modal!");
+
+      List<bool> updatedToTake = List<bool>.from(drugsToTake);
+      updatedToTake.removeAt(index);
+
       setState(() {
         totalModalsOpen -= 1;
-        drugs.removeAt(drugIndex);
-        remainingDrugsIndexes.removeAt(index);
+        drugs.removeAt(index);
+        drugsToTake = updatedToTake;
       });
-
-      if (context.mounted) {
-        Navigator.pop(context);
-      }
     } catch (error) {
-      print("OOOO $error");
+      logError("Failed on update drug quantity and status from modal",
+          error.toString());
       Fluttertoast.showToast(
           msg: "Falha ao tentar modificar o status do alerta!",
           gravity: ToastGravity.CENTER,
           backgroundColor: Colors.red,
           textColor: Colors.white,
           fontSize: 16.0);
+    } finally {
+      closeModal();
     }
   }
 
@@ -96,13 +111,8 @@ class _HomePage extends State<Home> {
     final String drugDose = drug.dose.toString();
 
     final String message = drug.quantity - drug.dose <= 0
-        ? 'Você precisa tomar ' +
-            drugDose +
-            drugDoseType +
-            ' de ' +
-            drugName +
-            ' mas já está chegando próximo do fim, providencie mais o mais rápido possível'
-        : "Tomar " + drugDose + " " + drug.doseType + " de " + drug.name;
+        ? 'Você precisa tomar $drugDose$drugDoseType de $drugName mas já está chegando próximo do fim, reponha o mais rápido possível'
+        : "Tomar $drugDose$drugDoseType de $drugName";
 
     showModalBottomSheet<void>(
         context: context,
@@ -110,14 +120,18 @@ class _HomePage extends State<Home> {
         builder: (BuildContext context) {
           return Container(
               height: 300,
+              alignment: Alignment.center,
               color: Colors.white,
               child: Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(message,
-                        style: const TextStyle(
-                            fontSize: 20, fontFamily: 'Montserrat')),
+                    Text(
+                      message,
+                      style: const TextStyle(
+                          fontSize: 20, fontFamily: 'Montserrat'),
+                      textAlign: TextAlign.center,
+                    ),
                     ElevatedButton(
                       onPressed: () => takeMed(index, 'taken'),
                       child: const Text(
@@ -140,11 +154,13 @@ class _HomePage extends State<Home> {
   void setupPeriodicCheck() {
     final timeCheckerTimer =
         Timer.periodic(const Duration(seconds: 3), (Timer clock) {
-      if (remainingDrugsIndexes.isEmpty) {
+      final bool nothingToTake = drugsToTake.every((index) => !index);
+
+      if (nothingToTake) {
         for (final (index, drug) in drugs.indexed) {
           if (itsTimeToTake(drug.alert.time)) {
             setState(() {
-              remainingDrugsIndexes.add(index);
+              drugsToTake[index] = true;
             });
           }
         }
@@ -153,8 +169,12 @@ class _HomePage extends State<Home> {
 
     final listCheckerTimer =
         Timer.periodic(const Duration(seconds: 5), (Timer clock) {
-      if (totalModalsOpen <= 0 && remainingDrugsIndexes.isNotEmpty) {
-        for (final int index in remainingDrugsIndexes) {
+      final bool hasToBeTaken = drugsToTake.any((index) => index);
+
+      if (totalModalsOpen <= 0 && hasToBeTaken) {
+        for (final (index, haveToTake) in drugsToTake.indexed) {
+          if (!haveToTake) continue;
+
           showModal(index);
           setState(() {
             totalModalsOpen += 1;
@@ -171,13 +191,23 @@ class _HomePage extends State<Home> {
 
   Future<void> getDrugs() async {
     try {
-      final data = await widget.db.getDrugs(widget.notifications);
-      final filteredData = filterData(data);
+      final List<DrugsScheduling> data =
+          await widget.db.getDrugs(widget.notifications);
+
+      final List<DrugsScheduling> filteredData = filterData(data);
+
+      successLog("Got filtered data successfully at Home Screen");
+
       setState(() {
         drugs = filteredData;
+        drugsToTake = List<bool>.filled(filteredData.length, false);
       });
+
       setupPeriodicCheck();
+
+      successLog("Set Periodic check successfully at Home Screen");
     } catch (error) {
+      logError("Failed on get data at Home Screen", error.toString());
       Fluttertoast.showToast(
           msg: "Falha ao tentar listar seus medicamentos!",
           gravity: ToastGravity.CENTER,
@@ -195,33 +225,6 @@ class _HomePage extends State<Home> {
     const double bottomBarHeight = 140;
     final double bodySize = height - topBarSize - bottomBarHeight;
 
-    Widget noDrugs() {
-      return Column(children: [
-        SizedBox(
-            height: topBarSize,
-            child: Container(
-              padding: const EdgeInsets.all(30),
-              child: const Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text("Não Tomados",
-                      style:
-                          TextStyle(fontSize: 40, fontFamily: "Montserrat"))),
-            )),
-        SizedBox(
-          height: bodySize,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Image.asset("images/fundo_home.png"),
-              const Text("Nenhum remédio a tomar!",
-                  style: TextStyle(fontFamily: "Montserrat", fontSize: 36),
-                  textAlign: TextAlign.center)
-            ],
-          ),
-        )
-      ]);
-    }
-
     return Scaffold(
         resizeToAvoidBottomInset: false,
         appBar: getAppBar(context),
@@ -232,7 +235,7 @@ class _HomePage extends State<Home> {
               future: _data,
               builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
                 if (snapshot.hasError || drugs.isEmpty) {
-                  return noDrugs();
+                  return NoDrugs(topBarSize: topBarSize, bodySize: bodySize);
                 }
 
                 return Column(

@@ -9,11 +9,9 @@ import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
 class DB {
-  Database? database;
+  late Database database;
 
-  Future<void> getDB() async {
-    if (database != null) return;
-
+  Future<void> init() async {
     database = await openDatabase(join(await getDatabasesPath(), 'data.db'),
         onCreate: (db, version) {
       db.execute('''
@@ -57,29 +55,23 @@ class DB {
   }
 
   Future<int> addDrug(Drug drug) async {
-    await getDB();
-
-    int id = await database!.insert('drug', drug.toMap(),
+    int id = await database.insert('drug', drug.toMap(),
         conflictAlgorithm: ConflictAlgorithm.fail);
 
     return id;
   }
 
   Future<int> addNotification(NotificationSettings notification) async {
-    await getDB();
-
-    int id = await database!.insert('notification', notification.toMap(),
+    int id = await database.insert('notification', notification.toMap(),
         conflictAlgorithm: ConflictAlgorithm.fail);
     return id;
   }
 
   Future<List<int>> addAlerts(List<Alert> alerts) async {
-    await getDB();
-
     List<int> ids = [];
 
     for (Alert alert in alerts) {
-      int id = await database!.insert('alert', alert.toMap(),
+      int id = await database.insert('alert', alert.toMap(),
           conflictAlgorithm: ConflictAlgorithm.fail);
       ids.add(id);
     }
@@ -89,9 +81,7 @@ class DB {
 
   Future<List<DrugsScheduling>> getDrugs(
       NotificationService notifications) async {
-    await getDB();
-
-    final data = await database!.rawQuery('''
+    final data = await database.rawQuery('''
       SELECT 
         alert.id as alert_id,
         alert.time,
@@ -104,38 +94,58 @@ class DB {
         drug.dose_type, 
         drug.dose,
         drug.status as drug_status,
-        drug.quantity
+        drug.quantity,
+        drug.recurrent
       FROM alert 
       INNER JOIN drug ON drug.id = alert.drug_id
       WHERE drug.status != 'archived' AND alert.status != 'aware' AND alert.status != 'taken';
     ''');
 
     List<DrugsScheduling> drugs = [];
+    List<int> archivedDrugs = [];
+
     for (final drug in data) {
-      final String lastDay = drug['last_day'] as String;
+      final String? lastDay = drug['last_day'] as String?;
       final int id = drug['drug_id'] as int;
       final int alertId = drug['alert_id'] as int;
+      final bool recurrent = (drug['recurrent'] as int) == 1;
 
-      if (equalDate(DateTime.now(), parseStringDate(lastDay))) {
-        await archiveDrug(id);
-        await notifications.cancelNotification(alertId);
-        continue;
+      if (archivedDrugs.contains(id)) continue;
+
+      if (!recurrent) {
+        try {
+          final List<int> alertsIds = data
+              .where((drugData) => (drugData['drug_id'] as int) == id)
+              .map((drugData) => drugData['alert_id'] as int)
+              .toList();
+
+          final bool archived =
+              await archiveOnLastDay(lastDay!, notifications, id, alertsIds);
+
+          if (archived) {
+            archivedDrugs.add(id);
+            successLog("Archived drug $id");
+            continue;
+          }
+        } catch (error) {
+          logError(
+              "failed on update drug to be archived on last day inside the getDrugs function",
+              error.toString());
+        }
       }
 
       final String time = drug['time'] as String;
       final String lastInteraction = drug['last_interaction'] as String;
+      final String lastStatus = drug['alert_status'] as String;
+      String status = lastStatus;
 
-      String status = 'pending';
-
-      if (passedAtLeastOneDay(parseStringDate(lastInteraction))) {
-        await updateAlertStatus(alertId, 'pending');
-      } else {
-        status = getAlertStatus(time);
-        final String lastStatus = drug['alert_status'] as String;
-
-        if (lastStatus == 'pending') {
-          await updateAlertStatus(alertId, status);
-        }
+      try {
+        status =
+            await autoUpdateStatus(lastInteraction, alertId, lastStatus, time);
+        successLog("Updated alert status from getDrugs");
+      } catch (error) {
+        logError(
+            "Failed on update alert status from getDrugs", error.toString());
       }
 
       drugs.add(DrugsScheduling(
@@ -157,11 +167,39 @@ class DB {
     return drugs;
   }
 
-  Future<List<DrugTinyData>> getAllDrugs() async {
-    await getDB();
+  Future<bool> archiveOnLastDay(String lastDay,
+      NotificationService notifications, int drugId, List<int> alerts) async {
+    if (!equalDate(DateTime.now(), parseStringDate(lastDay))) {
+      simpleLog("$drugId is not on its last day!");
+      return false;
+    }
 
-    final data =
-        await database!.query('drug', columns: ['id', 'name', 'image']);
+    await archiveDrug(drugId);
+    await notifications.cancelMultiple(alerts);
+    successLog("$drugId archived on last day");
+
+    return true;
+  }
+
+  Future<String> autoUpdateStatus(String lastInteraction, int alertId,
+      String lastStatus, String time) async {
+    if (passedAtLeastOneDay(parseStringDate(lastInteraction))) {
+      await updateAlertStatus(alertId, 'pending');
+      successLog("Reset the alert status to pending after days!");
+      return 'pending';
+    }
+
+    final String newStatus = getAlertStatus(time);
+    if (newStatus != lastStatus) {
+      await updateAlertStatus(alertId, newStatus);
+      successLog("Updated alert status on auto update: $newStatus!");
+    }
+
+    return newStatus;
+  }
+
+  Future<List<DrugTinyData>> getAllDrugs() async {
+    final data = await database.query('drug', columns: ['id', 'name', 'image']);
 
     List<DrugTinyData> drugs = [];
     for (final drug in data) {
@@ -175,17 +213,15 @@ class DB {
   }
 
   Future<FullDrug> getFullDrugData(int id) async {
-    await getDB();
-
     simpleLog("Getting Full Drug Data");
 
     final drugData =
-        (await database!.query('drug', where: 'id=?', whereArgs: [id])).first;
-    final notificationData = (await database!
+        (await database.query('drug', where: 'id=?', whereArgs: [id])).first;
+    final notificationData = (await database
             .query('notification', where: 'drug_id=?', whereArgs: [id]))
         .first;
     final alertsData =
-        await database!.query('alert', where: 'drug_id=?', whereArgs: [id]);
+        await database.query('alert', where: 'drug_id=?', whereArgs: [id]);
 
     final List<Alert> alerts = alertsData
         .map((data) => Alert(
@@ -225,42 +261,32 @@ class DB {
   }
 
   Future<void> deleteDrug(int id) async {
-    await getDB();
-
-    await database!.delete('notification', where: 'drug_id=?', whereArgs: [id]);
-    await database!.delete('alert', where: 'drug_id=?', whereArgs: [id]);
-    await database!.delete('drug', where: 'id=?', whereArgs: [id]);
+    await database.delete('notification', where: 'drug_id=?', whereArgs: [id]);
+    await database.delete('alert', where: 'drug_id=?', whereArgs: [id]);
+    await database.delete('drug', where: 'id=?', whereArgs: [id]);
   }
 
   Future<void> deleteAlerts(int drugId) async {
-    await getDB();
-    await database!.delete('alert', where: 'drug_id=?', whereArgs: [drugId]);
+    await database.delete('alert', where: 'drug_id=?', whereArgs: [drugId]);
   }
 
   Future<void> deleteNotificationSettings(int drugId) async {
-    await getDB();
-    await database!
+    await database
         .delete('notification', where: 'drug_id=?', whereArgs: [drugId]);
   }
 
   Future<void> archiveDrug(int id) async {
-    await getDB();
-
-    await database!.update('drug', {'status': 'archived'},
+    await database.update('drug', {'status': 'archived'},
         where: 'id = ?', whereArgs: [id]);
   }
 
   Future<void> unarchiveDrug(int id) async {
-    await getDB();
-
-    await database!.update('drug', {'status': 'current'},
+    await database.update('drug', {'status': 'current'},
         where: 'id = ?', whereArgs: [id]);
   }
 
   Future<void> updateDrug(Drug drug) async {
-    await getDB();
-
-    await database!.update('drug', drug.toMap(),
+    await database.update('drug', drug.toMap(),
         where: 'id=?',
         whereArgs: [drug.id],
         conflictAlgorithm: ConflictAlgorithm.fail);
@@ -268,29 +294,26 @@ class DB {
 
   Future<void> reduceQuantity(
       int id, int alertId, NotificationService notification) async {
-    await getDB();
-
-    final alertData = (await database!.query('alert',
+    final alertData = (await database.query('alert',
             columns: ['status'], where: 'id=?', whereArgs: [alertId]))
         .first;
 
     if (alertData.isEmpty) throw Exception('Invalid Alert data');
 
     final String status = alertData['status'] as String;
-    if (status == 'taken') return;
+    if (!['late', 'pending'].contains(status)) return;
 
-    final drugData = (await database!.query('drug',
+    final drugData = (await database.query('drug',
             columns: ['quantity', 'dose', 'name'],
             where: 'id=?',
             whereArgs: [id]))
         .first;
 
-    final notificationData = (await database!.query('notification',
+    final notificationData = (await database.query('notification',
             columns: ['quantity_offset'], where: 'drug_id=?', whereArgs: [id]))
         .first;
 
     final String drugName = drugData['name'] as String;
-
     final double quantity = drugData['quantity'] as double;
     final double dose = drugData['dose'] as double;
     final int quantityOffset = notificationData['quantity_offset'] as int;
@@ -300,38 +323,44 @@ class DB {
 
     if (newQuantity <= quantityOffset) {
       await notification.showQuantityNotification(id, drugName);
+      await updateDrugStatus(id, 'refill');
     }
 
-    await database!.rawUpdate('''
-      UPDATE drug
-      SET 
-        quantity = ?
-      WHERE id=?;
-    ''', [newQuantity, id]);
+    await database.update('drug', {'quantity': newQuantity},
+        where: 'id=?',
+        whereArgs: [id],
+        conflictAlgorithm: ConflictAlgorithm.fail);
   }
 
   Future<void> refillDrugAmount(int id, double amount) async {
-    await getDB();
-
-    await database!
-        .update('drug', {'quantity': amount}, where: 'id=?', whereArgs: [id]);
+    await database.update('drug', {'quantity': amount},
+        where: 'id=?', whereArgs: [id]);
   }
 
   Future<void> updateAlertStatus(int id, String status) async {
-    await getDB();
-
-    simpleLog("updating alert $id to status $status");
-
-    await database!.update('alert',
-        {'status': status, 'last_interaction': buildDateString(DateTime.now())},
+    await database.update(
+        'alert',
+        {
+          'status': status,
+          'last_interaction': DateTime.now().toIso8601String()
+        },
         where: 'id=?',
         whereArgs: [id],
         conflictAlgorithm: ConflictAlgorithm.fail);
 
-    successLog("Updated!");
+    successLog("Updated alert $id status to $status!");
+  }
+
+  Future<void> updateDrugStatus(int id, String status) async {
+    await database.update('drug', {'status': status},
+        where: 'id=?',
+        whereArgs: [id],
+        conflictAlgorithm: ConflictAlgorithm.fail);
+
+    successLog("Updated drug $id status to $status");
   }
 
   Future<void> close() async {
-    database?.close();
+    database.close();
   }
 }

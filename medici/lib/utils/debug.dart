@@ -12,9 +12,9 @@ void warning(String text) {
   debugPrint("${debugColors['yellow']}[*] $text${debugColors['reset']}");
 }
 
-void logError(String text, Exception error) {
+void logError(String text, String error) {
   debugPrint("${debugColors['red']}[!] $text${debugColors['reset']}");
-  debugPrint("$error");
+  debugPrint("${debugColors['red']}$error${debugColors['reset']}");
 }
 
 void simpleLog(String text) {

@@ -34,7 +34,8 @@ class BottomBar extends StatelessWidget {
     void goToPage(int index) {
       if (index == selected) return;
 
-      List<String> routes = ['home', 'add', 'list'];
+      const List<String> routes = ['home', 'add', 'list'];
+
       Navigator.pushNamed(context, routes[index]).then((_) {
         if (callback != null) {
           callback!();
@@ -44,7 +45,7 @@ class BottomBar extends StatelessWidget {
 
     return BottomNavigationBar(
       items: items,
-      backgroundColor: const Color(0xFFFFFFFF),
+      backgroundColor: Colors.white,
       onTap: goToPage,
     );
   }

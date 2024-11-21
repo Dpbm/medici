@@ -55,7 +55,7 @@ Future<void> notificationTapBackground(NotificationResponse response) async {
             break;
         }
       } catch (error) {
-        logError("failed on Take med", error as Exception);
+        logError("failed on Take med", error.toString());
       }
     }
     tmpDb.close();
@@ -75,10 +75,12 @@ Future<void> notificationTapBackground(NotificationResponse response) async {
 
 final NotificationService notifications =
     NotificationService(notificationTapBackground);
+final DB db = DB();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await notifications.init();
+  await db.init();
   runApp(const App());
 }
 
@@ -87,8 +89,6 @@ class App extends StatelessWidget {
 
   static final GlobalKey<NavigatorState> navigatorKey =
       GlobalKey<NavigatorState>();
-
-  static final DB db = DB();
 
   static void navigateToEditBackgroundTask(FullDrug drug) {
     navigatorKey.currentState?.pushNamed('edit', arguments: {'drug': drug});

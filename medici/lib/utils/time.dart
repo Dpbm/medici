@@ -1,27 +1,16 @@
-import 'package:flutter/material.dart';
-
-bool passedTime(TimeOfDay baseTime) {
-  final now = TimeOfDay.now();
-  if (now.hour > baseTime.hour) {
-    return true;
-  } else if (now.hour < baseTime.hour) {
-    return false;
-  } else if (now.minute > baseTime.minute) {
-    return true;
-  } else if (now.minute < baseTime.minute) {
-    return false;
-  }
-  return false;
+bool passedTime(DateTime baseTime) {
+  return DateTime.now().difference(baseTime).inMinutes >= 4;
 }
 
-TimeOfDay parseStringTime(String time) {
+DateTime parseStringTime(String time) {
   final List<int> splitTime =
       time.split(':').map((part) => int.parse(part)).toList();
 
-  return TimeOfDay(hour: splitTime[0], minute: splitTime[1]);
+  final DateTime now = DateTime.now();
+  return DateTime(now.year, now.month, now.day, splitTime[0], splitTime[1]);
 }
 
-String buildTimeString(TimeOfDay time) {
+String buildTimeString(DateTime time) {
   return '${time.hour.toString()}:${time.minute.toString()}';
 }
 
@@ -36,11 +25,7 @@ DateTime parseStringDate(String date) {
 }
 
 bool passedAtLeastOneDay(DateTime lastInteraction) {
-  final DateTime now = DateTime.now();
-
-  return (now.year > lastInteraction.year ||
-      now.month > lastInteraction.month ||
-      now.day > lastInteraction.day);
+  return DateTime.now().difference(lastInteraction).inDays >= 1;
 }
 
 bool equalDate(DateTime date1, DateTime date2) {

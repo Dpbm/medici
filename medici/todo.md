@@ -9,11 +9,12 @@
 - [x] check takeMed function when click on `take`
 - [ ] check the edit when expired foreground and background
 - [x] check the edit when quantity foreground and background
-- [ ] check take med notification foreground and background
+- [x] check take med notification foreground and background
 - [x] check if background notifications work when accepted at first
 
 ## ALL
 
+- [x] fix logError
 - [ ] add `debugPrint` for each error
 - [x] use named routing
 - [x] remove appBar
@@ -30,10 +31,10 @@
 
 ## Notifications
 
-- [ ] identify why sometimes the app freezes on splash screen after calling `Datetime.now().timeZoneName`
-- [ ] test don't allow notifications
-- [ ] add `showUserInterface=true`
-- [ ] fix open on edit page when clicked
+- [x] identify why sometimes the app freezes on splash screen after calling `Datetime.now().timeZoneName`
+- [x] test don't allow notifications
+- [x] add `showUserInterface=true`
+- [x] fix open on edit page when clicked
 
 ## Cards
 
@@ -79,7 +80,7 @@
 ## Add
 
 - [x] setup notifications
-- [ ] fix top bar
+- [x] fix top bar
 - [x] permissions to access camera, files and notifications
 - [x] handle images (camera/files)
 - [x] db insert drug function
@@ -103,7 +104,7 @@
 - [x] show only the next drug and late ones
 - [x] late comes first
 - [x] change `RestartableTimer` to `Timer.Periodic`
-- [ ] fix get data
+- [x] fix get data
 - [x] update time period to check remaining drugs to take(use 5s)
 - [x] reduce the amount of medicine when click on modal
 - [x] scroll view
@@ -116,8 +117,8 @@
 - [x] reload after coming back from drug page
 - [x] get drugs that are need to be taken today
 - [x] get alerts that are neither `taken` nor `late`
-- [ ] fix filter that is not showing the new med as late at first
-- [ ] fix modal text padding and margin
+- [x] fix filter that is not showing the new med as late at first
+- [x] fix modal text padding and margin
 
 ## Drugs
 
@@ -159,6 +160,7 @@
 - [x] add recurrent status
 - [ ] handle when expiration is today
 - [ ] handle when lastDay is today
+- [ ] handle different drug status (update on edit, on add, on take drug) (statuses: current, archived, refill, expired)
 
 - `aware`, `taken`, `late`, `pending` statuses
 

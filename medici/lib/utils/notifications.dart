@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:medici/utils/debug.dart';
@@ -88,7 +87,7 @@ class NotificationService {
       initialized = true;
       successLog("Initialized Notification Service");
     } catch (error) {
-      logError("Error on init NotificationService!", error as Exception);
+      logError("Error on init NotificationService!", error.toString());
     }
   }
 
@@ -157,7 +156,7 @@ class NotificationService {
     DateTime now = DateTime.now();
 
     for (int i = 0; i < hours.length; i++) {
-      final TimeOfDay time = parseStringTime(hours[i]);
+      final DateTime time = parseStringTime(hours[i]);
       DateTime newDate =
           DateTime(now.year, now.month, now.day, time.hour, time.minute);
 

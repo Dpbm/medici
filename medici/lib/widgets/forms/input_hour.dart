@@ -10,7 +10,7 @@ class InputHour extends StatefulWidget {
       this.initialValue});
 
   final String label;
-  final TimeOfDay? initialValue;
+  final DateTime? initialValue;
   final bool requiredField;
   final Function callback;
 
@@ -25,7 +25,7 @@ class _InputHour extends State<InputHour> {
   void initState() {
     super.initState();
     _hourInputController.text =
-        buildTimeString(widget.initialValue ?? TimeOfDay.now());
+        buildTimeString(widget.initialValue ?? DateTime.now());
   }
 
   @override
@@ -59,7 +59,11 @@ class _InputHour extends State<InputHour> {
 
       if (hour == null) return;
 
-      _hourInputController.text = buildTimeString(hour);
+      final DateTime now = DateTime.now();
+      final DateTime selectedTime =
+          DateTime(now.year, now.month, now.day, hour.hour, hour.minute);
+
+      _hourInputController.text = buildTimeString(selectedTime);
       widget.callback(hour);
     }
 

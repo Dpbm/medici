@@ -46,7 +46,7 @@ class _EditDrugPage extends State<EditDrug> {
   double? quantity, dose;
   int? frequency, expirationOffset, quantityOffset, id;
   bool? recurrent;
-  TimeOfDay? hour;
+  DateTime? hour;
 
   bool takingPicture = false;
 
@@ -67,12 +67,8 @@ class _EditDrugPage extends State<EditDrug> {
     expirationOffset = widget.drug.notification.expirationOffset;
     quantityOffset = widget.drug.notification.quantityOffset;
     id = widget.drug.id;
-
-    final splitTime = widget.drug.startingTime.split(':');
-
+    hour = parseStringTime(widget.drug.startingTime);
     frequency = frequencies[frequencyString];
-    hour = TimeOfDay(
-        hour: int.parse(splitTime[0]), minute: int.parse(splitTime[1]));
   }
 
   @override
@@ -132,7 +128,7 @@ class _EditDrugPage extends State<EditDrug> {
       });
     }
 
-    void getHour(TimeOfDay inputHour) {
+    void getHour(DateTime inputHour) {
       setState(() {
         hour = inputHour;
       });
@@ -198,7 +194,7 @@ class _EditDrugPage extends State<EditDrug> {
                 drugId: id!,
                 time: hour,
                 status: 'pending',
-                lastInteraction: buildDateString(DateTime.now())))
+                lastInteraction: DateTime.now().toIso8601String()))
             .toList();
         List<int> alertsIds = await widget.db.addAlerts(alerts);
         await widget.notifications

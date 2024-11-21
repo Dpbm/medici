@@ -8,6 +8,6 @@ void main() async {
   databaseFactory = databaseFactoryFfi;
 
   print("Creating database...");
-  DB db = DB();
-  await db.getDB();
+  final DB db = DB();
+  await db.init();
 }

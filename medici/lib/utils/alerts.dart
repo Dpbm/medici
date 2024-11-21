@@ -1,14 +1,16 @@
-import 'package:flutter/material.dart';
 import 'package:medici/utils/time.dart';
 
-List<String> getAlerts(TimeOfDay startingTime, int step) {
+const int timeTolerance = 3;
+
+List<String> getAlerts(DateTime startingTime, int step) {
   List<String> alerts = [buildTimeString(startingTime)];
 
   int currentHour = nextHour(startingTime.hour, step);
+  final DateTime now = DateTime.now();
 
   while (currentHour != startingTime.hour) {
-    alerts.add(buildTimeString(
-        TimeOfDay(hour: currentHour, minute: startingTime.minute)));
+    alerts.add(buildTimeString(DateTime(
+        now.year, now.month, now.day, currentHour, startingTime.minute)));
     currentHour = nextHour(currentHour, step);
   }
 
@@ -20,18 +22,12 @@ int nextHour(int hour, int step) {
 }
 
 String getAlertStatus(String time) {
-  const int tolerance = -3;
-  final TimeOfDay parsedTime = parseStringTime(time);
-  final bool isOnTolerance =
-      (parsedTime.hour - TimeOfDay.now().hour) >= tolerance;
-
-  return passedTime(parsedTime) && isOnTolerance ? 'late' : 'pending';
+  final DateTime parsedTime = parseStringTime(time);
+  final int diff = DateTime.now().difference(parsedTime).inHours;
+  return diff <= timeTolerance ? 'late' : 'pending';
 }
 
 bool itsTimeToTake(String time) {
-  final TimeOfDay parsedTime = parseStringTime(time);
-  final TimeOfDay now = TimeOfDay.now();
-  final int diff = parsedTime.hour - now.hour;
-
-  return diff <= 0 && diff.abs() <= 3;
+  final DateTime parsedTime = parseStringTime(time);
+  return DateTime.now().difference(parsedTime).inHours <= timeTolerance;
 }

@@ -50,7 +50,7 @@ class _AddPage extends State<Add> {
   String frequencyString = frequencies.keys.toList().first;
   int frequency = frequencies.values.toList().first;
   bool recurrent = false;
-  TimeOfDay hour = TimeOfDay.now();
+  DateTime hour = DateTime.now();
   int expirationOffset = int.parse(expirationOffsets.first);
   int quantityOffset = int.parse(quantityOffsets.first);
 
@@ -113,7 +113,7 @@ class _AddPage extends State<Add> {
       });
     }
 
-    void getHour(TimeOfDay inputHour) {
+    void getHour(DateTime inputHour) {
       setState(() {
         hour = inputHour;
       });
@@ -172,7 +172,7 @@ class _AddPage extends State<Add> {
                 drugId: drugId,
                 time: hour,
                 status: 'pending',
-                lastInteraction: buildDateString(DateTime.now())))
+                lastInteraction: DateTime.now().toIso8601String()))
             .toList();
 
         List<int> alertsIds = await widget.db.addAlerts(alerts);
