@@ -14,8 +14,7 @@
 
 ## ALL
 
-- [ ] use DateTime for everything
-- [ ] extract getTopBar to a class
+- [x] use DateTime for everything
 - [x] fix logError
 - [x] add `debugPrint` for each error
 - [x] use named routing
@@ -174,4 +173,4 @@
 
 ## Leaflet
 
-- [ ] fix JWT expiration date
+- [x] fix JWT expiration date
