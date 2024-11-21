@@ -142,11 +142,11 @@
   - [x] add.dart
   - [x] edit.dart
   - [x] drug.dart
-- [ ] add a way to refill/renew drug on drug screen
+- [x] add a way to refill/renew drug on drug screen
 - [x] already taken status
 - [x] drug status (archived, expired, drugs finished)
 - [x] check for Tomorrow filter
-- [ ] update status indicator widget
+- [x] update status indicator widget
 - [x] add status for each alert
 - [x] remove notifications after deleting the medicine
 - [x] delete and add new notifications after updating drug
@@ -154,16 +154,16 @@
 - [x] get everything related to that
 - [x] archive
 - [x] unarchive from drugs list
-- [ ] update style for archive/unarchive button
+- [x] update style for archive/unarchive button
 - [x] delete
 - [x] edit
 - [x] error text
 - [x] update default image
-- [ ] fix schedule component for one dose
+- [x] fix schedule component for one dose
 - [x] add recurrent status
-- [ ] handle when expiration is today
-- [ ] handle when lastDay is today
-- [ ] handle different drug status (update on edit, on add, on take drug) (statuses: current, archived, refill, expired)
+- [x] handle when expiration is today
+- [x] handle when lastDay is today
+- [x] handle different drug status (update on edit, on add, on take drug) (statuses: current, archived, refill, expired)
 
 - `aware`, `taken`, `late`, `pending` statuses
 

@@ -181,7 +181,9 @@ class DB {
 
   Future<bool> archiveOnLastDay(String lastDay,
       NotificationService notifications, int drugId, List<int> alerts) async {
-    if (!equalDate(DateTime.now(), parseStringDate(lastDay))) {
+    final DateTime now = DateTime.now();
+    if (!equalDate(
+        DateTime(now.year, now.month, now.day), parseStringDate(lastDay))) {
       simpleLog("$drugId is not on its last day!");
       return false;
     }
@@ -243,7 +245,7 @@ class DB {
         await database.query('alert', where: 'drug_id=?', whereArgs: [id]);
 
     final bool recurrent = drugData['recurrent'] == 1;
-    final String? lastDay = drugData['lastDay'] as String?;
+    final String? lastDay = drugData['last_day'] as String?;
     String drugStatus = drugData['status'] as String;
 
     final String expirationDate = drugData['expiration_date'] as String;
