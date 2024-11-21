@@ -213,10 +213,13 @@ class _EditDrugPage extends State<EditDrug> {
                 lastInteraction: DateTime.now().toIso8601String()))
             .toList();
         List<int> alertsIds = await widget.db.addAlerts(alerts);
-        await widget.notifications
-            .scheduleMultiple(hours, id!, name!, dose!, type!, alertsIds);
 
-        if (!recurrent!) {
+        if (newStatus != 'archived') {
+          await widget.notifications
+              .scheduleMultiple(hours, id!, name!, dose!, type!, alertsIds);
+        }
+
+        if (!recurrent! && newStatus != 'archived') {
           await widget.notifications.scheduleExpiration(
               parseStringDate(lastDay!), id!, name!, expirationOffset!);
         }

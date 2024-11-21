@@ -75,8 +75,11 @@ class _HomePage extends State<Home> {
     try {
       final DrugsScheduling drug = drugs[index];
 
-      await widget.db
-          .reduceQuantity(drug.id, drug.alert.id!, widget.notifications);
+      if (status != 'aware') {
+        await widget.db
+            .reduceQuantity(drug.id, drug.alert.id!, widget.notifications);
+      }
+
       await widget.db.updateAlertStatus(drug.alert.id!, status);
 
       successLog("Updated drug Status and quantity from modal!");

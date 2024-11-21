@@ -51,7 +51,6 @@ class TinyDrugCard extends StatelessWidget {
                           ))),
               Container(
                   height: 120,
-                  width: 140,
                   alignment: Alignment.centerLeft,
                   margin: const EdgeInsets.only(left: 5),
                   child: Text(
