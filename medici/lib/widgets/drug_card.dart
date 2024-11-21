@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:medici/models/drug.dart';
 import 'package:medici/utils/db.dart';
+import 'package:medici/utils/time.dart';
 
 class DrugCard extends StatelessWidget {
   final DrugsScheduling data;
@@ -19,9 +20,11 @@ class DrugCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final int timeDiff = data.alert.getTimeDiff();
+    final DateTime now = DateTime.now();
+    final DateTime drugTime = parseStringTime(data.alert.time);
+
+    final int timeDiff = drugTime.difference(now).inHours;
     final bool isLate = data.alert.status == 'late';
-    final bool isArchived = data.status == 'archived';
 
     return GestureDetector(
         onTap: () =>
@@ -54,47 +57,26 @@ class DrugCard extends StatelessWidget {
                             fit: BoxFit.cover,
                           ))),
               Container(
-                height: 120,
-                width: 140,
-                alignment: Alignment.centerLeft,
-                margin: const EdgeInsets.only(left: 5),
-                child: !isArchived
-                    ? Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(data.name,
-                              maxLines: 1,
-                              style: const TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.bold)),
-                          Text(
-                              data.dose.round().toString() +
-                                  " " +
-                                  data.doseType,
-                              style: const TextStyle(fontSize: 14)),
-                          Text(
-                              (isLate ? "Atrasado à " : "Em ") +
-                                  timeDiff.abs().toString() +
-                                  " horas - " +
-                                  data.alert.time +
-                                  "h",
-                              style: const TextStyle(fontSize: 14))
-                        ],
-                      )
-                    : Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(data.name,
-                              style: const TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.bold)),
-                          const Text("Arquivado",
-                              style:
-                                  TextStyle(fontSize: 18, color: Colors.red)),
-                        ],
-                      ),
-              ),
-              isLate && !isArchived
+                  height: 120,
+                  width: 140,
+                  alignment: Alignment.centerLeft,
+                  margin: const EdgeInsets.only(left: 5),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(data.name,
+                          maxLines: 1,
+                          style: const TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold)),
+                      Text("${data.dose}${data.doseType}",
+                          style: const TextStyle(fontSize: 14)),
+                      Text(
+                          "${(isLate ? "Atrasado à" : "Em")} $timeDiff horas - ${data.alert.time}h",
+                          style: const TextStyle(fontSize: 14))
+                    ],
+                  )),
+              isLate
                   ? Container(
                       width: 60,
                       height: 120,

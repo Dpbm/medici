@@ -28,9 +28,4 @@ class Alert {
       'last_interaction': lastInteraction
     };
   }
-
-  int getTimeDiff() {
-    final int hour = int.parse(time.split(':')[0]);
-    return hour - TimeOfDay.now().hour;
-  }
 }
