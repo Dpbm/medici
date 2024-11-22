@@ -33,6 +33,8 @@ Created to assist users in managing their medications, ensuring that medications
     <img src="./assets/notification.png" alt="notification example" style="width:200px; height:auto;">
     <img src="./assets/leaflet.png" alt="download drug leaflet" style="width:200px; height:auto;">
     <img src="./assets/list.png" alt="all drugs list" style="width:200px; height:auto;">
+    <img src="./assets/take_med_notification.jpg" alt="take med notification" style="width:200px; height:auto;">
+    <img src="./assets/expiration_notification.jpg" alt="expiration notification" style="width:200px; height:auto;">
 </p>
 
 ## Building by yourself
@@ -75,9 +77,9 @@ flutter build apk
 
 ## Installing
 
-You can build the whole project locally if you want, however you can get the prebuilt APK [here]() and make request to the api using the URL: `https://leaflet-dpbm-dpbms-projects.vercel.app/api/medicine/`.
+You can build the whole project locally if you want, however you can get the prebuilt APK [here](https://github.com/Dpbm/medici/releases/) and make request to the api using the URL: `https://leaflet-dpbm-dpbms-projects.vercel.app/api/medicine/`.
 
-For further informations about the API usage click [here](./leaflet/readme.md).
+For further information about the API usage click [here](./leaflet/readme.md).
 
 ## Group Members
 
