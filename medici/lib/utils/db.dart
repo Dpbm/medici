@@ -96,9 +96,11 @@ class DB {
         drug.status as drug_status,
         drug.quantity,
         drug.recurrent,
-        drug.expiration_date
+        drug.expiration_date,
+        notification.expiration_offset
       FROM alert 
       INNER JOIN drug ON drug.id = alert.drug_id
+      INNER JOIN notification ON drug.id = notification.drug_id
       WHERE drug.status != 'archived' AND alert.status != 'aware' AND alert.status != 'taken';
     ''');
 
@@ -136,9 +138,9 @@ class DB {
       }
 
       final String expirationDate = drug['expiration_date'] as String;
-      final DateTime now = DateTime.now();
-      if (equalDate(parseStringDate(expirationDate),
-          DateTime(now.year, now.month, now.day))) {
+      final int expirationOffset = drug['expiration_offset'] as int;
+      if (hasAlreadyExpired(
+          parseStringDate(expirationDate), expirationOffset)) {
         await updateDrugStatus(id, 'expired');
       }
 
@@ -249,9 +251,8 @@ class DB {
     String drugStatus = drugData['status'] as String;
 
     final String expirationDate = drugData['expiration_date'] as String;
-    final DateTime now = DateTime.now();
-    if (equalDate(parseStringDate(expirationDate),
-        DateTime(now.year, now.month, now.day))) {
+    final int expirationOffset = notificationData['expiration_offset'] as int;
+    if (hasAlreadyExpired(parseStringDate(expirationDate), expirationOffset)) {
       await updateDrugStatus(id, 'expired');
       drugStatus = 'expired';
     }

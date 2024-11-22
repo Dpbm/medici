@@ -39,3 +39,9 @@ bool passedTolerance(String time) {
   final int diff = DateTime.now().difference(parsedTime).inMinutes;
   return diff > timeTolerance;
 }
+
+bool hasAlreadyExpired(DateTime time, int offset) {
+  final DateTime now = DateTime.now();
+  return time.isBefore(time) ||
+      (time.isAfter(now) && time.difference(now).inDays <= offset);
+}

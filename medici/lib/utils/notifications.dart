@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:medici/utils/alerts.dart';
 import 'package:medici/utils/debug.dart';
 import 'package:medici/utils/notifications_ids.dart';
 import 'package:medici/utils/time.dart';
@@ -220,8 +221,14 @@ class NotificationService {
       return;
     }
 
-    final DateTime timeToExpire = DateTime(time.year, time.month, time.day)
-        .subtract(Duration(days: expirationOffset));
+    final DateTime now = DateTime.now();
+    DateTime timeToExpire = now;
+    bool isNow = true;
+
+    if (!hasAlreadyExpired(time, expirationOffset)) {
+      timeToExpire = now.add(Duration(days: expirationOffset));
+      isNow = false;
+    }
 
     final tz.TZDateTime scheduledTime = tz.TZDateTime.from(
         tz.TZDateTime.from(
@@ -237,16 +244,27 @@ class NotificationService {
             playSound: true,
             enableVibration: true));
 
-    await flutterLocalNotificationsPlugin.zonedSchedule(
-        getExpirationNotificationId(drugId),
-        'Seu remédio venceu',
-        "Descarte o $drugName e compre mais. Clique para atualizar a data de vencimento do remédio.",
-        scheduledTime,
-        notificationDetails,
-        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-        uiLocalNotificationDateInterpretation:
-            UILocalNotificationDateInterpretation.absoluteTime,
-        matchDateTimeComponents: DateTimeComponents.dayOfMonthAndTime,
-        payload: drugId.toString());
+    if (isNow) {
+      await flutterLocalNotificationsPlugin.show(
+          getExpirationNotificationId(drugId),
+          'Seu remédio venceu',
+          "Descarte o $drugName e compre mais. Clique para atualizar a data de vencimento do remédio.",
+          notificationDetails);
+    } else {
+      await flutterLocalNotificationsPlugin.zonedSchedule(
+          getExpirationNotificationId(drugId),
+          'Seu remédio venceu',
+          "Descarte o $drugName e compre mais. Clique para atualizar a data de vencimento do remédio.",
+          scheduledTime,
+          notificationDetails,
+          androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+          uiLocalNotificationDateInterpretation:
+              UILocalNotificationDateInterpretation.absoluteTime,
+          matchDateTimeComponents: DateTimeComponents.dayOfMonthAndTime,
+          payload: drugId.toString());
+
+      successLog(
+          "Scheduled $drugName Expiration notification to ${timeToExpire.toIso8601String()}");
+    }
   }
 }

@@ -7,6 +7,7 @@ import 'package:medici/utils/alerts.dart';
 import 'package:medici/utils/debug.dart';
 import 'package:medici/utils/leaflet.dart';
 import 'package:medici/utils/notifications.dart';
+import 'package:medici/utils/notifications_ids.dart';
 import 'package:medici/utils/time.dart';
 import 'package:medici/widgets/app_bar.dart';
 import 'package:medici/widgets/forms/image_area.dart';
@@ -158,6 +159,8 @@ class _EditDrugPage extends State<EditDrug> {
         for (final Alert alert in widget.drug.schedule) {
           await widget.notifications.cancelNotification(alert.id!);
         }
+        await widget.notifications
+            .cancelNotification(getExpirationNotificationId(id!));
 
         await widget.db.deleteAlerts(id!);
         await widget.db.deleteNotificationSettings(id!);
@@ -171,10 +174,10 @@ class _EditDrugPage extends State<EditDrug> {
         final DateTime today = DateTime(now.year, now.month, now.day);
 
         if (status! == 'archived' ||
-            (!recurrent! && equalDate(today, parseStringDate(lastDay!)))) {
+            (!recurrent! && today.compareTo(parseStringDate(lastDay!)) == 0)) {
           newStatus = 'archived';
         } else if (today.isAfter(parseStringDate(expirationDate!)) ||
-            equalDate(today, parseStringDate(expirationDate!))) {
+            today.compareTo(parseStringDate(expirationDate!)) == 0) {
           newStatus = 'expired';
         } else if (quantity! <= quantityOffset!) {
           newStatus = 'refill';
@@ -219,9 +222,9 @@ class _EditDrugPage extends State<EditDrug> {
               .scheduleMultiple(hours, id!, name!, dose!, type!, alertsIds);
         }
 
-        if (!recurrent! && newStatus != 'archived') {
+        if (newStatus != 'archived') {
           await widget.notifications.scheduleExpiration(
-              parseStringDate(lastDay!), id!, name!, expirationOffset!);
+              parseStringDate(expirationDate!), id!, name!, expirationOffset!);
         }
 
         successLog("Updated drug on page");
