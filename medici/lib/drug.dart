@@ -124,14 +124,11 @@ class _DrugPage extends State<DrugPage> {
 
       await widget.notifications.scheduleMultiple(
           alertsHours, id!, drug!.name, drug!.dose, drug!.doseType, alertsIds);
-
-      if (!drug!.recurrent) {
-        await widget.notifications.scheduleExpiration(
-            parseStringDate(drug!.lastDay!),
-            id!,
-            drug!.name,
-            drug!.notification.expirationOffset);
-      }
+      await widget.notifications.scheduleExpiration(
+          parseStringDate(drug!.expirationDate),
+          id!,
+          drug!.name,
+          drug!.notification.expirationOffset);
 
       Fluttertoast.showToast(
           msg: "Medicamento desarquivado com sucesso!",
