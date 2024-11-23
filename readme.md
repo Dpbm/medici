@@ -21,6 +21,10 @@ Created to assist users in managing their medications, ensuring that medications
 - Make
 - Vercel
 
+## Demo
+
+[![medici demo](https://img.youtube.com/vi/yl-l_jFLJEI/0.jpg)]([https://www.youtube.com/watch?v=4IgCdR--FIc](https://www.youtube.com/shorts/yl-l_jFLJEI))
+
 ## Screenshots
 
 <p float="left">
