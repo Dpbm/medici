@@ -156,17 +156,25 @@ class _EditDrugPage extends State<EditDrug> {
 
     Future<void> submit() async {
       try {
-        for (final Alert alert in widget.drug.schedule) {
-          await widget.notifications.cancelNotification(alert.id!);
+        final String startingTime = buildTimeString(hour!);
+
+        final bool changedSchedule = startingTime != widget.drug.startingTime ||
+            frequencyString != widget.drug.frequency;
+
+        if (changedSchedule) {
+          for (final Alert alert in widget.drug.schedule) {
+            await widget.notifications.cancelNotification(alert.id!);
+          }
+
+          await widget.db.deleteAlerts(id!);
         }
+
         await widget.notifications
             .cancelNotification(getExpirationNotificationId(id!));
 
-        await widget.db.deleteAlerts(id!);
         await widget.db.deleteNotificationSettings(id!);
 
         final String? leaflet = await getLeaflet(name!);
-        final String startingTime = buildTimeString(hour!);
 
         String newStatus = 'pending';
 
@@ -207,19 +215,21 @@ class _EditDrugPage extends State<EditDrug> {
         await widget.db.updateDrug(data);
         await widget.db.addNotification(notification);
 
-        List<String> hours = getAlerts(hour!, frequency!);
-        List<Alert> alerts = hours
-            .map((hour) => Alert(
-                drugId: id!,
-                time: hour,
-                status: 'pending',
-                lastInteraction: DateTime.now().toIso8601String()))
-            .toList();
-        List<int> alertsIds = await widget.db.addAlerts(alerts);
+        if (changedSchedule) {
+          List<String> hours = getAlerts(hour!, frequency!);
+          List<Alert> alerts = hours
+              .map((hour) => Alert(
+                  drugId: id!,
+                  time: hour,
+                  status: 'pending',
+                  lastInteraction: DateTime.now().toIso8601String()))
+              .toList();
+          List<int> alertsIds = await widget.db.addAlerts(alerts);
 
-        if (newStatus != 'archived') {
-          await widget.notifications
-              .scheduleMultiple(hours, id!, name!, dose!, type!, alertsIds);
+          if (newStatus != 'archived') {
+            await widget.notifications
+                .scheduleMultiple(hours, id!, name!, dose!, type!, alertsIds);
+          }
         }
 
         if (newStatus != 'archived') {

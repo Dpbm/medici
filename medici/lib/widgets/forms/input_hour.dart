@@ -38,14 +38,14 @@ class _InputHour extends State<InputHour> {
     if (!widget.requiredField) return null;
 
     if (value == null || value.isEmpty) {
-      return widget.label + " Inválido";
+      return "${widget.label} Inválido";
     }
     return null;
   }
 
   @override
   Widget build(BuildContext context) {
-    Future<void> _openTimeDialog(event) async {
+    Future<void> openTimeDialog(event) async {
       TimeOfDay? hour = await showTimePicker(
           context: context,
           initialTime: TimeOfDay.now(),
@@ -64,11 +64,11 @@ class _InputHour extends State<InputHour> {
           DateTime(now.year, now.month, now.day, hour.hour, hour.minute);
 
       _hourInputController.text = buildTimeString(selectedTime);
-      widget.callback(hour);
+      widget.callback(selectedTime);
     }
 
     return TapRegion(
-        onTapInside: _openTimeDialog,
+        onTapInside: openTimeDialog,
         child: TextFormField(
           keyboardType: TextInputType.datetime,
           enabled: true,
