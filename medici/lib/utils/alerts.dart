@@ -36,7 +36,7 @@ bool itsTimeToTake(String time) {
 
 bool passedTolerance(String time) {
   final DateTime parsedTime = parseStringTime(time);
-  final int diff = DateTime.now().difference(parsedTime).inMinutes;
+  final int diff = DateTime.now().difference(parsedTime).inHours;
   return diff > timeTolerance;
 }
 
