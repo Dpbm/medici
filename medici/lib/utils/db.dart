@@ -3,6 +3,7 @@ import 'package:medici/models/alert.dart';
 import 'package:medici/models/drug.dart';
 import 'package:medici/models/notification_settings.dart';
 import 'package:medici/utils/alerts.dart';
+import 'package:medici/utils/constants.dart';
 import 'package:medici/utils/debug.dart';
 import 'package:medici/utils/notifications.dart';
 import 'package:path/path.dart';
@@ -152,7 +153,8 @@ class DB {
       final String lastStatus = drug['alert_status'] as String;
       String status = lastStatus;
 
-      if (passedTolerance(time)) {
+      final TimeParser parsedTime = TimeParser.fromString(time);
+      if (parsedTime.passedHoursTolerance(TIME_TOLERANCE)) {
         continue;
       }
 

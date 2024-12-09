@@ -1,8 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:medici/datetime_parser.dart';
 import 'package:medici/models/drug.dart';
-import 'package:medici/utils/alerts.dart';
+import 'package:medici/utils/constants.dart';
 import 'package:medici/utils/db.dart';
 import 'package:medici/utils/debug.dart';
 import 'package:medici/utils/filter_data.dart';
@@ -161,7 +162,8 @@ class _HomePage extends State<Home> {
 
       if (nothingToTake) {
         for (final (index, drug) in drugs.indexed) {
-          if (itsTimeToTake(drug.alert.time)) {
+          if (TimeParser.fromString(drug.alert.time)
+              .passedHoursTolerance(TIME_TOLERANCE)) {
             setState(() {
               drugsToTake[index] = true;
             });

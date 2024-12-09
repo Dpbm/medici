@@ -1,6 +1,5 @@
 import 'package:medici/datetime_parser.dart';
-
-const int timeTolerance = 3;
+import 'package:medici/utils/constants.dart';
 
 List<String> getAlerts(DateTime startingTime, int step) {
   List<String> alerts = [TimeParser(startingTime).getTimeString()];
@@ -26,17 +25,5 @@ int nextHour(int hour, int step) {
 String getAlertStatus(String time) {
   final TimeParser parsedTime = TimeParser.fromString(time);
   final int diff = parsedTime.differenceFromNow().inMinutes;
-  return diff >= 5 && diff <= (timeTolerance * 60) ? 'late' : 'pending';
-}
-
-bool itsTimeToTake(String time) {
-  final TimeParser parsedTime = TimeParser.fromString(time);
-  final int diff = parsedTime.differenceFromNow().inHours;
-  return diff <= timeTolerance && !parsedTime.isFuture();
-}
-
-bool passedTolerance(String time) {
-  final TimeParser parsedTime = TimeParser.fromString(time);
-  final int diff = parsedTime.differenceFromNow().inHours;
-  return diff > timeTolerance;
+  return diff >= 5 && diff <= (TIME_TOLERANCE * 60) ? 'late' : 'pending';
 }

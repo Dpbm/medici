@@ -102,6 +102,11 @@ class TimeParser extends DateTimeParser {
   String getTimeString() {
     return '${_time.hour.toString()}:${_time.minute.toString()}';
   }
+
+  bool passedHoursTolerance(int tolerance) {
+    return !isFuture() ||
+        (isFuture() && differenceFromNow().inHours <= tolerance);
+  }
 }
 
 class DateParser extends DateTimeParser {

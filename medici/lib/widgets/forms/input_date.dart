@@ -47,7 +47,7 @@ class _InputDate extends State<InputDate> {
     Future<void> openDateDialog(event) async {
       DateTime? date = await showDatePicker(
         context: context,
-        firstDate: DateParser.fromNow().getTime(),
+        firstDate: DateTime.now(),
         lastDate: DateTime(2999),
         builder: (BuildContext context, Widget? child) {
           return Theme(
@@ -59,12 +59,10 @@ class _InputDate extends State<InputDate> {
       );
 
       if (date == null) return;
-
       final DateParser selectedDate = DateParser(date);
-
       _textInput.text = selectedDate.getTimeString();
 
-      widget.callback(selectedDate);
+      widget.callback(selectedDate.getTimeString());
     }
 
     return TapRegion(
