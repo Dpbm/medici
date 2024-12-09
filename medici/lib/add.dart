@@ -135,11 +135,20 @@ class _AddPage extends State<Add> {
     }
 
     Future<void> submit() async {
+      String? leaflet;
+      int? drugId;
+      List<String> hours;
+      List<int> alertsIds;
+
       try {
-        final String? leaflet = await getLeaflet(name!);
+        leaflet = await getLeaflet(name!);
+      } catch (error) {
+        logError("Failed on get leaflet", error.toString());
+      }
 
-        final startingTime = buildTimeString(hour);
+      final startingTime = buildTimeString(hour);
 
+      try {
         Drug data = Drug(
             name: name!,
             image: image,
@@ -154,41 +163,25 @@ class _AddPage extends State<Add> {
             frequency: frequencyString,
             startingTime: startingTime);
 
-        final int drugId = await widget.db.addDrug(data);
+        drugId = await widget.db.addDrug(data);
 
         await widget.db.addNotification(NotificationSettings(
             drugId: drugId,
             expirationOffset: expirationOffset,
             quantityOffset: quantityOffset));
 
-        List<String> hours = getAlerts(hour, frequency);
+        hours = getAlerts(hour, frequency);
         List<Alert> alerts = hours
             .map((hour) => Alert(
-                drugId: drugId,
+                drugId: drugId!,
                 time: hour,
                 status: 'pending',
                 lastInteraction: DateTime.now().toIso8601String()))
             .toList();
 
-        List<int> alertsIds = await widget.db.addAlerts(alerts);
-        await widget.notifications
-            .scheduleMultiple(hours, drugId, name!, dose!, type, alertsIds);
-
-        await widget.notifications.scheduleExpiration(
-            parseStringDate(expirationDate!), drugId, name!, expirationOffset);
-
-        Fluttertoast.showToast(
-            msg: "Medicamento adicionado com sucesso!",
-            gravity: ToastGravity.CENTER,
-            backgroundColor: Colors.green,
-            textColor: Colors.white,
-            fontSize: 16.0);
-
-        if (context.mounted) {
-          Navigator.pop(context);
-        }
+        alertsIds = await widget.db.addAlerts(alerts);
       } catch (error) {
-        logError("Failed on Submit data addDrug", error.toString());
+        logError("Failed on add drug data", error.toString());
         Fluttertoast.showToast(
             msg:
                 "Falha ao tentar adicionar o medicamento. Por favor, tente novamente mais tarde!",
@@ -196,6 +189,28 @@ class _AddPage extends State<Add> {
             backgroundColor: Colors.red,
             textColor: Colors.white,
             fontSize: 16.0);
+        return;
+      }
+
+      try {
+        await widget.notifications
+            .scheduleMultiple(hours, drugId, name!, dose!, type, alertsIds);
+
+        await widget.notifications.scheduleExpiration(
+            parseStringDate(expirationDate!), drugId, name!, expirationOffset);
+      } catch (error) {
+        logError("Failed on setup notifications", error.toString());
+      }
+
+      Fluttertoast.showToast(
+          msg: "Medicamento adicionado com sucesso!",
+          gravity: ToastGravity.CENTER,
+          backgroundColor: Colors.green,
+          textColor: Colors.white,
+          fontSize: 16.0);
+
+      if (context.mounted) {
+        Navigator.pop(context);
       }
     }
 
