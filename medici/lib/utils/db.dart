@@ -143,7 +143,6 @@ class DB {
 
       final DateParser expirationDateParsed =
           DateParser.fromString(expirationDate);
-
       if (expirationDateParsed.passedDaysOffset(expirationOffset)) {
         await updateDrugStatus(id, 'expired');
       }

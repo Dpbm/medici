@@ -200,7 +200,6 @@ class _HomePage extends State<Home> {
           await widget.db.getDrugs(widget.notifications);
 
       final List<DrugsScheduling> filteredData = filterData(data);
-
       successLog("Got filtered data successfully at Home Screen");
 
       setState(() {

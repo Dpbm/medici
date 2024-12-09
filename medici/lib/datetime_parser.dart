@@ -1,5 +1,3 @@
-import 'package:medici/utils/debug.dart';
-
 abstract class DateTimeParser {
   late DateTime _time;
   late DateTime _now;
@@ -31,10 +29,6 @@ abstract class DateTimeParser {
     return isEqualTo(_today);
   }
 
-  bool passedToday() {
-    return _today.isAfter(_time);
-  }
-
   DateTime getTime() {
     return _time;
   }
@@ -53,10 +47,6 @@ abstract class DateTimeParser {
 
   Duration differenceFromNow() {
     return _time.difference(_now);
-  }
-
-  Duration differenceFromToday() {
-    return _today.difference(_time);
   }
 
   bool isAtMostToday() {
@@ -104,8 +94,7 @@ class TimeParser extends DateTimeParser {
   }
 
   bool passedHoursTolerance(int tolerance) {
-    return !isFuture() ||
-        (isFuture() && differenceFromNow().inHours <= tolerance);
+    return differenceFromNow().inHours <= tolerance;
   }
 }
 
@@ -121,7 +110,6 @@ class DateParser extends DateTimeParser {
   }
 
   static DateTime parseStringDate(String date) {
-    simpleLog("AAAAA $date");
     final List<int> splitTime =
         date.split('/').map((part) => int.parse(part)).toList();
     return DateTime(splitTime[2], splitTime[1], splitTime[0]);
@@ -132,7 +120,6 @@ class DateParser extends DateTimeParser {
   }
 
   bool passedDaysOffset(int offset) {
-    return !isFuture() ||
-        (isFuture() && differenceFromToday().inDays <= offset);
+    return differenceFromNow().inDays <= offset;
   }
 }

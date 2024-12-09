@@ -207,7 +207,7 @@ class _EditDrugPage extends State<EditDrug> {
         if (status! == 'archived' ||
             (!recurrent! && lastDayTimeParser.isToday())) {
           newStatus = 'archived';
-        } else if (expirationTimeParser.passedToday() ||
+        } else if (expirationTimeParser.isPast() ||
             expirationTimeParser.isToday()) {
           newStatus = 'expired';
         } else if (quantity! <= quantityOffset!) {
