@@ -174,3 +174,12 @@
 ## Leaflet
 
 - [x] fix JWT expiration date
+
+---
+
+## FIXES
+
+- [ ] bug while adding 
+- [ ] bug while updating
+- [ ] time functions
+- [ ] widgets

@@ -1,7 +1,3 @@
-bool passedTime(DateTime baseTime) {
-  return DateTime.now().difference(baseTime).inMinutes >= 4;
-}
-
 DateTime parseStringTime(String time) {
   final List<int> splitTime =
       time.split(':').map((part) => int.parse(part)).toList();
