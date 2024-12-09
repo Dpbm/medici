@@ -24,6 +24,5 @@ int nextHour(int hour, int step) {
 
 String getAlertStatus(String time) {
   final TimeParser parsedTime = TimeParser.fromString(time);
-  final int diff = parsedTime.differenceFromNow().inMinutes;
-  return diff >= 5 && diff <= (TIME_TOLERANCE * 60) ? 'late' : 'pending';
+  return parsedTime.passedHoursTolerance(TIME_TOLERANCE) ? 'late' : 'pending';
 }

@@ -143,6 +143,7 @@ class DB {
 
       final DateParser expirationDateParsed =
           DateParser.fromString(expirationDate);
+
       if (expirationDateParsed.passedDaysOffset(expirationOffset)) {
         await updateDrugStatus(id, 'expired');
       }
@@ -204,7 +205,7 @@ class DB {
       String time, String lastStatus) async {
     final TimeParser parsedLastInteraction =
         TimeParser.fromRaw(lastInteraction);
-    if (parsedLastInteraction.isPast()) {
+    if (parsedLastInteraction.passedAtLeastOneDay()) {
       await updateAlertStatus(alertId, 'pending');
       successLog("Reset the alert status to pending after days!");
       return 'pending';

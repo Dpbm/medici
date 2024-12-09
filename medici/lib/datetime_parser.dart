@@ -64,6 +64,10 @@ abstract class DateTimeParser {
   int getAbsHoursDifferenceFromNow() {
     return differenceFromNow().inHours.abs();
   }
+
+  bool passedAtLeastOneDay() {
+    return differenceFromNow().inDays <= -1;
+  }
 }
 
 class TimeParser extends DateTimeParser {
@@ -94,7 +98,8 @@ class TimeParser extends DateTimeParser {
   }
 
   bool passedHoursTolerance(int tolerance) {
-    return differenceFromNow().inHours <= tolerance;
+    final int diffHours = differenceFromNow().inHours;
+    return diffHours > 0 && diffHours < -tolerance;
   }
 }
 

@@ -63,7 +63,7 @@ class _InputHour extends State<InputHour> {
       final DateTime selectedTime =
           DateTime(now.year, now.month, now.day, hour.hour, hour.minute);
 
-      _hourInputController.text = DateParser(selectedTime).getTimeString();
+      _hourInputController.text = TimeParser(selectedTime).getTimeString();
       widget.callback(selectedTime);
     }
 
