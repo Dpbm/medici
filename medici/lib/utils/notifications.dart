@@ -1,10 +1,9 @@
 import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:medici/utils/alerts.dart';
+import 'package:medici/datetime_parser.dart';
 import 'package:medici/utils/debug.dart';
 import 'package:medici/utils/notifications_ids.dart';
-import 'package:medici/utils/time.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
@@ -154,12 +153,10 @@ class NotificationService {
       return;
     }
 
-    DateTime now = DateTime.now();
-
     for (int i = 0; i < hours.length; i++) {
-      final DateTime time = parseStringTime(hours[i]);
-      DateTime newDate =
-          DateTime(now.year, now.month, now.day, time.hour, time.minute);
+      final TimeParser time = TimeParser.fromString(hours[i]);
+      final DateTime timeData = time.getTime();
+      DateTime newDate = DateTime(0, 0, 0, timeData.hour, timeData.minute);
 
       await scheduleDrug(
           newDate, drugId, drugName, dose, doseType, alertsIds[i]);
@@ -221,18 +218,19 @@ class NotificationService {
       return;
     }
 
-    final DateTime now = DateTime.now();
-    DateTime timeToExpire = now;
+    final DateParser drugExpirationDate = DateParser(time);
+    final TimeParser timeToExpire = TimeParser.fromNow();
     bool isNow = true;
 
-    if (!hasAlreadyExpired(time, expirationOffset)) {
-      timeToExpire = now.add(Duration(days: expirationOffset));
+    if (!drugExpirationDate.passedDaysOffset(expirationOffset)) {
+      timeToExpire.add(Duration(days: expirationOffset));
       isNow = false;
     }
 
     final tz.TZDateTime scheduledTime = tz.TZDateTime.from(
         tz.TZDateTime.from(
-            timeToExpire, // EX: use expiration offset to show this notification x days before the expiration
+            timeToExpire
+                .getTime(), // EX: use expiration offset to show this notification x days before the expiration
             timeZone),
         timeZone);
 
@@ -264,7 +262,7 @@ class NotificationService {
           payload: drugId.toString());
 
       successLog(
-          "Scheduled $drugName Expiration notification to ${timeToExpire.toIso8601String()}");
+          "Scheduled $drugName Expiration notification to ${timeToExpire.getCompleteTimeString()}");
     }
   }
 }

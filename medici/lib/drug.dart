@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:medici/datetime_parser.dart';
 import 'package:medici/models/alert.dart';
 import 'package:medici/models/drug.dart';
 import 'package:medici/utils/db.dart';
 import 'package:medici/utils/debug.dart';
 import 'package:medici/utils/notifications.dart';
 import 'package:medici/utils/notifications_ids.dart';
-import 'package:medici/utils/time.dart';
 import 'package:medici/widgets/app_bar.dart';
 import 'package:medici/widgets/archive_button.dart';
 import 'package:medici/widgets/delete_button.dart';
@@ -125,7 +125,7 @@ class _DrugPage extends State<DrugPage> {
       await widget.notifications.scheduleMultiple(
           alertsHours, id!, drug!.name, drug!.dose, drug!.doseType, alertsIds);
       await widget.notifications.scheduleExpiration(
-          parseStringDate(drug!.expirationDate),
+          DateParser.fromString(drug!.expirationDate).getTime(),
           id!,
           drug!.name,
           drug!.notification.expirationOffset);

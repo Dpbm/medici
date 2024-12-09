@@ -9,7 +9,6 @@ import 'package:medici/utils/debug.dart';
 import 'package:medici/utils/leaflet.dart';
 import 'package:medici/utils/notifications.dart';
 import 'package:medici/utils/notifications_ids.dart';
-import 'package:medici/utils/time.dart';
 import 'package:medici/widgets/app_bar.dart';
 import 'package:medici/widgets/forms/image_area.dart';
 import 'package:medici/widgets/forms/input_hour.dart';
@@ -70,7 +69,7 @@ class _EditDrugPage extends State<EditDrug> {
     expirationOffset = widget.drug.notification.expirationOffset;
     quantityOffset = widget.drug.notification.quantityOffset;
     id = widget.drug.id;
-    hour = parseStringTime(widget.drug.startingTime);
+    hour = TimeParser.fromString(widget.drug.startingTime).getTime();
     frequency = frequencies[frequencyString];
   }
 

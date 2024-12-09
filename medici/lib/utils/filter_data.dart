@@ -1,5 +1,5 @@
+import 'package:medici/datetime_parser.dart';
 import 'package:medici/models/drug.dart';
-import 'package:medici/utils/time.dart';
 
 List<DrugsScheduling> filterData(List<DrugsScheduling> data) {
   List<DrugsScheduling> meds = data;
@@ -57,8 +57,8 @@ int sortByStatus(DrugsScheduling drug1, DrugsScheduling drug2) {
 }
 
 int sortByHour(DrugsScheduling drug1, DrugsScheduling drug2) {
-  final DateTime parsedTime1 = parseStringTime(drug1.alert.time);
-  final DateTime parsedTime2 = parseStringTime(drug2.alert.time);
+  final TimeParser parsedTime1 = TimeParser.fromString(drug1.alert.time);
+  final TimeParser parsedTime2 = TimeParser.fromString(drug2.alert.time);
 
-  return parsedTime1.compareTo(parsedTime2);
+  return parsedTime1.compareTo(parsedTime2.getTime());
 }

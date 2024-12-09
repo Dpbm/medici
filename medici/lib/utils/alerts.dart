@@ -1,16 +1,18 @@
-import 'package:medici/utils/time.dart';
+import 'package:medici/datetime_parser.dart';
 
 const int timeTolerance = 3;
 
 List<String> getAlerts(DateTime startingTime, int step) {
-  List<String> alerts = [buildTimeString(startingTime)];
+  List<String> alerts = [TimeParser(startingTime).getTimeString()];
 
   int currentHour = nextHour(startingTime.hour, step);
-  final DateTime now = DateTime.now();
 
   while (currentHour != startingTime.hour) {
-    alerts.add(buildTimeString(DateTime(
-        now.year, now.month, now.day, currentHour, startingTime.minute)));
+    TimeParser time = TimeParser.fromNow();
+    time.setHour(currentHour);
+    time.setMinute(startingTime.minute);
+
+    alerts.add(time.getTimeString());
     currentHour = nextHour(currentHour, step);
   }
 
@@ -22,26 +24,19 @@ int nextHour(int hour, int step) {
 }
 
 String getAlertStatus(String time) {
-  final DateTime parsedTime = parseStringTime(time);
-  final int diff = DateTime.now().difference(parsedTime).inMinutes;
+  final TimeParser parsedTime = TimeParser.fromString(time);
+  final int diff = parsedTime.differenceFromNow().inMinutes;
   return diff >= 5 && diff <= (timeTolerance * 60) ? 'late' : 'pending';
 }
 
 bool itsTimeToTake(String time) {
-  final DateTime parsedTime = parseStringTime(time);
-  final DateTime now = DateTime.now();
-  final int diff = DateTime.now().difference(parsedTime).inHours;
-  return diff <= timeTolerance && now.compareTo(parsedTime) != -1;
+  final TimeParser parsedTime = TimeParser.fromString(time);
+  final int diff = parsedTime.differenceFromNow().inHours;
+  return diff <= timeTolerance && !parsedTime.isFuture();
 }
 
 bool passedTolerance(String time) {
-  final DateTime parsedTime = parseStringTime(time);
-  final int diff = DateTime.now().difference(parsedTime).inHours;
+  final TimeParser parsedTime = TimeParser.fromString(time);
+  final int diff = parsedTime.differenceFromNow().inHours;
   return diff > timeTolerance;
-}
-
-bool hasAlreadyExpired(DateTime time, int offset) {
-  final DateTime now = DateTime.now();
-  return time.isBefore(time) ||
-      (time.isAfter(now) && time.difference(now).inDays <= offset);
 }

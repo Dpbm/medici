@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:medici/utils/time.dart';
+import 'package:medici/datetime_parser.dart';
 
 class InputHour extends StatefulWidget {
   const InputHour(
@@ -25,7 +25,7 @@ class _InputHour extends State<InputHour> {
   void initState() {
     super.initState();
     _hourInputController.text =
-        buildTimeString(widget.initialValue ?? DateTime.now());
+        TimeParser(widget.initialValue ?? DateTime.now()).getTimeString();
   }
 
   @override
@@ -63,7 +63,7 @@ class _InputHour extends State<InputHour> {
       final DateTime selectedTime =
           DateTime(now.year, now.month, now.day, hour.hour, hour.minute);
 
-      _hourInputController.text = buildTimeString(selectedTime);
+      _hourInputController.text = DateParser(selectedTime).getTimeString();
       widget.callback(selectedTime);
     }
 

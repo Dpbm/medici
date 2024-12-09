@@ -1,8 +1,8 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:medici/datetime_parser.dart';
 import 'package:medici/models/drug.dart';
 import 'package:medici/utils/db.dart';
-import 'package:medici/utils/time.dart';
 
 class DrugCard extends StatelessWidget {
   final DrugsScheduling data;
@@ -20,10 +20,9 @@ class DrugCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DateTime now = DateTime.now();
-    final DateTime drugTime = parseStringTime(data.alert.time);
+    final TimeParser drugTime = TimeParser.fromString(data.alert.time);
+    final int timeDiff = drugTime.getAbsHoursDifferenceFromNow();
 
-    final int timeDiff = drugTime.difference(now).inHours;
     final bool isLate = data.alert.status == 'late';
 
     return GestureDetector(

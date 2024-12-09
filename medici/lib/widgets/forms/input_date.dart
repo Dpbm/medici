@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:medici/utils/time.dart';
+import 'package:medici/datetime_parser.dart';
 
 class InputDate extends StatefulWidget {
   const InputDate(
@@ -37,7 +37,7 @@ class _InputDate extends State<InputDate> {
     if (!widget.requiredField) return null;
 
     if (value == null || value.isEmpty) {
-      return widget.label + " Inválido";
+      return "${widget.label} Inválido";
     }
     return null;
   }
@@ -47,8 +47,7 @@ class _InputDate extends State<InputDate> {
     Future<void> openDateDialog(event) async {
       DateTime? date = await showDatePicker(
         context: context,
-        firstDate: DateTime(
-            DateTime.now().year, DateTime.now().month, DateTime.now().day),
+        firstDate: DateParser.fromNow().getTime(),
         lastDate: DateTime(2999),
         builder: (BuildContext context, Widget? child) {
           return Theme(
@@ -61,11 +60,9 @@ class _InputDate extends State<InputDate> {
 
       if (date == null) return;
 
-      final selectedDate = buildDateString(date);
+      final DateParser selectedDate = DateParser(date);
 
-      if (selectedDate.isEmpty) return;
-
-      _textInput.text = selectedDate;
+      _textInput.text = selectedDate.getTimeString();
 
       widget.callback(selectedDate);
     }

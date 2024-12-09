@@ -181,5 +181,5 @@
 
 - [x] bug while adding 
 - [x] bug while updating
-- [ ] time functions
+- [x] time functions
 - [ ] widgets

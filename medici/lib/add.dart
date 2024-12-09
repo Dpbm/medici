@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:medici/datetime_parser.dart';
 import 'package:medici/models/alert.dart';
 import 'package:medici/models/drug.dart';
 import 'package:medici/models/notification_settings.dart';
@@ -7,7 +8,6 @@ import 'package:medici/utils/alerts.dart';
 import 'package:medici/utils/debug.dart';
 import 'package:medici/utils/leaflet.dart';
 import 'package:medici/utils/notifications.dart';
-import 'package:medici/utils/time.dart';
 import 'package:medici/widgets/app_bar.dart';
 import 'package:medici/widgets/forms/image_area.dart';
 import 'package:medici/widgets/forms/input_hour.dart';
@@ -146,7 +146,7 @@ class _AddPage extends State<Add> {
         logError("Failed on get leaflet", error.toString());
       }
 
-      final startingTime = buildTimeString(hour);
+      final TimeParser startingTime = TimeParser(hour);
 
       try {
         Drug data = Drug(
@@ -161,7 +161,7 @@ class _AddPage extends State<Add> {
             leaflet: leaflet,
             status: 'current',
             frequency: frequencyString,
-            startingTime: startingTime);
+            startingTime: startingTime.getTimeString());
 
         drugId = await widget.db.addDrug(data);
 
@@ -176,7 +176,7 @@ class _AddPage extends State<Add> {
                 drugId: drugId!,
                 time: hour,
                 status: 'pending',
-                lastInteraction: DateTime.now().toIso8601String()))
+                lastInteraction: TimeParser.fromNow().getCompleteTimeString()))
             .toList();
 
         alertsIds = await widget.db.addAlerts(alerts);
@@ -197,7 +197,10 @@ class _AddPage extends State<Add> {
             .scheduleMultiple(hours, drugId, name!, dose!, type, alertsIds);
 
         await widget.notifications.scheduleExpiration(
-            parseStringDate(expirationDate!), drugId, name!, expirationOffset);
+            DateParser.fromString(expirationDate!).getTime(),
+            drugId,
+            name!,
+            expirationOffset);
       } catch (error) {
         logError("Failed on setup notifications", error.toString());
       }

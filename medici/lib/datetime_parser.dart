@@ -11,8 +11,20 @@ abstract class DateTimeParser {
     _today = DateTime(_now.year, _now.month, _now.day);
   }
 
+  int compareTo(DateTime time2) {
+    return _time.compareTo(time2);
+  }
+
+  bool isFuture() {
+    return _now.compareTo(_time) == -1;
+  }
+
+  bool isPast() {
+    return _now.compareTo(_time) == 1;
+  }
+
   bool isEqualTo(DateTime time2) {
-    return _time.compareTo(time2) == 0;
+    return compareTo(time2) == 0;
   }
 
   bool isToday() {
@@ -26,6 +38,42 @@ abstract class DateTimeParser {
   DateTime getTime() {
     return _time;
   }
+
+  void setHour(int hour) {
+    _time = DateTime(_time.year, _time.month, _time.day, hour, _time.minute);
+  }
+
+  void setMinute(int minute) {
+    _time = DateTime(_time.year, _time.month, _time.day, _time.hour, minute);
+  }
+
+  Duration difference(DateTime time2) {
+    return _time.difference(time2);
+  }
+
+  Duration differenceFromNow() {
+    return _time.difference(_now);
+  }
+
+  Duration differenceFromToday() {
+    return _today.difference(_time);
+  }
+
+  bool isAtMostToday() {
+    return isToday() || isPast();
+  }
+
+  void add(Duration amount) {
+    _time.add(amount);
+  }
+
+  String getCompleteTimeString() {
+    return _time.toIso8601String();
+  }
+
+  int getAbsHoursDifferenceFromNow() {
+    return differenceFromNow().inHours.abs();
+  }
 }
 
 class TimeParser extends DateTimeParser {
@@ -37,6 +85,10 @@ class TimeParser extends DateTimeParser {
 
   factory TimeParser.fromString(String time) {
     return TimeParser(parseStringTime(time));
+  }
+
+  factory TimeParser.fromRaw(String time) {
+    return TimeParser(DateTime.parse(time));
   }
 
   static DateTime parseStringTime(String time) {
@@ -72,5 +124,10 @@ class DateParser extends DateTimeParser {
 
   String getTimeString() {
     return '${_time.day}/${_time.month}/${_time.year}';
+  }
+
+  bool passedDaysOffset(int offset) {
+    return !isFuture() ||
+        (isFuture() && differenceFromToday().inDays <= offset);
   }
 }

@@ -1,10 +1,10 @@
+import 'package:medici/datetime_parser.dart';
 import 'package:medici/models/alert.dart';
 import 'package:medici/models/drug.dart';
 import 'package:medici/models/notification_settings.dart';
 import 'package:medici/utils/alerts.dart';
 import 'package:medici/utils/debug.dart';
 import 'package:medici/utils/notifications.dart';
-import 'package:medici/utils/time.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -139,8 +139,11 @@ class DB {
 
       final String expirationDate = drug['expiration_date'] as String;
       final int expirationOffset = drug['expiration_offset'] as int;
-      if (hasAlreadyExpired(
-          parseStringDate(expirationDate), expirationOffset)) {
+
+      final DateParser expirationDateParsed =
+          DateParser.fromString(expirationDate);
+
+      if (expirationDateParsed.passedDaysOffset(expirationOffset)) {
         await updateDrugStatus(id, 'expired');
       }
 
@@ -183,9 +186,8 @@ class DB {
 
   Future<bool> archiveOnLastDay(String lastDay,
       NotificationService notifications, int drugId, List<int> alerts) async {
-    final DateTime now = DateTime.now();
-    if (!equalDate(
-        DateTime(now.year, now.month, now.day), parseStringDate(lastDay))) {
+    final DateParser lastDayParsed = DateParser.fromString(lastDay);
+    if (!lastDayParsed.isAtMostToday()) {
       simpleLog("$drugId is not on its last day!");
       return false;
     }
@@ -199,7 +201,9 @@ class DB {
 
   Future<String> autoUpdateStatus(String lastInteraction, int alertId,
       String time, String lastStatus) async {
-    if (passedAtLeastOneDay(DateTime.parse(lastInteraction))) {
+    final TimeParser parsedLastInteraction =
+        TimeParser.fromRaw(lastInteraction);
+    if (parsedLastInteraction.isPast()) {
       await updateAlertStatus(alertId, 'pending');
       successLog("Reset the alert status to pending after days!");
       return 'pending';
@@ -252,7 +256,11 @@ class DB {
 
     final String expirationDate = drugData['expiration_date'] as String;
     final int expirationOffset = notificationData['expiration_offset'] as int;
-    if (hasAlreadyExpired(parseStringDate(expirationDate), expirationOffset)) {
+
+    final DateParser expirationDateParsed =
+        DateParser.fromString(expirationDate);
+
+    if (expirationDateParsed.passedDaysOffset(expirationOffset)) {
       await updateDrugStatus(id, 'expired');
       drugStatus = 'expired';
     }
