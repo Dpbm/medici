@@ -182,4 +182,3 @@
 - [x] bug while adding 
 - [x] bug while updating
 - [x] time functions
-- [ ] widgets
