@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:medici/datetime_parser.dart';
 import 'package:medici/models/alert.dart';
 import 'package:medici/models/drug.dart';
 import 'package:medici/models/notification_settings.dart';
@@ -155,37 +156,60 @@ class _EditDrugPage extends State<EditDrug> {
     }
 
     Future<void> submit() async {
-      try {
-        final String startingTime = buildTimeString(hour!);
+      final TimeParser startingTime = TimeParser(hour!);
+      final TimeParser oldStartingTime =
+          TimeParser.fromString(widget.drug.startingTime);
 
-        final bool changedSchedule = startingTime != widget.drug.startingTime ||
-            frequencyString != widget.drug.frequency;
+      final bool changedSchedule =
+          !startingTime.isEqualTo(oldStartingTime.getTime()) ||
+              frequencyString != widget.drug.frequency;
 
-        if (changedSchedule) {
+      if (changedSchedule) {
+        try {
           for (final Alert alert in widget.drug.schedule) {
             await widget.notifications.cancelNotification(alert.id!);
           }
 
           await widget.db.deleteAlerts(id!);
+        } catch (error) {
+          logError("Failed on clear drug alerts", error.toString());
         }
+      }
 
+      try {
         await widget.notifications
             .cancelNotification(getExpirationNotificationId(id!));
 
         await widget.db.deleteNotificationSettings(id!);
+      } catch (error) {
+        logError("Failed on delete notification settings", error.toString());
+      }
 
-        final String? leaflet = await getLeaflet(name!);
+      String? leaflet;
+      List<String> hours = [];
+      List<int> alertsIds = [];
+      String newStatus = 'pending';
 
-        String newStatus = 'pending';
+      DateParser? lastDayTimeParser = DateParser.fromNow();
 
-        final DateTime now = DateTime.now();
-        final DateTime today = DateTime(now.year, now.month, now.day);
+      if (!recurrent!) {
+        lastDayTimeParser = DateParser.fromString(lastDay!);
+      }
 
+      DateParser expirationTimeParser = DateParser.fromString(expirationDate!);
+
+      try {
+        leaflet = await getLeaflet(name!);
+      } catch (error) {
+        logError("failed on get leaflet", error.toString());
+      }
+
+      try {
         if (status! == 'archived' ||
-            (!recurrent! && today.compareTo(parseStringDate(lastDay!)) == 0)) {
+            (!recurrent! && lastDayTimeParser.isToday())) {
           newStatus = 'archived';
-        } else if (today.isAfter(parseStringDate(expirationDate!)) ||
-            today.compareTo(parseStringDate(expirationDate!)) == 0) {
+        } else if (expirationTimeParser.passedToday() ||
+            expirationTimeParser.isToday()) {
           newStatus = 'expired';
         } else if (quantity! <= quantityOffset!) {
           newStatus = 'refill';
@@ -204,7 +228,7 @@ class _EditDrugPage extends State<EditDrug> {
           leaflet: leaflet,
           status: newStatus,
           frequency: frequencyString!,
-          startingTime: startingTime,
+          startingTime: startingTime.getTimeString(),
         );
 
         NotificationSettings notification = NotificationSettings(
@@ -216,7 +240,7 @@ class _EditDrugPage extends State<EditDrug> {
         await widget.db.addNotification(notification);
 
         if (changedSchedule) {
-          List<String> hours = getAlerts(hour!, frequency!);
+          hours = getAlerts(hour!, frequency!);
           List<Alert> alerts = hours
               .map((hour) => Alert(
                   drugId: id!,
@@ -224,30 +248,7 @@ class _EditDrugPage extends State<EditDrug> {
                   status: 'pending',
                   lastInteraction: DateTime.now().toIso8601String()))
               .toList();
-          List<int> alertsIds = await widget.db.addAlerts(alerts);
-
-          if (newStatus != 'archived') {
-            await widget.notifications
-                .scheduleMultiple(hours, id!, name!, dose!, type!, alertsIds);
-          }
-        }
-
-        if (newStatus != 'archived') {
-          await widget.notifications.scheduleExpiration(
-              parseStringDate(expirationDate!), id!, name!, expirationOffset!);
-        }
-
-        successLog("Updated drug on page");
-
-        Fluttertoast.showToast(
-            msg: "Medicamento atualizado com sucesso!",
-            gravity: ToastGravity.CENTER,
-            backgroundColor: Colors.green,
-            textColor: Colors.white,
-            fontSize: 16.0);
-
-        if (context.mounted) {
-          Navigator.pop(context);
+          alertsIds = await widget.db.addAlerts(alerts);
         }
       } catch (error) {
         logError("Failed during updating drug on page", error.toString());
@@ -258,6 +259,38 @@ class _EditDrugPage extends State<EditDrug> {
             backgroundColor: Colors.red,
             textColor: Colors.white,
             fontSize: 16.0);
+        return;
+      }
+
+      if (changedSchedule && newStatus != 'archived') {
+        try {
+          await widget.notifications
+              .scheduleMultiple(hours, id!, name!, dose!, type!, alertsIds);
+        } catch (error) {
+          logError("failed on schedule drugs", error.toString());
+        }
+      }
+
+      if (newStatus != 'archived') {
+        try {
+          await widget.notifications.scheduleExpiration(
+              expirationTimeParser.getTime(), id!, name!, expirationOffset!);
+        } catch (error) {
+          logError("Failed on schedule expiration!", error.toString());
+        }
+      }
+
+      successLog("Updated drug on page");
+
+      Fluttertoast.showToast(
+          msg: "Medicamento atualizado com sucesso!",
+          gravity: ToastGravity.CENTER,
+          backgroundColor: Colors.green,
+          textColor: Colors.white,
+          fontSize: 16.0);
+
+      if (context.mounted) {
+        Navigator.pop(context);
       }
     }
 

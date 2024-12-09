@@ -179,7 +179,7 @@
 
 ## FIXES
 
-- [ ] bug while adding 
-- [ ] bug while updating
+- [x] bug while adding 
+- [x] bug while updating
 - [ ] time functions
 - [ ] widgets
